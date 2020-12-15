@@ -1,0 +1,11 @@
+*.pyc
+.vscode
+.ipynb_checkpoints
+
+venv
+__pycache__
+hidden*
+archive
+
+
+/site
