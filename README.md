@@ -8,7 +8,7 @@ I typically use an ESP32 for all MicroPython scripts.
 
 I don't have a lot of time to maintain/update/improve this resository. I'm trying to keep all my new code here, and as I have time I'm going back and adding old code (from older projects).
 
-Feel free to use the code however you like. If it is a great benefit to you, send me something nice, like money or a nice bottle of wine.
+Feel free to use the code however you like. If it is a great benefit to you, be sure to send me something nice, like money or a bottle of wine (or at least a message).
 
 Cheers,
 
