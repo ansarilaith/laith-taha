@@ -1,6 +1,6 @@
 # YouTube Projects Code
 
-This is a repository for code used in various projects from my YouTube channel [ClaytonDarwin](https://www.youtube.com/claytondarwin).
+This is a repository to host the code used I use in projects from my YouTube channel [ClaytonDarwin](https://www.youtube.com/claytondarwin).
 
 I use a Debian Linux based desktop computer for testing/running all the Python scripts. I have no way of knowing if any of these scripts will work on Windows and/or Mac OS X.
 
