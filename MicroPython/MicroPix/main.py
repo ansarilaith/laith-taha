@@ -32,24 +32,24 @@ try:
 
         mp.clear()
         time.sleep_ms(250)
-        mp.scroll_text('merry'    ,16+32,3-32,16-32,3+32,True,True,'white',pause=80)
+        mp.scroll_text('merry',16+32,3-32,16-32,3+32,True,True,'white',pause=80)
         time.sleep_ms(250)
-        mp.scroll_text('merry'    ,16-32,3-32,16+32,3+32,True,True,'white',pause=80)
+        mp.scroll_text('merry',16-32,3-32,16+32,3+32,True,True,'white',pause=80)
         time.sleep_ms(250)
-        mp.scroll_text('christmas',16+64,3-0,16-64,3+0,True,True,'green',pause=60)
+        mp.scroll_text('christmas',16+64,3,16-64,3,True,True,'green',pause=60)
         time.sleep_ms(250)
 
-        mp.scroll_text('from',16,3-32,16,3,True,True,'red',pause=80)
-        mp.place_text('from',16,3,True,True,'red',write=True)
+        mp.scroll_text('to',16,3-32,16,3,True,True,'red',pause=80)
+        mp.place_text('to',16,3,True,True,'red',write=True)
         time.sleep_ms(500)
-        mp.scroll_text('from',16,3,16,3+32,True,True,'red',pause=80)
+        mp.scroll_text('to',16,3,16,3+32,True,True,'red',pause=80)
         time.sleep_ms(250)
 
-        mp.scroll_text('me'  ,16+0,3+16,16-0,3+0,True,True,'blue',pause=80)
-        mp.place_text('me'  ,16,3,True,True,'blue',write=True)
+        mp.scroll_text('you',16,3+16,16,3,True,True,'blue',pause=80)
+        mp.place_text('you' ,16,3,True,True,'blue',write=True)
         time.sleep_ms(500)
 
-        # clear with snow (one in ieach col)
+        # clear with snow (one in each col)
         cols = [(random(),x) for x in range(32)]
         cols.sort()
         for _,x in cols:
@@ -61,9 +61,14 @@ try:
             time.sleep_ms(12)
 
         # then do random snow
-        cols = [1]*32 # depth of snow
-        for _ in range(64):
+        flakes = 64
+        cols = [1]*32
+        while flakes:
             x = randint(0,31)
+            if x != 0 and cols[x] - cols[x-1] > 1:
+                x -= 1
+            elif x != 31 and cols[x] - cols[x+1] > 1:
+                x += 1
             d = cols[x] # depth in col
             if d < 8:
                 f = 7-d # fall distance
@@ -74,15 +79,7 @@ try:
                 mp.setxy(x,f,'white',write=True)
                 cols[x] += 1
                 time.sleep_ms(12)
-        
-        
-        
-
-        
-
-
-
-    
+                flakes -= 1
 
 #-----------------------
 # end testing catch
