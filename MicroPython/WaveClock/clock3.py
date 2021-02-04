@@ -129,7 +129,8 @@ class CLOCK:
         for x in range(10):
             try:
                 # IMPORTANT: there is no guarantee I won't kill this service
-                headers,response = wget('http://symple.design/cgi-bin/ztime.py?TZ=New_York',None,True,True,1024)
+                # this should be changed to use urequests not that it is available
+                headers,response = wget('http://claytondarwin.com/cgi-bin/ztime.py?TZ=New_York',None,True,True,1024)
                 response = response.strip().split(b'\n')[-1]
                 year,month,day,hour,minute,second = [int(x) for x in response.split()[:6]]
                 self.rtc.datetime((year,month,day,None,hour,minute,second,0))

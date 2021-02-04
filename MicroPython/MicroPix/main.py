@@ -25,61 +25,93 @@ try:
     import micropix
     from urandom import random,randint
 
-    mp = micropix.MicroPix(21,4,1)
+    mp = micropix.MicroPix(21,2,2)
     mp.set_bright(8)
+    mp.make_xy2it()
 
-    while 1:
+    def snow(colors=['white'],
+             loops=-1,
+             depth=3,
+             layers=2,
+             speed=16,
+             melt=True):
 
-        mp.clear()
-        time.sleep_ms(250)
-        mp.scroll_text('merry',16+32,3-32,16-32,3+32,True,True,'white',pause=80)
-        time.sleep_ms(250)
-        mp.scroll_text('merry',16-32,3-32,16+32,3+32,True,True,'white',pause=80)
-        time.sleep_ms(250)
-        mp.scroll_text('christmas',16+64,3,16-64,3,True,True,'green',pause=60)
-        time.sleep_ms(250)
+        # get colors
+        black = mp.get_color('black')
+        colors = [mp.get_color(c) for c in colors]
+        clen = len(colors)
 
-        mp.scroll_text('to',16,3-32,16,3,True,True,'red',pause=80)
-        mp.place_text('to',16,3,True,True,'red',write=True)
-        time.sleep_ms(500)
-        mp.scroll_text('to',16,3,16,3+32,True,True,'red',pause=80)
-        time.sleep_ms(250)
+        # loop prep
+        cols = [0]*mp.pixelx
+        flakes = mp.pixelx*depth
+        history = []
 
-        mp.scroll_text('you',16,3+16,16,3,True,True,'blue',pause=80)
-        mp.place_text('you' ,16,3,True,True,'blue',write=True)
-        time.sleep_ms(500)
+        # main loop
+        while loops:
+            loops -= 1
 
-        # clear with snow (one in each col)
-        cols = [(random(),x) for x in range(32)]
-        cols.sort()
-        for _,x in cols:
-            for y in range(7):
-                mp.setxy(x,y,'white',write=True)
-                mp.setxy(x,y,'black',write=False)
-                time.sleep_ms(12)
-            mp.setxy(x,7,'white',write=True)
-            time.sleep_ms(12)
+            # select color
+            if clen == 1:
+                color = colors[0]
+            while 1:
+                color = colors[randint(0,clen-1)]
+                if color not in history:
+                    break
+            history.append(color)
+            history = history[-layers:]
 
-        # then do random snow
-        flakes = 64
-        cols = [1]*32
-        while flakes:
-            x = randint(0,31)
-            if x != 0 and cols[x] - cols[x-1] > 1:
-                x -= 1
-            elif x != 31 and cols[x] - cols[x+1] > 1:
-                x += 1
-            d = cols[x] # depth in col
-            if d < 8:
-                f = 7-d # fall distance
-                for y in range(f):
-                    mp.setxy(x,y,'white',write=True)
-                    mp.setxy(x,y,'black',write=False)
-                    time.sleep_ms(12)
-                mp.setxy(x,f,'white',write=True)
-                cols[x] += 1
-                time.sleep_ms(12)
-                flakes -= 1
+            # color loop
+            for f in range(flakes):
+
+                # snow
+                x = randint(0,mp.pixelx-1)
+                if x != 0 and cols[x] - cols[x-1] > 1:
+                    x -= 1
+                elif x != mp.pixelx-1 and cols[x] - cols[x+1] > 1:
+                    x += 1
+                d = cols[x] # depth in col
+                if d < mp.pixely:
+                    f = mp.pixelx-1-d # fall distance
+                    for y in range(f):
+                        mp.setxy(x,y,color,cfixed=True,write=True)
+                        mp.setxy(x,y,black,cfixed=True,write=False)
+                        time.sleep_ms(speed)
+                    mp.setxy(x,f,color,cfixed=True,write=True)
+                    cols[x] += 1
+                    time.sleep_ms(speed)
+
+                # melt
+                if melt:
+
+                    # select old colors for deletion
+                    xs = []
+                    for x in range(mp.pixelx):
+                        c = mp.geti(mp.xy2i(x,mp.pixely-1))
+                        if (c != black) and (c not in history):
+                            xs.append(x)
+                    if xs:
+                        x = xs[randint(0,len(xs)-1)]
+                        depth = cols[x]
+                        for y in range(mp.pixely-1,mp.pixely-depth-1,-1):
+                            color2 = mp.geti(mp.xy2i(x,y))
+                            mp.setxy(x,y+1,color2,cfixed=True,write=False)
+                        mp.setxy(x,mp.pixely-depth,black,cfixed=True,write=False)
+                        cols[x] -= 1
+                        mp.write()
+                        time.sleep_ms(speed)
+
+    colors = ['green', 'greener', 'lime', 'chartreuse', 'yellow', 'sunflower', 'orange', 'pumpkin', 'tomato', 'red', 'rose', 'fuchsia', 'magenta', 'pinker', 'pink', 'violet', 'ultra', 'indigo', 'blue', 'water', 'sky', 'azure', 'cyan', 'aqua', 'mint', 'grass']
+
+##    while 1:
+##        for c in ['red','blue','green']:
+##            mp.setxy(15,15,c,write=True)
+##            time.sleep_ms(100)
+##            mp.setxy(15,15,'black',write=True)
+##            time.sleep_ms(100)
+
+
+
+    snow(colors)
 
 #-----------------------
 # end testing catch

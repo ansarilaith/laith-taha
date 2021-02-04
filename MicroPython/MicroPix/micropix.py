@@ -53,6 +53,9 @@ class MicroPix:
     # x axis positive is to the RIGHT
     # y axis positive is DOWN
 
+    # index table lookup from x,y
+    xy2it = []
+
     #-----------------------
     # color values
     #-----------------------
@@ -60,26 +63,33 @@ class MicroPix:
     # GRB bold colors
     colors = {
         'black':(0,0,0),
-        'off':(0,0,0),
-        'blue':(0,0,255),
-        'deeppurple':(0,32,255),
-        'purple':(0,127,255),
-        'red':(0,255,0),
-        'deeppink':(0,255,32),
-        'pink':(0,255,127),
-        'magenta':(0,255,255),
-        'deepbluegatoraide':(32,0,255),
-        'electricpumpkin':(32,255,0),
-        'bluegatoraide':(127,0,255),
-        'orange':(127,255,0),
+        'white':(255,255,225),
         'green':(255,0,0),
-        'electricmint':(255,0,32),
-        'aqua':(255,0,127),
+        'greener':(255,32,0),
+        'lime':(255,64,0),
+        'chartreuse':(255,128,0),
+        'yellow':(225,255,0),
+        'sunflower':(128,255,0),
+        'orange':(64,255,0),
+        'pumpkin':(32,255,0),
+        'tomato':(16,255,0),
+        'red':(0,255,0),
+        'rose':(0,255,16),
+        'fuchsia':(0,255,32),
+        'magenta':(0,255,64),
+        'pinker':(0,255,128),
+        'pink':(0,255,255),
+        'violet':(0,128,255),
+        'ultra':(0,64,255),
+        'indigo':(0,32,255),
+        'blue':(0,0,255),
+        'water':(32,0,255),
+        'sky':(64,0,255),
+        'azure':(128,0,255),
         'cyan':(255,0,255),
-        'electriclime':(255,32,0),
-        'greenyellow':(255,127,0),
-        'yellow':(255,255,0),
-        'white':(255,255,255),
+        'aqua':(255,0,128),
+        'mint':(255,0,64),
+        'grass':(255,0,32),
         }
 
     # get GBR bytearray
@@ -151,46 +161,91 @@ class MicroPix:
         color = self.get_color(color,bright)
 
         for x in range(self.pixels):
-            self.set(x,color)
+            self.seti(x,color)
 
         if write:
             self.write()
-       
-    # set a pixel
-    def set(self,pixel,color):
-        self.array[pixel*3:pixel*3+3] = color
+
+    # get index from xy
+    def xy2i(self,x,y):
+        # 1) pannels above current row of pannels
+        #    64 * self.panelx * (y//8)
+        # 2) pannels before working pannel
+        #    64 * (x//8)
+        # 3) rows on current pannel above working row
+        #    8 * (y%8)
+        # 4) pixels before given pixel
+        #    x%8
+        # 5) everything combined
+        return 64 * self.panelx * (y//8) + 64 * (x//8) + 8 * (y%8) + x%8
+      
+    # set a pixel at index to color
+    def seti(self,index,color):
+        self.array[index*3:index*3+3] = color
+
+    # get color of pixel at index
+    def geti(self,index):
+        return self.array[index*3:index*3+3]
+
+    # build a table of locations
+    def make_xy2it(self):
+        for x in range(self.pixelx):
+            self.xy2it.append([self.xy2i(x,y) for y in range(self.pixely)])
 
     # set a pixel at (x,y)
     def setxy(self,x,y,color='red',bright=0,cfixed=False,write=False):
 
-        # 1) pannels above current row of pannels
-        #    64 * self.panelx * (y//8)
+        # x and y within range
+        if 0 <= x < self.pixelx and 0 <= y < self.pixely:
 
-        # 2) pannels before working pannel
-        #    64 * (x//8)
-        
-        # 3) rows on current pannel above working row
-        #    8 * (y%8)
+            # use xy2i table
+            if self.xy2it:
+                index = self.xy2it[x][y]
 
-        # 4) pixels before given pixel
-        #    x%8
-
-        # 5) everything combined
-        pixel = 64 * self.panelx * (y//8) + 64 * (x//8) + 8 * (y%8) + x%8
-
-        # insure correct range
-        if 0 <= pixel <= (self.pixels-1):
-
+            # calculate
+            else:
+                index = self.xy2i(x,y)
+                
             # get color
             if not cfixed:
                 color = self.get_color(color)
 
             # set
-            self.set(pixel,color)
+            self.seti(index,color)
 
             # write
             if write:
                 self.write()
+            
+
+##        # 1) pannels above current row of pannels
+##        #    64 * self.panelx * (y//8)
+##
+##        # 2) pannels before working pannel
+##        #    64 * (x//8)
+##        
+##        # 3) rows on current pannel above working row
+##        #    8 * (y%8)
+##
+##        # 4) pixels before given pixel
+##        #    x%8
+##
+##        # 5) everything combined
+##        pixel = 64 * self.panelx * (y//8) + 64 * (x//8) + 8 * (y%8) + x%8
+##
+##        # insure correct range
+##        if 0 <= pixel <= (self.pixels-1):
+##
+##            # get color
+##            if not cfixed:
+##                color = self.get_color(color)
+##
+##            # set
+##            self.seti(pixel,color)
+##
+##            # write
+##            if write:
+##                self.write()
 
     #-----------------------
     # draw functions
