@@ -22,10 +22,10 @@ class OpenSocket_Server:
     # creates server socket
     # accepts client sockets 1 at a time
     # opens client socket, keeps it open
-    # accepts lines of data delineated by b'\r\n'
+    # accepts lines of data delineated by self.line_end = b'\r\n'
     # sends each line to OpenSocket_Server.application
     # sends application return value (should be a line) to client socket
-    # repeat until receiving b'EOD\r\n' from client, or a timeout, or a crash
+    # repeat until receiving b'EOD' + self.line_end from client, or a timeout, or a crash
     # sends b'EOD\r\n' to client socket
     # accepts next client socket
 
@@ -59,6 +59,7 @@ class OpenSocket_Server:
     server_host = '0.0.0.0'
     server_port = 8765
     client_timeout = 10 # seconds after last data received
+    line_end = b'\r\n'
 
     # EXAMPLE APPLICATION (should be replaced by user application)
     # this just bounces the input line back to the server
@@ -168,7 +169,7 @@ class OpenSocket_Server:
                                 # timeout period since last read passed
                                 if time.ticks_diff(time.ticks_ms(),timeout) >= 0:
                                     print('TIMEOUT: {} seconds since last data.'.format(self.client_timeout))
-                                    bytes_out += client_socket.write(b'TIMEOUT\r\n')
+                                    bytes_out += client_socket.write(b'TIMEOUT'+self.line_end)
                                     break
 
                                 # wait and try again
@@ -183,10 +184,10 @@ class OpenSocket_Server:
                                 buffer += data
 
                                 # parse buffer
-                                if b'\r\n' in buffer:
+                                if self.line_end in buffer:
 
                                     # split (last item won't be a full line)
-                                    buffer = buffer.split(b'\r\n')
+                                    buffer = buffer.split(self.line_end)
 
                                     # process lines in buffer
                                     for line in buffer[:-1]:
@@ -198,7 +199,7 @@ class OpenSocket_Server:
                                             response = self.application(b'PING')
                                             if type(response) != bytes:
                                                 response = bytes(str(response),'utf-8')
-                                            bytes_out += client_socket.write(response.strip()+b'\r\n')
+                                            bytes_out += client_socket.write(response.strip()+self.line_end)
 
                                         # end of data (don't notify client or app here)
                                         elif line in (b'EOD',b'eod'):
@@ -211,7 +212,7 @@ class OpenSocket_Server:
                                             if type(response) != bytes:
                                                 response = bytes(str(response),'utf-8')
                                             lineid = bytes('L{} '.format(lc),'ascii')
-                                            bytes_out += client_socket.write(lineid+response.strip()+b'\r\n')
+                                            bytes_out += client_socket.write(lineid+response.strip()+self.line_end)
 
                                     # reset line buffre
                                     buffer = buffer[-1]
@@ -230,10 +231,10 @@ class OpenSocket_Server:
                             if type(response) != bytes:
                                 response = bytes(str(response),'utf-8')
                             lineid = bytes('L{} '.format(lc),'ascii')
-                            bytes_out += client_socket.write(lineid+response.strip()+b'\r\n')
+                            bytes_out += client_socket.write(lineid+response.strip()+self.line_end)
 
                         # send EOD to client
-                        bytes_out += client_socket.write(b'EOD\r\n')
+                        bytes_out += client_socket.write(b'EOD'+self.line_end)
 
                     # catch client socket errors
                     except OSError as e:

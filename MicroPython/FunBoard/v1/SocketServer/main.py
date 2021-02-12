@@ -53,8 +53,8 @@ while 1:
 
     # network connect
     # these are placeholders, use your own
-    essid = 'DARWIN-NET-X'
-    essid_password = 'claytondarwinsecretpassword' 
+    essid = 'DARWIN-NET-3'
+    essid_password = 'claytondarwin' 
     wlan_connect(essid,essid_password,timeout=15)
 
     # server setup
@@ -62,7 +62,8 @@ while 1:
     server.server_host = '0.0.0.0'
     server.server_port = 8888
     server.client_timeout = 10
-    server.application = application    
+    server.application = application
+    server.line_end = b'\n'
 
     # server start
     try:
