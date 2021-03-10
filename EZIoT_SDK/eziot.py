@@ -6,7 +6,13 @@
 # user variables
 #----------------------------------------------
 
-api_key = 'EXAMPLE'
+# the default key and secret "EXAMPLE" is a user
+# that everybody can use to test things out
+
+# you will need to use get_creds() to get your
+# own account (unless you just like sharing)
+
+api_key = 'EXAMPLE' 
 api_secret = 'EXAMPLE'
 api_version = 1
 
@@ -15,7 +21,6 @@ api_version = 1
 #----------------------------------------------
 
 api_base_path = 'https://eziot.link/api'
-api_base_path = 'http://localhost:8888/api'
 
 #----------------------------------------------
 # imports
