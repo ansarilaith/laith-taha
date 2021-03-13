@@ -14,7 +14,7 @@
 
 api_key = 'EXAMPLE' 
 api_secret = 'EXAMPLE'
-api_version = 1
+api_version = 1.0
 
 #----------------------------------------------
 # general variables
@@ -313,6 +313,20 @@ def _make_request(route,data={},timeout=10):
 # user credentials functions 
 #----------------------------------------------
 
+def delete_creds():
+
+    print('\nWARNING: This permanently DELETE your account and ALL data!')
+    if not prompt('Do you really want to DELETE your credentials?',True):
+        print('Okay. Closing credentials script.')
+        return
+    code,jdata = _make_request('creds/delete',{'delete':True})
+    if not jdata.get('success',False):
+        print('Something went wrong: {}'.format(jdata.get('message','unknown error')))
+        print('Try again later.')
+        return
+    else:
+        print('Your credentials and all data have been deleted.')
+
 def get_creds():
     '''Get your own credentials based on your email.
     Verification data and credentials are sent to your email.
@@ -329,7 +343,7 @@ def get_creds():
 
     # check email
     print('Checking email...')
-    code,jdata = _make_request('creds',{'email':email,'action':'check'})
+    code,jdata = _make_request('creds/get',{'email':email,'action':'check'})
     known = jdata.get('success',False)
 
     # known email options
@@ -337,7 +351,7 @@ def get_creds():
         print('EZIot knows this email.')
         print('You can resend or reset your credentials.')
         if prompt('Do you want to RESEND your credentials?',True):
-            code,jdata = _make_request('creds',{'email':email,'action':'resend'})
+            code,jdata = _make_request('creds/get',{'email':email,'action':'resend'})
             if not jdata.get('success',False):
                 if '429' in jdata.get('message',''):
                     print('You can only resend every 10 minutes.')
@@ -350,7 +364,7 @@ def get_creds():
         elif prompt('Do you want to RESET your credentials?',True):
             print('If you reset, you will have to change the the credentials in all your device.')
             if prompt('Are you sure you want to RESET your credentials?',True):
-                code,jdata = _make_request('creds',{'email':email,'action':'reset'})
+                code,jdata = _make_request('creds/get',{'email':email,'action':'reset'})
                 if not jdata.get('success',False):
                     if '429' in jdata.get('message',''):
                         print('You can only reset every 10 minutes.')
@@ -375,7 +389,7 @@ def get_creds():
             print('Okay. Closing credentials script.')
             return
         print("\nOkay. I'm requesting a validation code...")
-        code,jdata = _make_request('creds',{'email':email,'action':'new'})
+        code,jdata = _make_request('creds/get',{'email':email,'action':'new'})
         if not jdata.get('success',False):
             print('Something went wrong: {}'.format(jdata.get('message','unknown error')))
             print('Try again later.')
@@ -383,7 +397,7 @@ def get_creds():
         print('A validation code has been sent to your email address.')
         vcode = prompt('What is the validation code?')
         print("I'm checking the code...")
-        code,jdata = _make_request('creds',{'email':email,'action':'new','code':vcode})
+        code,jdata = _make_request('creds/get',{'email':email,'action':'new','code':vcode})
         if not jdata.get('success',False):
             print('Something went wrong: {}'.format(jdata.get('message','unknown error')))
             print('Try again later.')
