@@ -72,11 +72,11 @@ Here are some simple examples you can try using your desktop or the MicroPython 
 
 ```python
 # assuming you have Python open and eziot.py on the import path
->>> import eziot
->>> eziot.post_data('my_group','my_device','hello from me')
+>>> import eziot # import module
+>>> eziot.post_data('my_group','my_device','hello from me') # post data group, device, and data1
 2 # this is the rowid of the post
 >>> for x in range(3):
-...     eziot.post_data('my_group','my_device','hello from me',x)
+...     eziot.post_data('my_group','my_device','hello from me',x) # also posting to x to data2
 ... 
 3 # rowid
 4 # rowid
@@ -101,17 +101,34 @@ Here are some simple examples you can try using your desktop or the MicroPython 
 [1, 1615761087, '2021-03-14 22:31:27', '67.140.214.0', 'clayton', 'example', 'hello', 'this is rowid 1', 1, 'you cannot delete this']
 >>> 
 ```
-
-
-
-
-
-
-
-
-
 ## Getting an Account
 
+The example account is good for testing, but it's mixing the data from everyone. So next you will want get an account of your own. This is done using the SDK.
+
+Start by opening a Python or MicroPython REPL prompt, then do the following:
+```python
+# assuming you have Python open and eziot.py on the import path
+>>> import eziot
+>>> eziot.get_creds()
+What is your email address?> 
+```
+At this point just do what you are asked. You have to agree with some stuff, and then a validation code will be sent to your email. Once you enter your validation code (copy and paste), then your new user credentials will be sent to your email. This will give you a `key`, a `secret`, and a `version`. They should be in a format that lets you copy and paste them straight into your start script.
+
+**IMPORTANT:** Keep your key and secret a secret. If anybody else knows them, they can manipulate your account just as you can. They can even delete it and all your data.
+
+Once you have your credentials, add then to your start script like this:
+```python
+import eziot
+
+eziot.api_key = XXXXXXXXXXXXXXX
+eziot.api_secret = XXXXXXXXXXXXXXXX
+eziot.api_version = 1.0
+
+# connect to wifi
+
+# post some data or whatever
+
+```
 
 ## Functions
 The SDK only has a few common commands plus a few extras for convenience.
