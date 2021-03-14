@@ -2,11 +2,13 @@
 
 **Note:** I'm just starting to write these docs. Keep checking back.
 
-## What is EZIoT.link? 
+## What is EZIoT.link?
 
-The file `eziot.py` is a script that will run with both **Python3** and **MicroPython**. It functions as a **S**oftware **D**evelopment **K**it or **SDK** that allows the user to easily interact with the **A**pplication **P**rogramming **I**nterface or **API** on the `eziot.link` website.
+The `eziot.link` website and application is an online location that IoT developers and hobbyiest can use to post data from their IoT devices. The posted data can then be downloaded and used by other IoT devices or desktop applications. 
 
-The **API** on the `eziot.link` website allows users to create an account where they can easily upload data from their internet-connected projects and devices. The uploaded data can then be downloaded and used by your other devices or your desktop. The `eziot.link` website is basically a cloud location where you can drop off your data so that it can be picked up later by your other devices. 
+The Python file `eziot.py` is a script that can be run with both **Python3** and **MicroPython**. It functions as a Software Development Kit or **SDK** that allows the user to easily interact with the Application Programming Interface or **API** on the `eziot.link` website.
+
+By adding the SDK to MicroPython-based projects and devices, users can easily swap data between devices and desktop applications. The `eziot.link` website is basically a cloud data platform where you can drop off your data package so that it can be picked up later by your other devices. 
 
 ![EZIoT.link Illustration](https://eziot.link/images/eziot_illustration_1.png)
 
@@ -22,34 +24,58 @@ The `eziot.py` SDK in combination with the `eziot.link` API will allow your uplo
 
 1. **Pass Data Between Devices** - You can easily send commands to devices and pass data between devices by using the `group` and `device` values. Just post data using a specific group and device, and then the target device can get that data using the same group and device. Easy.
 
-1. **Delete Your Account** - You can also delete everything, as if you never existed on the server. I don't want or need to keep any of your data.
-
 ## What Can't I Do?
 
 The `eziot.link` API is designed handle what most developers and hobbyists need: an interim place to post and get data. It will probably handle 90% of IoT applications. But just to be clear, here are some of the things you shouldn't expect from `eziot.link`:
 
 1. **Unlimited Data** - Nope. This is a place to post data so you can get it and use it some other place, not save it forever. You get 1024 rows to work with. If you need to save all data forever, then periodically download it to your desktop.
 
-1. **Huge Data** - Nope. You only get 6 fields to post data, and only one allows a long string. So, you can post temperatures, counts, status, et cetera, and it you need you can put some JSON into `data4`. That's mainly what IoT needs to do. And don't forget that the `eziot.link` API will add those extras line timestamps.
+1. **Huge Data** - Nope. You only get 6 fields to post data, and only one allows a long string. So, you can post temperatures, counts, status, et cetera, and if you need you can put some JSON into `data4` field. That's mainly what IoT needs to do. And don't forget that the `eziot.link` API will add those extras line timestamps.
 
 1. **User Support** - It's a super-simple, basically-free, service. It's also tested and known to work if used as intended. It's being used everyday by people all over the place. If your having trouble, the best bet is to read the docs again.
 
-## Anything Else I Need to Know?
-Just to wrap up this introduction:
+## What About Privacy and Security?
 
 1. The `eziot.link` website and API is not interested in collecting your data. Your data is intended to be transient and exists in only one location, and when you delete it, or if it gets dropped off the bottom of the stack, then it's gone forever. Don't ask about recovering it because it can't be done. There are no backups. Anything that needs to be maintained should be downloaded to your desktop soon after it is posted.
 
 1. The `eziot.link` website and API does collect data necessary to maintain a web server. Access logs (which include IP addresses) are maintained (but not for very long). We also, of course, keep the email address you used to create an account for the period that the account exists (until you delete it).
 
-1. The `eziot.link` website and API **SHOULD NOT** be used to host any data that is critical to commercial, medical, government, or military systems or infrastructure. This is an experimental site/application designed to developers and hobbyists. There is no guarantee of permanence of data or application. It may be removed at any time.
+1. The `eziot.link` website and API **SHOULD NOT** be used to host any data that is critical to commercial, medical, government, or military systems or infrastructure. This is an experimental site/application designed for developers and hobbyists. There is no guarantee of permanence for data or application. Both may be removed at any time.
 
 1. The `eziot.link` website and API **SHOULD NOT** be used to host any data that is personal or private in nature. We use encryption on the front end, but not on the back end. That is, your data is encrypted when transmitted over the internet (if you are using HTTPS), but it is not stored in an encrypted format. Please keep this in mind.
 
 # EZIoT SDK Documentation
 
+## A Video to Get Started
+
+To be added soon.
+
 ## No Installation
 
+### Python Versions
+
+**Python:** Developed on 3.8. Should work on 3.5+.
+
+**MicroPython:** Developed on 1.13. Should work on 1.1+.
+
+### Setup Requirements
+
+The EZIoT.link SDK script itself does not need installation. Simply copy/load it to a location in your Python or MicroPython `import` path list (see `sys.path`).
+
+The SDK used the `requests` or `urequests` module to send and receive data. This is included with most current versions of Python/Micropython.
+
+## Test Run
+
+
+
+
+
+
+
+
+
 ## Getting an Account
+
 
 ## Functions
 The SDK only has a few common commands plus a few extras for convenience.
