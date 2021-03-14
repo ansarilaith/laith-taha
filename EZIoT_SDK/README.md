@@ -26,7 +26,7 @@ The `eziot.py` SDK in combination with the `eziot.link` API will allow your uplo
 
 ## What Can't I Do?
 
-The `eziot.link` API is designed handle what most developers and hobbiests need: an interim place to post and get data. It will probably handle 90% of IoT applications. But just to be clear, here are some of the things you shouldn't expect from `eziot.link`:
+The `eziot.link` API is designed handle what most developers and hobbyists need: an interim place to post and get data. It will probably handle 90% of IoT applications. But just to be clear, here are some of the things you shouldn't expect from `eziot.link`:
 
 1. **Unlimited Data** - Nope. This is a place to post data so you can get it and use it some other place, not save it forever. You get 1024 rows to work with. If you need to save all data forever, then periodically download it to your desktop.
 
@@ -41,7 +41,7 @@ Just to wrap up this introduction:
 
 1. The `eziot.link` website and API does collect data necessary to maintain a web server. Access logs (which include IP addresses) are maintained (but not for very long). We also, of course, keep the email address you used to create an account for the period that the account exists (until you delete it).
 
-1. The `eziot.link` website and API **SHOULD NOT** be used to host any data that is critical to commercial, medical, government, or military systems or infrastructure. This is an experimental site/application designed to developers and hobbiests. There is no guarantee of permanence of data or application. It may be removed at any time.
+1. The `eziot.link` website and API **SHOULD NOT** be used to host any data that is critical to commercial, medical, government, or military systems or infrastructure. This is an experimental site/application designed to developers and hobbyists. There is no guarantee of permanence of data or application. It may be removed at any time.
 
 1. The `eziot.link` website and API **SHOULD NOT** be used to host any data that is personal or private in nature. We use encryption on the front end, but not on the back end. That is, your data is encrypted when transmitted over the internet (if you are using HTTPS), but it is not stored in an encrypted format. Please keep this in mind.
 
