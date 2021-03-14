@@ -1,8 +1,8 @@
-# EZIoT Toolkit Intro
+# Introduction
 
-Note: I'm just starting to write these docs. Keep checking back.
+**Note:** I'm just starting to write these docs. Keep checking back.
 
-## What is EZIoT? 
+## What is EZIoT.link? 
 
 The file `eziot.py` is a script that will run with both **Python3** and **MicroPython**. It functions as a **S**oftware **D**evelopment **K**it or **SDK** that allows the user to easily interact with the **A**pplication **P**rogramming **I**nterface or **API** on the `eziot.link` website.
 
@@ -39,6 +39,10 @@ Just to wrap up this introduction:
 
 1. The `eziot.link` website and API does collect data necessary to maintain a web server. Access logs (which include IP addresses) are maintained (but not for very long). We also, of course, keep the email address you used to create an account for the period that the account exists (until you delete it).
 
+1. The `eziot.link` website and API **SHOULD NOT** be used to host any data that is critical to commercial, medical, government, or military systems or infrastructure. This is an experimental site/application designed to developers and hobbiests. There is no guarantee of permanence of data or application. It may be removed at any time.
+
+1. The `eziot.link` website and API **SHOULD NOT** be used to host any data that is personal or private in nature. We use encryption on the front end, but not on the back end. That is, your data is encrypted when transmitted over the internet (if you are using HTTPS), but it is not stored in an encrypted format. Please keep this in mind.
+
 # EZIoT SDK Documentation
 
 ## No Installation
@@ -52,11 +56,11 @@ The SDK only has a few common commands plus a few extras for convenience.
 
 ### Posting Data
 
-Best Practice: Only post what is needed. Don't hog bandwidth posting useless information.
+**Best Practice:** Only post what is needed. Don't hog bandwidth posting useless information.
 
 ### Getting Data
 
-Best Practice: Only download the rows your need. Use rowids to limit your downloads and not re-download.
+**Best Practice:** Only download the rows your need. Use rowids to limit your downloads and not re-download.
 
 ### Deleting Data
 ### Getting Stats
@@ -68,7 +72,7 @@ The SDK includes several MicroPython WiFi functions as a convenience:
 ### Getting Credentials
 ### Deleting Credentials/Account
 
-Important: If you delete your credentials, everything on the server will be lost. All data, all knowledge that you ever has an account.
+**Important:** If you delete your credentials, everything on the server will be lost. All data, all knowledge that you ever has an account.
 
 
 
