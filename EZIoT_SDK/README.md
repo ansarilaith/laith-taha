@@ -8,4 +8,5 @@ The file `eziot.py` is a script that will run with both Python3 and MicroPython.
 
 The **API** on the `eziot.link` website allows users to create an account where they can easily upload data from their internet-connected projects and devices. The uploaded data can then be downloaded and used by other devices or your desktop.
 
+![EZIoT.link Illustration](https://eziot.link/images/eziot_illustration_1.png)
 
