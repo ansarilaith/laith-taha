@@ -4,7 +4,7 @@ Note: I'm just starting to write these docs. Keep checking back.
 
 ## What is EZIoT? 
 
-The file `eziot.py` is a script that will run with both Python3 and MicroPython. It functions as a **S**oftware **D**evelopment **K**it or **SDK** that allows the user to easily interact with the **A**pplication **P**rogramming **I**nterface or **API** on the `eziot.link` website.
+The file `eziot.py` is a script that will run with both **Python3** and **MicroPython**. It functions as a **S**oftware **D**evelopment **K**it or **SDK** that allows the user to easily interact with the **A**pplication **P**rogramming **I**nterface or **API** on the `eziot.link` website.
 
 The **API** on the `eziot.link` website allows users to create an account where they can easily upload data from their internet-connected projects and devices. The uploaded data can then be downloaded and used by your other devices or your desktop. The `eziot.link` website is basically a cloud location where you can drop off your data so that it can be picked up later by your other devices. 
 
@@ -32,6 +32,13 @@ The `eziot.link` API is designed handle what most developers and hobbiests need:
 
 1. **Huge Data** - Nope. You only get 6 fields to post data, and only one allows a long string. So, you can post temperatures, counts, status, et cetera, and it you need you can put some JSON into `data4`. That's mainly what IoT needs to do. And don't forget that the `eziot.link` API will add those extras line timestamps.
 
+## Anything Else I Need to Know?
+Just to wrap up this introduction:
+
+1. The `eziot.link` website and API is not interested in collecting your data. Your data is intended to be transient and exists in only one location, and when you delete it, or if it gets dropped off the bottom of the stack, then it's gone forever. Don't ask about recovering it because it can't be done. There are no backups. Anything that needs to be maintained should be downloaded to your desktop soon after it is posted.
+
+1. The `eziot.link` website and API does collect data necessary to maintain a web server. Access logs (which include IP addresses) are maintained (but not for very long). We also, of course, keep the email address you used to create an account for the period that the account exists (until you delete it).
+
 # EZIoT SDK Documentation
 
 ## No Installation
@@ -41,14 +48,27 @@ The `eziot.link` API is designed handle what most developers and hobbiests need:
 ## Functions
 The SDK only has a few common commands plus a few extras for convenience.
 
+### Rate Limits
+
 ### Posting Data
+
+Best Practice: Only post what is needed. Don't hog bandwidth posting useless information.
+
 ### Getting Data
+
+Best Practice: Only download the rows your need. Use rowids to limit your downloads and not re-download.
+
 ### Deleting Data
 ### Getting Stats
 ### Sending Commands
 ### Wifi Connections
+
+The SDK includes several MicroPython WiFi functions as a convenience: 
+
 ### Getting Credentials
 ### Deleting Credentials/Account
+
+Important: If you delete your credentials, everything on the server will be lost. All data, all knowledge that you ever has an account.
 
 
 
