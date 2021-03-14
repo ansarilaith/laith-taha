@@ -32,6 +32,8 @@ The `eziot.link` API is designed handle what most developers and hobbiests need:
 
 1. **Huge Data** - Nope. You only get 6 fields to post data, and only one allows a long string. So, you can post temperatures, counts, status, et cetera, and it you need you can put some JSON into `data4`. That's mainly what IoT needs to do. And don't forget that the `eziot.link` API will add those extras line timestamps.
 
+1. **User Support** - It's a super-simple, basically-free, service. It's also tested and known to work if used as intended. It's being used everyday by people all over the place. If your having trouble, the best bet is to read the docs again.
+
 ## Anything Else I Need to Know?
 Just to wrap up this introduction:
 
