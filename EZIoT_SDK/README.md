@@ -66,6 +66,42 @@ The SDK used the `requests` or `urequests` module to send and receive data. This
 
 ## Test Run
 
+The EZIoT.link API has a default user account that everyone can use for testing. 
+The SDK comes set up to use the default account.
+Here are some simple examples you can try using your desktop or the MicroPython REPL:
+
+```python
+# assuming you have Python open and eziot.py on the import path
+>>> import eziot
+>>> eziot.post_data('my_group','my_device','hello from me')
+2 # this is the rowid of the post
+>>> for x in range(3):
+...     eziot.post_data('my_group','my_device','hello from me',x)
+... 
+3 # rowid
+4 # rowid
+5 # rowid
+>>> for x in eziot.get_data(10): # ask for last 10 rows (only 5 exist)
+...     print(x)
+... 
+[5, 1615761740, '2021-03-14 22:42:20', '67.140.214.0', 'my_group', 'my_device', 'hello from me', 2, None, None]
+[4, 1615761740, '2021-03-14 22:42:20', '67.140.214.0', 'my_group', 'my_device', 'hello from me', 1, None, None]
+[3, 1615761739, '2021-03-14 22:42:19', '67.140.214.0', 'my_group', 'my_device', 'hello from me', 0, None, None]
+[2, 1615761700, '2021-03-14 22:41:40', '67.140.214.0', 'my_group', 'my_device', 'hello from me', None, None, None]
+[1, 1615761087, '2021-03-14 22:31:27', '67.140.214.0', 'clayton', 'example', 'hello', 'this is rowid 1', 1, 'you cannot delete this']
+>>> eziot.stats() # get stats for data
+{'size': 8192, 'rows': 5, 'min_rowid': 1, 'max_rowid': 5, 'max_rows': 1024, 'max_rate': 2.0, 'email': 'example@eziot.link'}
+>>> eziot.delete_data(rowids=[4,2]) # delete rows 4 and 2
+2
+>>> for x in eziot.get_data(10): # ask for last 10 rows (now only 3 exist)
+...     print(x)
+... 
+[5, 1615761740, '2021-03-14 22:42:20', '67.140.214.0', 'my_group', 'my_device', 'hello from me', 2, None, None]
+[3, 1615761739, '2021-03-14 22:42:19', '67.140.214.0', 'my_group', 'my_device', 'hello from me', 0, None, None]
+[1, 1615761087, '2021-03-14 22:31:27', '67.140.214.0', 'clayton', 'example', 'hello', 'this is rowid 1', 1, 'you cannot delete this']
+>>> 
+```
+
 
 
 
