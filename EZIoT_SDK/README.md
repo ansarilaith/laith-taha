@@ -131,29 +131,52 @@ eziot.api_version = 1.0
 ```
 
 ## Functions
-The SDK only has a few common commands plus a few extras for convenience.
+The SDK only has a few common commands, plus a few odd extras for convenience.
 
 ### Rate Limits
+
+It is important to remember that the EZIoT.link API rate limits each account. Basically, you want to try and keep your posts and gets to about **1 request per second**. 
+There are so-called "burst" limits in case you have several devices trying to post data at one time, but the target for your account should be less than is 1 per second. For devices like an ESP32, this isn't a problem because a request will take more than a second, but you can easily exceed this on a desktop or IoT device with a fast processor.
+
+If you exceed your limit, the API won't complete your request and the SDK will raise an error.
 
 ### Posting Data
 
 **Best Practice:** Only post what is needed. Don't hog bandwidth posting useless information.
 
+`eziot.post_data(group=None,device=None,data1=None,data2=None,data3=None,data4=None)`
+
+Post the given data to your data as a row. Return the rowid of the newly-created row. You can include all or none of the variables. If no variables are given, the API will add a row with with a current timestamp and IP from the device making the post.
+
+- group: Should be a STRING with a max length of 32 characters. If an INT or FLOAT is given, it will be coersed to a string.
+- decive: Should be a STRING with a max length of 32 characters. If an INT or FLOAT is given, it will be coersed to a string.
+- data1-3: Can be an INT, a FLOAT, of a STRING with a max length of 32 characters.
+- data4: Can be an INT, a FLOAT, of a STRING with a max length of 256 characters. Use this for JSON-type data.
+
 ### Getting Data
 
 **Best Practice:** Only download the rows your need. Use rowids to limit your downloads and not re-download.
+
+`eziot.`
+
+
 
 ### Deleting Data
 ### Getting Stats
 ### Sending Commands
 ### Wifi Connections
 
-The SDK includes several MicroPython WiFi functions as a convenience: 
+The SDK includes several MicroPython WiFi functions as a convenience:
+
+
 
 ### Getting Credentials
+
+See "Getting an Account" above.
+
 ### Deleting Credentials/Account
 
-**Important:** If you delete your credentials, everything on the server will be lost. All data, all knowledge that you ever has an account.
+**IMPORTANT:** If you delete your credentials, everything on the server will be lost. All data, all knowledge that you ever had an account.
 
 
 
