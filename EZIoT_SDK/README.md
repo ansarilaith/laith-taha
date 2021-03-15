@@ -140,6 +140,10 @@ There are so-called "burst" limits in case you have several devices trying to po
 
 If you exceed your limit, the API won't complete your request and the SDK will raise an error.
 
+### ROWIDs
+
+Every data row has an associated `rowid` which can be used to select the row for return or deletion. The rowids start at 1 and are augmented such that a new rowid will be 1 higher than the highest rowid in the data. Rowids can recycle in two cases: 1) if any number of most-recent rows are deleted, and 1) if all rows are deleted (starts again with 1).
+
 ### Posting Data
 
 **Best Practice:** Only post what is needed. Don't hog bandwidth posting useless information.
@@ -148,27 +152,84 @@ If you exceed your limit, the API won't complete your request and the SDK will r
 
 Post the given data to your data as a row. Return the rowid of the newly-created row. You can include all or none of the variables. If no variables are given, the API will add a row with with a current timestamp and IP from the device making the post.
 
-- group: Should be a STRING with a max length of 32 characters. If an INT or FLOAT is given, it will be coersed to a string.
-- decive: Should be a STRING with a max length of 32 characters. If an INT or FLOAT is given, it will be coersed to a string.
-- data1-3: Can be an INT, a FLOAT, of a STRING with a max length of 32 characters.
-- data4: Can be an INT, a FLOAT, of a STRING with a max length of 256 characters. Use this for JSON-type data.
+- group: should be a STRING with a max length of 32 characters. if an INTEGER or FLOAT is given, it will be coersed to a string.
+- decive: should be a STRING with a max length of 32 characters. if an INTEGER or FLOAT is given, it will be coersed to a string.
+- data1-3: can be an INTEGER, a FLOAT, of a STRING with a max length of 32 characters.
+- data4: can be an INTEGER, a FLOAT, of a STRING with a max length of 256 characters. use this for JSON-type data.
 
 ### Getting Data
 
 **Best Practice:** Only download the rows your need. Use rowids to limit your downloads and not re-download.
 
-`eziot.`
+`eziot.get_data(count=1,after=None,group=None,device=None)`
 
+Return a list of data rows (also lists). The default is to return the last row added.
 
+- count: an INTEGER number of rows to return (if available)
+- after: a INTEGER rowid, return all rows posted after this rowid (not including it). takes precedence over count.
+- group: a STRING. limit returned rows to those where the group field exactly matches this string.
+- device: a STRING. limit returned rows to those where the device field exactly matches this string.
+
+return = `[[rowid,epoch,gmt,ip,group,device,data1,data2,data3,data4],...]`
+
+- rowid: the data row id number (can be used to select or delete)
+- epoch: an integer representing the epoch time when the row was created
+- gmt: a GMT timestamp based on the epoch time
+- ip: the IP address of the device that posted the data
+- group,device,data1-4: see the description above in `eziot.post_data`
 
 ### Deleting Data
+
+**IMPORTANT:** Deletions are permanent. There is no recovery.
+
+`eziot.delete_data(rowids=[],before=None,xall=False)`
+
+Delete rows and return the number of rows deleted.
+
+- rowids: a single INTEGER or a list of INTEGERs. the rowids to delete (if they exist).
+- before: an INTEGER rowid. delete all rows before this row (not including it). takes precedence over rowids.
+- xall: boolean. if `True`, delete all rows.
+
 ### Getting Stats
+
+`eziot.stats()`
+
+Return a dictionary of stats related to the data.
+
+return = `{'rows': 5,
+           'min_rowid': 1,
+           'max_rowid': 5,
+           'max_rows': 1024,
+           'max_rate': 1.0,
+           'email': 'example@eziot.link',
+           'size': 8192
+           }`
+
+- rows: an INTEGER. current rows in data.
+- min_-max_rowid: INTEGERs. the current lowest and highest rowids in the data. 
+- max_rows: an INTEGER. the maximum rows a user can add before the oldest rows begin to be repoved from the stack.
+- max_rate: an INTEGER. the target maximum request rate per second for the given user.
+- email: a STRING. the email address associated with the data account.
+- size: an INTEGER. the size-on-disk of the data in bytes (this may be removed in the future)
+
 ### Sending Commands
 ### Wifi Connections
 
 The SDK includes several MicroPython WiFi functions as a convenience:
 
+`eziot.wifi_scan()`
 
+Scan for available WiFi access points. Print a list of lists of APs.
+
+print = `Network AP: [ssid,bssid,channel,RSSI,authmode,hidden]` per AP
+
+`eziot.wifi_connect(essid,essid_password)`
+
+Connect to the given AP using the `essid` and `essid_password`. The `essid_password` can be `None` if no password is required.
+
+`eziot.wifi_disconnect()`
+
+Self explanitory.
 
 ### Getting Credentials
 
@@ -177,6 +238,10 @@ See "Getting an Account" above.
 ### Deleting Credentials/Account
 
 **IMPORTANT:** If you delete your credentials, everything on the server will be lost. All data, all knowledge that you ever had an account.
+
+`eziot.delete_creds()`
+
+You will be prompted. If you indicate yes, bye-bye to everything.
 
 
 
