@@ -200,7 +200,7 @@ Delete rows and return the number of rows deleted.
 
 - rowids: a single INTEGER or a list of INTEGERs. the rowids to delete (if they exist).
 - before: an INTEGER rowid. delete all rows before this row (not including it). takes precedence over rowids.
-- xall: boolean. if `True`, delete all rows.
+- xall: boolean. if not `False`, delete all rows.
 
 ### Getting Stats
 
@@ -208,7 +208,7 @@ Delete rows and return the number of rows deleted.
 
 Return a dictionary of stats related to the data.
 
-return = `{'rows': 5,
+return = `{'rows':5,
 'min_rowid':1,
 'max_rowid':5,
 'max_rows':1024,
@@ -217,8 +217,8 @@ return = `{'rows': 5,
 'size':8192
 }`
 
-- rows: an INTEGER. current rows in data.
-- min_-max_rowid: INTEGERs. the current lowest and highest rowids in the data. 
+- rows: an INTEGER. current number of rows in the data.
+- min/max_rowid: INTEGER. the current lowest/highest rowid in the data. 
 - max_rows: an INTEGER. the maximum rows a user can add before the oldest rows begin to be removed from the stack.
 - max_rate: an INTEGER. the target maximum request rate per second for the given user.
 - email: a STRING. the email address associated with the data account.
@@ -246,7 +246,7 @@ for rowid,epoch,gmt,group,device,data1,data2,data3 in rows:
     
 ```
 
-If you wanted, you could have it send back a response that is did as it was told:
+If you wanted, you could have it send back a response that indicating it did as it was told:
 
 `rowid = eziot.post_data('response','FunBoard_1','neopixels','red','okay')`
 
@@ -258,7 +258,7 @@ The SDK includes several MicroPython WiFi functions as a convenience:
 
 `eziot.wifi_scan()`
 
-Scan for available WiFi access points. Print a list of lists of APs.
+Scan for available WiFi access points. Print a list of APs.
 
 print = `Network AP: [ssid,bssid,channel,RSSI,authmode,hidden]` per AP
 
@@ -280,5 +280,5 @@ See "Getting an Account" above.
 
 `eziot.delete_creds()`
 
-You will be prompted. If you indicate yes, bye-bye to everything.
+You will be prompted. If you indicate yes, say bye-bye to everything.
 
