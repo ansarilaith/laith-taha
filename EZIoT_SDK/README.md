@@ -18,7 +18,7 @@ The `eziot.py` SDK in combination with the `eziot.link` API will allow your uplo
 
 1. **Upload Data** - You can upload up to **1024** rows of data. For each row of data you can include **6** items or values: `[group,device,data1,data2,data3,data4]`. The first 5 values can be strings (i.e. text), integers, or floats. If the value is a string, it can be up to **32** characters long. The `data4` value is the same, except that if it is a string, it can be **256** characters long. If you load more than 1024 rows, the oldest row will be dropped from the data and the new row will be added. Also, the `eziot.link` API will add a time stamp, an id number, and an IP address to the row, so you don't need to worry about that.
 
-1. **Download Data** - Once you have some data, you can easily get it back. You can easliy download the latest rows (newest data). You can request 1 to 1024 rows, and you can select on `group` and `device`. So it you want to get the most recent row for the `command` group and the `FunBoard1` device, no problem. If you need to do something fancy, just grab all your rows and do what you need.
+1. **Download Data** - Once you have some data, you can easily get it back. You can easily download the latest rows (newest data). You can request 1 to 1024 rows, and you can select on `group` and `device`. So it you want to get the most recent row for the `command` group and the `FunBoard1` device, no problem. If you need to do something fancy, just grab all your rows and do what you need.
 
 1. **Delete Data** - It's your data. You can delete any row, or any row older than a given row, or all of it. Whatever you need. I don't care. I don't want it.
 
@@ -76,13 +76,13 @@ Here are some simple examples you can try using your desktop or the MicroPython 
 >>> eziot.post_data('my_group','my_device','hello from me') # post data group, device, and data1
 2 # this is the rowid of the post
 >>> for x in range(3):
-...     eziot.post_data('my_group','my_device','hello from me',x) # also posting to x to data2
+... eziot.post_data('my_group','my_device','hello from me',x) # also posting to x to data2
 ... 
 3 # rowid
 4 # rowid
 5 # rowid
 >>> for x in eziot.get_data(10): # ask for last 10 rows (only 5 exist)
-...     print(x)
+... print(x)
 ... 
 [5, 1615761740, '2021-03-14 22:42:20', '67.140.214.0', 'my_group', 'my_device', 'hello from me', 2, None, None]
 [4, 1615761740, '2021-03-14 22:42:20', '67.140.214.0', 'my_group', 'my_device', 'hello from me', 1, None, None]
@@ -94,7 +94,7 @@ Here are some simple examples you can try using your desktop or the MicroPython 
 >>> eziot.delete_data(rowids=[4,2]) # delete rows 4 and 2
 2
 >>> for x in eziot.get_data(10): # ask for last 10 rows (now only 3 exist)
-...     print(x)
+... print(x)
 ... 
 [5, 1615761740, '2021-03-14 22:42:20', '67.140.214.0', 'my_group', 'my_device', 'hello from me', 2, None, None]
 [3, 1615761739, '2021-03-14 22:42:19', '67.140.214.0', 'my_group', 'my_device', 'hello from me', 0, None, None]
@@ -152,8 +152,8 @@ Every data row has an associated `rowid` which can be used to select the row for
 
 Post the given data to your data as a row. Return the rowid of the newly-created row. You can include all or none of the variables. If no variables are given, the API will add a row with with a current timestamp and IP from the device making the post.
 
-- group: should be a STRING with a max length of 32 characters. if an INTEGER or FLOAT is given, it will be coersed to a string.
-- decive: should be a STRING with a max length of 32 characters. if an INTEGER or FLOAT is given, it will be coersed to a string.
+- group: should be a STRING with a max length of 32 characters. if an INTEGER or FLOAT is given, it will be coerced to a string.
+- decive: should be a STRING with a max length of 32 characters. if an INTEGER or FLOAT is given, it will be coerced to a string.
 - data1-3: can be an INTEGER, a FLOAT, of a STRING with a max length of 32 characters.
 - data4: can be an INTEGER, a FLOAT, of a STRING with a max length of 256 characters. use this for JSON-type data.
 
@@ -197,17 +197,17 @@ Delete rows and return the number of rows deleted.
 Return a dictionary of stats related to the data.
 
 return = `{'rows': 5,
-           'min_rowid': 1,
-           'max_rowid': 5,
-           'max_rows': 1024,
-           'max_rate': 1.0,
-           'email': 'example@eziot.link',
-           'size': 8192
-           }`
+'min_rowid': 1,
+'max_rowid': 5,
+'max_rows': 1024,
+'max_rate': 1.0,
+'email': 'example@eziot.link',
+'size': 8192
+}`
 
 - rows: an INTEGER. current rows in data.
 - min_-max_rowid: INTEGERs. the current lowest and highest rowids in the data. 
-- max_rows: an INTEGER. the maximum rows a user can add before the oldest rows begin to be repoved from the stack.
+- max_rows: an INTEGER. the maximum rows a user can add before the oldest rows begin to be removed from the stack.
 - max_rate: an INTEGER. the target maximum request rate per second for the given user.
 - email: a STRING. the email address associated with the data account.
 - size: an INTEGER. the size-on-disk of the data in bytes (this may be removed in the future)
@@ -229,7 +229,7 @@ Connect to the given AP using the `essid` and `essid_password`. The `essid_passw
 
 `eziot.wifi_disconnect()`
 
-Self explanitory.
+Self explanatory.
 
 ### Getting Credentials
 
@@ -242,7 +242,4 @@ See "Getting an Account" above.
 `eziot.delete_creds()`
 
 You will be prompted. If you indicate yes, bye-bye to everything.
-
-
-
 
