@@ -197,12 +197,12 @@ Delete rows and return the number of rows deleted.
 Return a dictionary of stats related to the data.
 
 return = `{'rows': 5,
-'min_rowid': 1,
-'max_rowid': 5,
-'max_rows': 1024,
-'max_rate': 1.0,
-'email': 'example@eziot.link',
-'size': 8192
+'min_rowid':1,
+'max_rowid':5,
+'max_rows':1024,
+'max_rate':1.0,
+'email':'example@eziot.link',
+'size':8192
 }`
 
 - rows: an INTEGER. current rows in data.
