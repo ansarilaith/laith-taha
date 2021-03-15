@@ -1,6 +1,6 @@
 # Introduction
 
-**Note:** I'm just starting to write these docs. Keep checking back.
+**Note:** I'm just starting to write these docs. I haven't even done good a proof reeding. Keep checking back.
 
 ## What is EZIoT.link?
 
@@ -216,7 +216,7 @@ return = `{'rows': 5,
 
 Because the EZIoT.link SDK is a simple way to post and get data, it can easily be used to pass data between devices. This can be used to send commands to devices.
 
-For example, it I have a FunBoard and I want it to turn its neopixels red, from my desktop I can create a post similar to this:
+For example, if you have a FunBoard and you want it to turn its neopixels red, from your desktop you can create a post similar to this:
 
 `rowid = eziot.post_data('command','FunBoard_1','neopixels','red')`
 
