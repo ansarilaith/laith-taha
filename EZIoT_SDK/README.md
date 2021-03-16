@@ -33,7 +33,7 @@ It will probably handle 90% of IoT applications. But just to be clear, here are 
 
 1. **Huge Data** - Nope. You only get 6 fields to post data, and only one allows a long string. So, you can post temperature, humidity, readings, counts, status, et cetera, and if you need you can put some JSON into the `data4` field. That's mainly what IoT needs to do. And don't forget that the `eziot.link` API will add those extras items (timestamps, ip address, id numbers).
 
-1. **User Support** - Not really. It's a super-simple, basically-free, service. It's also tested and known to work if used as intended. It's being used everyday by people all over the place. If you're having trouble, the best best is to read the docs again. Or you can check my [Patreon](https://www.patreon.com/claytondarwin) account and send me a message. 
+1. **User Support** - Not really. It's a super-simple, basically-free, service. It's also tested and known to work if used as intended. It's being used everyday by people all over the place. If you're having trouble, the best thing is to read the docs again. Or you can check my [Patreon](https://www.patreon.com/claytondarwin) account and send me a message. 
 
 ## What About Privacy and Security?
 
