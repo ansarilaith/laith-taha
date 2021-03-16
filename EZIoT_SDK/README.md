@@ -224,34 +224,6 @@ return = `{'rows':5,
 - email: a STRING. the email address associated with the data account.
 - size: an INTEGER. the size-on-disk of the data in bytes (this may be removed in the future)
 
-### Sending Commands
-
-Because the EZIoT.link SDK is a simple way to post and get data, it can easily be used to pass data between devices. This can be used to send commands to devices.
-
-For example, if you have a FunBoard and you want it to turn its neopixels red, from your desktop you can create a post similar to this:
-
-`rowid = eziot.post_data('command','FunBoard_1','neopixels','red')`
-
-The FunBoard needs to be running a loop that has a requests to get commands directed at it.
-When it sees the command come through, it should set the neopixels and then delete the command.
-
-```python
-# this is redimantary, you need wait periods and try-except catches etc.
-
-rows = eziot.get_data(1024,group='command',device='FunBoard_1')
-
-for rowid,epoch,gmt,group,device,data1,data2,data3 in rows:
-    do_command(data1,data2)
-    eziot.delete_data(rowid)
-    
-```
-
-If you wanted, you could have it send back a response that indicating it did as it was told:
-
-`rowid = eziot.post_data('response','FunBoard_1','neopixels','red','okay')`
-
-You could read this from your desktop.
-
 ### Wifi Connections
 
 The SDK includes several MicroPython WiFi functions as a convenience:
@@ -281,4 +253,39 @@ See "Getting an Account" above.
 `eziot.delete_creds()`
 
 You will be prompted. If you indicate yes, say bye-bye to everything.
+
+## Tricks
+
+### Get All Rows
+
+`eziot.get_data(after=0)`
+
+### Sending Commands
+
+Because the EZIoT.link SDK is a simple way to post and get data, it can easily be used to pass data between devices. This can be used to send commands to devices.
+
+For example, if you have a FunBoard and you want it to turn its neopixels red, from your desktop you can create a post similar to this:
+
+`rowid = eziot.post_data('command','FunBoard_1','neopixels','red')`
+
+The FunBoard needs to be running a loop that has a requests to get commands directed at it.
+When it sees the command come through, it should set the neopixels and then delete the command.
+
+```python
+# this is redimantary, you need wait periods and try-except catches etc.
+
+rows = eziot.get_data(1024,group='command',device='FunBoard_1')
+
+for rowid,epoch,gmt,group,device,data1,data2,data3 in rows:
+    do_command(data1,data2)
+    eziot.delete_data(rowid)
+    
+```
+
+If you wanted, you could have it send back a response that indicating it did as it was told:
+
+`rowid = eziot.post_data('response','FunBoard_1','neopixels','red','okay')`
+
+You could read this from your desktop.
+
 
