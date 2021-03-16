@@ -30,8 +30,7 @@ try:
     # connect to wifi access point
     print()
     eziot.wifi_connect('your_essid','your_password')  
-    eziot.wifi_connect('DARWIN-NET-TEST','claytondarwin')  
-
+ 
     # add credentials for example data table
     # to get your own credentials: eziot.get_creds()
     eziot.api_key = 'EXAMPLE'
