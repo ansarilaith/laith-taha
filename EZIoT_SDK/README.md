@@ -4,7 +4,7 @@
 
 ## What is EZIoT.link?
 
-The `eziot.link` website and application is an online location that IoT developers and hobbyiest can use to post data from their IoT devices. The posted data can then be downloaded and used by other IoT devices or desktop applications. 
+The `eziot.link` website and application is an online location that IoT developers and hobbyist can use to post data from their IoT devices. The posted data can then be downloaded and used by other IoT devices or desktop applications. 
 
 The Python file `eziot.py` is a script that can be run with both **Python3** and **MicroPython**. It functions as a Software Development Kit or **SDK** that allows the user to easily interact with the Application Programming Interface or **API** on the `eziot.link` website.
 
@@ -163,7 +163,7 @@ Every data row has an associated `rowid` which can be used to select the row for
 Post the given data to your data as a row. Return the rowid of the newly-created row. You can include all or none of the variables. If no variables are given, the API will add a row with with a current timestamp and IP from the device making the post.
 
 - group: should be a STRING with a max length of 32 characters. if an INTEGER or FLOAT is given, it will be coerced to a string.
-- decive: should be a STRING with a max length of 32 characters. if an INTEGER or FLOAT is given, it will be coerced to a string.
+- device: should be a STRING with a max length of 32 characters. if an INTEGER or FLOAT is given, it will be coerced to a string.
 - data1-3: can be an INTEGER, a FLOAT, or a STRING with a max length of 32 characters.
 - data4: can be an INTEGER, a FLOAT, or a STRING with a max length of 256 characters. use this for JSON-type data.
 
@@ -272,14 +272,13 @@ The FunBoard needs to be running a loop that has a requests to get commands dire
 When it sees the command come through, it should set the neopixels and then delete the command.
 
 ```python
-# this is redimantary, you need wait periods and try-except catches etc.
+# this is rudimentary, you need wait periods and try-except catches etc.
 
 rows = eziot.get_data(1024,group='command',device='FunBoard_1')
 
 for rowid,epoch,gmt,group,device,data1,data2,data3 in rows:
-    do_command(data1,data2)
-    eziot.delete_data(rowid)
-    
+do_command(data1,data2)
+eziot.delete_data(rowid)
 ```
 
 If you wanted, you could have it send back a response that indicating it did as it was told:
