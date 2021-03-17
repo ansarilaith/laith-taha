@@ -254,11 +254,37 @@ See "Getting an Account" above.
 
 You will be prompted. If you indicate yes, say bye-bye to everything.
 
-## Tricks
+## Tips and Tricks
 
 ### Get All Rows
 
-`eziot.get_data(after=0)`
+The `after` variable takes precedence over the `count` variable. Set `after=0` to get all rows after rowid 0 (which doesn't exist). This will get all rows.
+
+`eziot.get_data(1,0)` == `eziot.get_data(count=1,after=0,xall=False)`
+
+### JSON for Data Objects
+
+The `json` module, which supports the JSON (JavaScript Object Notation) data format, allows you to take Python objects like `list` and `dict` and convert them to a string format that you can store in `data4` (or another field if it is short). You can then use the module to convert the string back into a Python object. 
+
+```python
+# assuming your are already connected
+
+import json
+
+data = {'cat':'aloof','dog':'dirty','frog':'wet'} # make some data
+
+jdata = json.dumps(data) # convert or "dump" the object to a json-formatted string
+
+rowid = eziot.post('testing','funboard1',data4=jdata) # post to data4
+
+for row in eziot.get_data(after=rowid-1,group='testing',device='funboard1'):
+    if row[0] == rowid: # match rowid
+        jdata = row[-1] # get data4 (last item in row)
+        data = json.loads(jdata) # convert or "load" the json string back to a python object
+        print(data)
+        break
+
+```
 
 ### Sending Commands
 
