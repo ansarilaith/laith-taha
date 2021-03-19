@@ -30,7 +30,11 @@ try:
     # connect to wifi access point
     print()
     eziot.wifi_connect('your_essid','your_password')  
+<<<<<<< HEAD
 
+=======
+ 
+>>>>>>> 85e84be7034f2023b859e4a9e8f91f2029e24ec9
     # add credentials for example data table
     # to get your own credentials: eziot.get_creds()
     eziot.api_key = 'EXAMPLE'
