@@ -1,4 +1,4 @@
-# Introduction
+﻿# Introduction
 
 **Note:** I'm just starting to write these docs. I haven't even done good a proof reading yet. Keep checking back.
 
@@ -175,10 +175,14 @@ Post the given data to your data as a row. Return the rowid of the newly-created
 
 Return a list of data rows (also lists). The default is to return the last row added.
 
-- count: an INTEGER number of rows to return (if available)
-- after: a INTEGER rowid, return all rows posted after this rowid (not including it). takes precedence over count.
+{+ **IMPORTANT:** +} The API will easily return all 1024 rows, even if they have the maximum allotted data in each row. However, an **ESP32** or similar device cannot handle that much data. It will exceed the memory capacity. Use count, after, group, and device to limit the returns to a size your device can handle.
+
+- count: an INTEGER number of rows to return (if available) {+ set to 0 for no limit +}
+- after: a INTEGER rowid, return all rows posted after this rowid (not including it). {- ~~takes precedence over count.~~ -}
 - group: a STRING. limit returned rows to those where the group field exactly matches this string.
 - device: a STRING. limit returned rows to those where the device field exactly matches this string.
+- {+ NOTs: +} the `group` and `device` string values can be preceded by `"not:"` to match all values except the string that follows. `group=”not:desktop”`
+- {+ WILDs: +} the `group` and `device` string values can contain the wildcard `"%"` to match any series of characters. `group=”funboard%”`
 
 return = `[[rowid,epoch,gmt,ip,group,device,data1,data2,data3,data4],...]`
 
