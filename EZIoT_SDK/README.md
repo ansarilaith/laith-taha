@@ -181,8 +181,9 @@ Return a list of data rows (also lists). The default is to return the last row a
 - after: a INTEGER rowid, return all rows posted after this rowid (not including it). ~~takes precedence over count.~~
 - group: a STRING. limit returned rows to those where the group field exactly matches this string.
 - device: a STRING. limit returned rows to those where the device field exactly matches this string.
-- NOTs: the `group` and `device` string values can be preceded by `"not:"` to match all values except the string that follows. `group=”not:desktop”`
-- WILDs: the `group` and `device` string values can contain the wildcard `"%"` to match any series of characters. `group=”funboard%”`
+- NOTs: the `group` and `device` string values can be preceded by `"not:"` to match all values except the string that follows.
+- WILDs: the `group` and `device` string values can contain the wildcard `"%"` to match any series of characters.
+- examples: `group="funboard1"`, `group="funboard2"`, `group="funboard%"`, `group="not:funboard%"`
 
 return = `[[rowid,epoch,gmt,ip,group,device,data1,data2,data3,data4],...]`
 
