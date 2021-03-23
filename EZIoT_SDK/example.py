@@ -2,7 +2,7 @@
 # notify
 #-----------------------
 
-print('RUN: main.py')
+print('RUN: example.py')
 
 #-----------------------
 # general imports
