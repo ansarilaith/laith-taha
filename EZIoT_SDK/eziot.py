@@ -130,7 +130,7 @@ def get_data(count=1,after=None,group=None,device=None):
     data = {}
 
     # count
-    assert type(count) == int and count > 0
+    assert type(count) == int
     data['count'] = count
 
     # check general data types and string lengths
