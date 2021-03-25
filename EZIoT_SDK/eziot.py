@@ -80,6 +80,20 @@ def stats():
     # return dict
     return jdata.get('stats',{})
 
+# may be used at a later date
+def report():
+    '''Undocumented. Experimental.'''
+
+    # make request
+    code,jdata = _make_request('report')
+
+    # error
+    _check_error(code,jdata)
+
+    # get, print, return
+    report = jdata.get('report','No report available.')
+    print(report)
+
 # insert a row of data, return rowid of insert
 def post_data(group=None,device=None,data1=None,data2=None,data3=None,data4=None):
     '''Insert a row of data. No values are required.
