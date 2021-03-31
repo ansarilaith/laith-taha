@@ -80,19 +80,47 @@ def stats():
     # return dict
     return jdata.get('stats',{})
 
-# may be used at a later date
-def report():
-    '''Undocumented. Experimental.'''
+# a meta function to watch for updates
+# this uses get_data() in an economical way
+def watch(startrows=10,update=10,group=None,device=None):
 
-    # make request
-    code,jdata = _make_request('report')
+    # tracking variables
+    last_rowid = 0
+    if upython:
+        update = int(update*1000)
+        next_loop = time.ticks_ms()
+    else:
+        next_loop = int(time.time())
 
-    # error
-    _check_error(code,jdata)
+    # infinite loop
+    while 1:
 
-    # get, print, return
-    report = jdata.get('report','No report available.')
-    print(report)
+        # wait until time
+        if upython:
+            while time.ticks_diff(time.ticks_ms(),next_loop) < 0:
+                time.sleep_ms(int(update/100))
+            next_loop = time.ticks_add(next_loop,update)
+        else:
+            while time.time() < next_loop:
+                time.sleep(update/100)
+            next_loop += update
+
+        # get rows
+        if not last_rowid:
+            rows = get_data(startrows,0,group,device)
+        else:
+            rows = get_data(0,last_rowid,group,device)
+
+        # print oldest first (not the way it comes)
+        rows.sort()
+
+        # print
+        # row = [rowid,epoch,gmt,ip,group,device,data1,date2,data3,data4]
+        for row in rows:
+            last_rowid = row[0]
+            print('ROW:',row)
+
+        #print('---',next_loop)
 
 # insert a row of data, return rowid of insert
 def post_data(group=None,device=None,data1=None,data2=None,data3=None,data4=None):

@@ -1,6 +1,6 @@
 ﻿# Introduction
 
-**Note:** I'm just starting to write these docs. I haven't even done good a proof reading yet. Keep checking back.
+**Note:** I'm continuing to update these docs. Keep checking back.
 
 ## What is EZIoT.link?
 
@@ -175,7 +175,7 @@ Post the given data to your data as a row. Return the rowid of the newly-created
 
 Return a list of data rows (also lists). The default is to return the last row added.
 
-**IMPORTANT:** The API will easily return all 1024 rows, even if they have the maximum allotted data in each row. However, an **ESP32** or similar device cannot handle that much data. It will exceed the memory capacity. Use count, after, group, and device to limit the returns to a size your device can handle.
+**IMPORTANT:** The API will easily return all 1024 rows, even if they have the maximum allotted data in each row. However, an **ESP32** or similar device cannot handle that much data. It will exceed the memory capacity. Use count, after, group, and device to limit the returns to a size your device can handle. Also see the `watch()` function below.
 
 - count: an INTEGER number of rows to return (if available). set to 0 for no limit.
 - after: a INTEGER rowid, return all rows posted after this rowid (not including it). ~~takes precedence over count.~~
@@ -194,6 +194,14 @@ The returned list of rows is ordered most-recent-first (descending by rowid + ep
 - gmt: a GMT timestamp based on the epoch time
 - ip: the IP address of the device that posted the data
 - group,device,data1-4: see the description above in `eziot.post_data`
+
+`eziot.watch(startrows=10,update=10,group=None,device=None)`
+
+This meta function uses `get_data()` and the `after` variable to efficiently watch for new rows added to the data. Once called it will loop indefinitely and print new rows to the screen.
+
+- startrows: an INTEGER number of rows to start the printout. default is 10.
+- update: an INTEGER or FLOAT number of seconds between ‘get_data()’ requests. default is 10.
+- group|device: as described in ‘get_data()’.
 
 ### Deleting Data
 
