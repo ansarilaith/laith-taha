@@ -1,4 +1,4 @@
-﻿# Introduction
+# Introduction
 
 **Note:** I'm continuing to update these docs. Keep checking back.
 
@@ -197,11 +197,11 @@ The returned list of rows is ordered most-recent-first (descending by rowid + ep
 
 `eziot.watch(startrows=10,update=10,group=None,device=None)`
 
-This meta function uses `get_data()` and the `after` variable to efficiently watch for new rows added to the data. Once called it will loop indefinitely and print new rows to the screen.
+This meta function uses `get_data` and the `after` variable to efficiently watch for new rows added to the data. Once called it will loop indefinitely and print new rows to the screen.
 
 - startrows: an INTEGER number of rows to start the printout. default is 10.
-- update: an INTEGER or FLOAT number of seconds between ‘get_data()’ requests. default is 10.
-- group|device: as described in ‘get_data()’.
+- update: an INTEGER or FLOAT number of seconds between `get_data` requests. default is 10.
+- group|device: see the description above in `eziot.post_data`
 
 ### Deleting Data
 
