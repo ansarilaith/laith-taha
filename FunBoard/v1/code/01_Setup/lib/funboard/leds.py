@@ -1,10 +1,4 @@
 #-----------------------
-# notify
-#-----------------------
-
-print('LOAD: gpio_leds.py')
-
-#-----------------------
 # imports
 #-----------------------
 
@@ -70,15 +64,11 @@ class LED:
             self.off()
             time.sleep_ms(offtime)
 
-# blink any pin shortcut function
-def blink(pin,count=1,ontime=22,offtime=220,anode=True):
-    LED(pin,anode).blink(count,ontime,offtime)
-
 #-----------------------
-# neopixel class
+# micro pixel class
 #-----------------------
 
-class NP:
+class PIXELS:
 
     # brightness out of 255
     brightness = 32
@@ -135,12 +125,19 @@ class NP:
     # brightness reset
     def set_brightness(self,brightness=0):
 
-        self.brightness = min(255,abs(brightness))
+        # set
+        old = self.brightness
+        new = min(255,abs(brightness))
+        self.brightness = new
 
+        # redo
+        scale = new/old
+        for pixel in range(self.pixels):
+            self.np[pixel] = tuple([int(min(255,x*scale)) for x in self.np[pixel]])
         self.np.write()
 
     # get a color
-    def get_color(self,color):
+    def get_color(self,color,brightness=None):
 
         # leave color tuples as is
         if type(color) in (list,tuple):
@@ -151,14 +148,21 @@ class NP:
         value = self.colors.get(color,(255,255,255))
 
         # scale
-        return tuple([int(x*self.brightness/255) for x in value])
+        return tuple([int(x*(brightness or self.brightness)/255) for x in value])
 
     # set a pixel
-    def setp(self,pixel,color):
+    def setp(self,pixel,color,brightness=None,write=True):
+        self.np[min(pixel,self.pixels-1)] = self.get_color(color,brightness)
+        if write:
+            self.np.write()
 
-        self.np[min(pixel,self.pixels-1)] = self.get_color(color)
-
-        self.np.write()
+    # sweep up and back
+    def sweep(self,color=None,brightness=None,ontime=25,offtime=5):
+        for p in (0,1,2,3,4,5,6,7,6,5,4,3,2,1,0):
+            self.setp(p,color or ['red','blue','green'][p%3],brightness)
+            time.sleep_ms(ontime)
+            self.setp(p,(0,0,0))
+            time.sleep_ms(offtime)
 
 #-----------------------
 # end

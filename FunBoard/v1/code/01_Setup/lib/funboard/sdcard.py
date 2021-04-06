@@ -1,17 +1,10 @@
 #-----------------------
-# notify
-#-----------------------
-
-print('LOAD: device_sdcard.py')
-
-#-----------------------
 # imports
 #-----------------------
 
-import os,sys,time
+import os
+import time
 from machine import SDCard
-
-import system_tools as st
 
 #-----------------------
 # tools class
@@ -23,11 +16,11 @@ class SDCARD:
     
     _sdcard = None # SDCard object
     _mount_point = None # current mount point
-    slot = 3
-    cs   = 15
-    sck  = 14
-    mosi = 13    
-    miso = 12
+    slot =  3 # default slot 3
+    cs   = 15 # default slot 3
+    sck  = 14 # default slot 3
+    mosi = 13 # default slot 3
+    miso = 12 # default slot 3
 
     def __init__(self,slot=None,cs=None,sck=None,mosi=None,miso=None):
         self.slot = slot or self.slot
@@ -40,7 +33,10 @@ class SDCARD:
     def error(self,e=None,s='SDCard not mounted.',unmount=False):
 
         if e:
-            sys.print_exception(e)
+            pass
+            #from sys import print_exception
+            #print_exception(e)
+            #del print_exception
 
         if s:
             print('ERROR:',s)

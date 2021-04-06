@@ -270,7 +270,7 @@ def wifi_connect(essid,password,timeout=15):
     wlan.active(True)
     if not wlan.isconnected():
         wlan.connect(essid,password)
-        time.sleep(0.1)
+        time.sleep_ms(100)
         for x in range(timeout):
             if wlan.isconnected():
                 break
@@ -289,11 +289,11 @@ def wifi_disconnect(timeout=15):
     if wlan.active():
         if wlan.isconnected():
             wlan.disconnect()
-            time.sleep(0.1)
+            time.sleep_ms(100)
             for x in range(timeout):
                 if not wlan.isconnected():
                     break
-                time.sleep(1)
+                time.sleep_ms(1000)
             return_value = not wlan.isconnected()
     wlan.active(False)
     print('Network Disonnect:',return_value)
