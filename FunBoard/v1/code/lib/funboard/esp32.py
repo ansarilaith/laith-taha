@@ -26,11 +26,11 @@ class ESP32:
 
     @property
     def temp(self):
-        return raw_temperature()
+        return round((raw_temperature()-32)/1.8,1)
 
     @property
     def tempf(self):
-        return raw_temperature()*1.8 + 32
+        return raw_temperature()
 
     @property
     def hall(self):
