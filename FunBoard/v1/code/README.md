@@ -23,13 +23,13 @@ Change to the directory containing the `lib` diretory and the `REPLace.py` scrip
 
 You need to make sure the FunBoard isn't running any processes and is ready to accept input.
 
-.1 Connect to the FunBoard via your serial terminal.
+1. Connect to the FunBoard via your serial terminal.
 
-.1 Do a reboot `ctrl-d`.
+1. Do a reboot `ctrl-d`.
 
-.1 Kill any running process `ctrl-c`.
+1. Kill any running process `ctrl-c`.
 
-.1 Disconnect.
+1. Disconnect.
 
 # Load All
 
