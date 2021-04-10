@@ -46,6 +46,7 @@ excludes = [
     # filse
     'REPLace.py',
     'notes.txt',
+    'README.md',
     'requirements.txt',
     'includes.json',
     'template_networks.csv',

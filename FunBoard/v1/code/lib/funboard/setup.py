@@ -97,7 +97,7 @@ def setup():
     # wifi tools
     #-----------------------
 
-    from lib.funboard.wifi_tools import WIFI
+    from lib.funboard.wifi import WIFI
     builtins.wifi = WIFI()
     del WIFI
     
@@ -105,7 +105,7 @@ def setup():
     # rtc
     #-----------------------
 
-    from lib.funboard.rtc_tools import RTCTOOLS
+    from lib.funboard.rtc import RTCTOOLS
     builtins.rtc = RTCTOOLS()
     del RTCTOOLS
 
@@ -113,14 +113,14 @@ def setup():
     # eziot
     #-----------------------
 
-    import lib.funboard.eziot_minimal as ez
+    import lib.funboard.eziot as ez
     builtins.eziot = ez
 
     #-----------------------
     # system tools
     #-----------------------
 
-    import lib.funboard.system_tools as st
+    import lib.funboard.st as st
     builtins.st = st
     
     #-----------------------
@@ -138,7 +138,7 @@ def setup():
     led.off()
 
     funboard.info
-    funboard.help
+    print('For help try "funboard.help".')
     print('Ready to Go!')
 
 # run
