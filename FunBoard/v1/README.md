@@ -81,24 +81,17 @@ There are also a lot of convenience functions included for common events such as
 Most of the class names are self-explanatory, but be sure to have a look at the obscure ones like **st**, which has lots of handy functions for exploring the file system, and **esp32**, which has some *esp32-specific* functions.
 
 ### beeper
-- `beeper.__init__(pin)`
 - `beeper.beep(freq=None,secs=None,vol=None,duty=None)`
 - `beeper.beepn(count=1,freq=None,secs=None,vol=None,duty=None,wait=None)`
 - `beeper.beep2(freq=None,freq2=None,secs=None,vol=None,duty=None,fcps=100)`
 - `beeper.play(notestring=None,root=None,beat=None,vol=None,duty=None)`
-- `beeper._beep(pin,freq=2200,secs=0.125,vol=100,duty=25)`
-- `beeper._beep2(pin,freq=2200,freq2=4400,secs=0.125,vol=100,duty=25,fcps=100)`
-- `beeper._play(pin,notestring,root=440,beat=0.125,vol=100,duty=25)`
-- `beeper._play_note(pin,note,octave,period,root,beat,vol,duty)`
 
 ### funboard
-- `funboard.__init__()`
 - `funboard.info`
 - `funboard.help`
 - `funboard.show(module=None)`
 
 ### esp32
-- `esp32.__init__(reset_pin)`
 - `esp32.reset`
 - `esp32.temp`
 - `esp32.tempf`
@@ -112,11 +105,8 @@ Most of the class names are self-explanatory, but be sure to have a look at the 
 - `eziot.post_data(group=None,device=None,data1=None,data2=None,data3=None,data4=None)`
 - `eziot.get_data(count=1,after=None,group=None,device=None)`
 - `eziot.delete_data(rowids=[],before=None,xall=False)`
-- `eziot._check_error(code,jdata)`
-- `eziot._make_request(route,data={},timeout=10)`
 
 ### led
-- `led.__init__(pin,initon=False)`
 - `led.on()`
 - `led.off()`
 - `led.blink(count=1,ontime=None,offtime=None)`
@@ -125,7 +115,6 @@ Most of the class names are self-explanatory, but be sure to have a look at the 
 - `led.pwm2(start=0,end=100,pause=10)`
 
 ### pixels
-- `pixels.__init__(pin,pixels)`
 - `pixels.off()`
 - `pixels.kill()`
 - `pixels.set_brightness(brightness=0)`
@@ -134,7 +123,6 @@ Most of the class names are self-explanatory, but be sure to have a look at the 
 - `pixels.sweep(color=None,brightness=None,ontime=25,offtime=5)`
 
 ### rtc
-- `rtc.__init__()`
 - `rtc.ntp_set()`
 - `rtc.set(datetime_tuple)`
 - `rtc.get()`
@@ -142,7 +130,6 @@ Most of the class names are self-explanatory, but be sure to have a look at the 
 - `rtc.dtstamp`
 
 ### sdcard
-- `sdcard.__init__(slot=None,cs=None,sck=None,mosi=None,miso=None)`
 - `sdcard.error(e=None,s='SDCard not mounted.',unmount=False)`
 - `sdcard.sdpath(path=None)`
 - `sdcard.mount()`
