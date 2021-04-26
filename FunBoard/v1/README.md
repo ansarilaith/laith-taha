@@ -8,43 +8,167 @@
 
 A work in progress.
 
-## Default Setup
-
-### Out-of-the-Box
-
-#### Physical Layout
-
-#### Code Layout
-
-### Updates
-
 ## Connecting
 
-## Functions
+### Putty
+
+Coming soon to a theater near you.
+
+### Picocom
+
+In Linux, you must add your username to the `dialout` group and then **log out** or **reboot**.
+```
+sudo adduser your_username dialout
+```
+
+Install:
+```
+sudo apt install picocom
+```
+
+Connect:
+```
+picocom -b 115200 /dev/ttyUSB1
+```
+Be sure to set your port to the correct one.
+
+Disconnect:
+
+Use `ctrl-a crtl-x` to exit picocom and return to the command prompt.
+
+### Python + PySerial
+
+Ref: [PySerial Docs](https://pythonhosted.org/pyserial/)
+
+Add your username to the `dialout` group and then **log out** or **reboot**.
+```
+sudo adduser your_username dialout
+```
+
+Add the PySerial module from the command line:
+```
+python3 -m pip install pyserial
+```
+
+Basic usage in Python:
+```
+uart = serial.Serial('/dev/ttyUSB1',115200) # 9600,8,N,1 is default
+
+uart.open()
+uart.read(1024)
+uart.write(b'some bytes')
+uart.close()
+```
+
+Or this:
+```
+uart = serial.Serial()
+uart.baudrate = 115200
+uart.port = '/dev/ttyUSB1'
+uart.timeout = 0
+
+uart.open()
+uart.read(1024)
+uart.write(b'some bytes')
+uart.close()
+```
+
+## Built In Functions
 
 The FunBoard comes with software to support all of the attached board peripherals like the MicroSD card, the leds, beeper, etc.
 There are also a lot of convenience functions included for common events such as connecting to WiFi, file and directory management, and using the Real-Time-Clock.
 
-Most of the class names are self-explanatory, but be sure to have a look at the obscure ones like **st**, which has lots of handy functions for exploring the file system, and **esp32**, which has some *ESP32-specific* functions.
+Most of the class names are self-explanatory, but be sure to have a look at the obscure ones like **st**, which has lots of handy functions for exploring the file system, and **esp32**, which has some *esp32-specific* functions.
 
 ### beeper
+- `beeper.__init__(pin)`
+- `beeper.beep(freq=None,secs=None,vol=None,duty=None)`
+- `beeper.beepn(count=1,freq=None,secs=None,vol=None,duty=None,wait=None)`
+- `beeper.beep2(freq=None,freq2=None,secs=None,vol=None,duty=None,fcps=100)`
+- `beeper.play(notestring=None,root=None,beat=None,vol=None,duty=None)`
+- `beeper._beep(pin,freq=2200,secs=0.125,vol=100,duty=25)`
+- `beeper._beep2(pin,freq=2200,freq2=4400,secs=0.125,vol=100,duty=25,fcps=100)`
+- `beeper._play(pin,notestring,root=440,beat=0.125,vol=100,duty=25)`
+- `beeper._play_note(pin,note,octave,period,root,beat,vol,duty)`
 
-### esp32: ESP32 Functions
+### funboard
+- `funboard.__init__()`
+- `funboard.info`
+- `funboard.help`
+- `funboard.show(module=None)`
 
-### eziot: EZIoT.link Cloud API
+### esp32
+- `esp32.__init__(reset_pin)`
+- `esp32.reset`
+- `esp32.temp`
+- `esp32.tempf`
+- `esp32.hall`
+- `esp32.memory`
+- `esp32.flash`
 
-### funboard:
+## eziot
+- `eziot.stats()`
+- `eziot.watch(startrows=10,update=10,group=None,device=None)`
+- `eziot.post_data(group=None,device=None,data1=None,data2=None,data3=None,data4=None)`
+- `eziot.get_data(count=1,after=None,group=None,device=None)`
+- `eziot.delete_data(rowids=[],before=None,xall=False)`
+- `eziot._check_error(code,jdata)`
+- `eziot._make_request(route,data={},timeout=10)`
 
-### led: Blue LED Control
+### led
+- `led.__init__(pin,initon=False)`
+- `led.on()`
+- `led.off()`
+- `led.blink(count=1,ontime=None,offtime=None)`
+- `led.pwmx(force=False)`
+- `led.pwm(percent=100)`
+- `led.pwm2(start=0,end=100,pause=10)`
 
-### pixels: Micro-Pixel Control
+### pixels
+- `pixels.__init__(pin,pixels)`
+- `pixels.off()`
+- `pixels.kill()`
+- `pixels.set_brightness(brightness=0)`
+- `pixels.get_color(color,brightness=None)`
+- `pixels.setp(pixel,color,brightness=None,write=True)`
+- `pixels.sweep(color=None,brightness=None,ontime=25,offtime=5)`
 
-### rtc: Real-Time-Clock
+### rtc
+- `rtc.__init__()`
+- `rtc.ntp_set()`
+- `rtc.set(datetime_tuple)`
+- `rtc.get()`
+- `rtc.linux_epoch`
+- `rtc.dtstamp`
 
-### sdcard: MicroSD Card Tools
+### sdcard
+- `sdcard.__init__(slot=None,cs=None,sck=None,mosi=None,miso=None)`
+- `sdcard.error(e=None,s='SDCard not mounted.',unmount=False)`
+- `sdcard.sdpath(path=None)`
+- `sdcard.mount()`
+- `sdcard.unmount(show=True)`
+- `sdcard.format(warn=True)`
 
-### st: System Tools
+## st
+- `st.abspath(fd=None)`
+- `st.isfile(f)`
+- `st.isdir(d)`
+- `st.exists(fd)`
+- `st.tree(d=None,i=0)`
+- `st.mkdir(d)`
+- `st.remove(f)`
+- `st.rmdir(d,root=False)`
+- `st.pf(f)`
+- `st.printfile(f)`
+- `st.pp(obj,depth=0,indentline=True,newline=True,end='\n')`
+- `st.ps(obj,depth=0,indentline=True,newline=True,jsonify=False)`
+- `st.reload(module)`
+- `st.du(d=None,h='MB',show=True,rt=False)`
+- `st.memp(show=True,collect=True,rt=False)`
 
-### wifi: WiFi Tools
+### wifi
+- `wifi.scan()`
+- `wifi.connect(essid=None,password=None,timeout=15)`
+- `wifi.disconnect(timeout=15)`
 
  

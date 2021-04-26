@@ -3,6 +3,8 @@
 .ipynb_checkpoints
 .*
 
+doc_assist*
+
 venv
 __pycache__
 hidden*
