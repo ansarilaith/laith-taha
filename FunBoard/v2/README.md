@@ -107,12 +107,13 @@ Most of the class names are self-explanatory, but be sure to have a look at the 
 - `eziot.delete_data(rowids=[],before=None,xall=False)`
 
 ### led
-- `led.on()`
-- `led.off()`
-- `led.blink(count=1,ontime=None,offtime=None)`
-- `led.pwmx(force=False)`
-- `led.pwm(percent=100)`
-- `led.pwm2(start=0,end=100,pause=10)`
+Control the blue LED.
+- `led.on()` - Turn the blue LED on.
+- `led.off()` - Turn the blue LED off.
+- `led.blink(count=1,ontime=None,offtime=None)` - Blink the blue LED. You can set the number of blinks using `count=n`. You can also set the `ontime` and `offtime` in milliseconds. Defaults are on for 50ms and off for 250ms.
+- `led.pwmx(force=False)` - Turn of pulse-width modulation (see below). You can also use `led.off()`.
+- `led.pwm(percent=100)` - Turn on blue LED using pulse-width modulation. This allows you to control brightness. Provide an integer percent from 0 (off) to 100 (full brightness).
+- `led.pwm2(start=0,end=100,pause=10)` - Progressive change of blue LED from `start` percent to `end` percent, pause `pause` milliseconds between steps (sets how long the transition tales). This allow a fade in, fade out option.
 
 ### pixels
 - `pixels.off()`
@@ -123,11 +124,12 @@ Most of the class names are self-explanatory, but be sure to have a look at the 
 - `pixels.sweep(color=None,brightness=None,ontime=25,offtime=5)`
 
 ### rtc
-- `rtc.ntp_set()`
-- `rtc.set(datetime_tuple)`
-- `rtc.get()`
-- `rtc.linux_epoch`
-- `rtc.dtstamp`
+Real-Time Clock functions. 
+- `rtc.ntp_set()` - Set local time using network time server. Requires an established WiFi connection. May time out without setting (not sure why at this point). If it fails, let the connection stabilize and try again.
+- `rtc.set(datetime_tuple)` - Set local time manually. `datetime_tuple = (year,month,day,hours,minutes,seconds)`
+- `rtc.get()` - Get local time as a tuple of numbers. `datetime_tuple = (year,month,day,hours,minutes,seconds)`
+- `rtc.linux_epoch` - Get the Linux epoch time integer (seconds since Jan 1 1970). Differs from ESP32 time stamp.
+- `rtc.dtstamp` - Get local time as a string: `2021-05-27 18:42:35 UTC`
 
 ### sdcard
 - `sdcard.error(e=None,s='SDCard not mounted.',unmount=False)`
