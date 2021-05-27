@@ -125,17 +125,16 @@ class PIXELS:
     # bold colors
     colors = {
         'blue': (0, 0, 255),
-        'deepbluegatoraide': (0, 32, 255),
-        'bluegatoraide': (0, 127, 255),
+        'bluesky': (0, 32, 255),
+        'sky': (0, 127, 255),
         'cyan': (0, 255, 255),
         'aqua': (0, 255, 127),
-        'electricmint': (0, 255, 32),
+        'mint': (0, 255, 32),
         'green': (0, 255, 0),
-        'electriclime': (32, 255, 0),
-        'greenyellow': (127, 255, 0),
+        'lime': (127, 255, 0),
         'yellow': (255, 255, 0),
         'orange': (255, 127, 0),
-        'electricpumpkin': (255, 32, 0),
+        'pumpkin': (255, 32, 0),
         'red': (255, 0, 0),
         'deeppink': (255, 0, 32),
         'pink': (255, 0, 127),
@@ -197,6 +196,11 @@ class PIXELS:
 
         # scale
         return tuple([int(x*(brightness or self.brightness)/255) for x in value])
+
+    # print colors
+    def clist(self):
+        for color,values in self.colors.items():
+            print('{:<12} {}'.format(color,values))
 
     # set a pixel
     def setp(self,pixel,color,brightness=None,write=True):
