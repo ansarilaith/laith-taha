@@ -193,7 +193,7 @@ The micropixels are controlled by providing a pixel address, a color tuple of RG
 - `sdcard.unmount()` - Unmount any SD card (before removing it).
 - `sdcard.format()` - **DELETE ALL DATA** and the SD card and format it.
 
-## st
+### st
 The **System Tools** module provides a range of convenience functions for working with files, directories, and memory.
 - `st.abspath(fd=None)` - Try to build a full, correct path string from the given path string.
 - `st.isfile(f)` - Test if string `f` is a file. Return True|False.
