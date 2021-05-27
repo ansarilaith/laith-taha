@@ -10,12 +10,18 @@ A work in progress.
 
 ## Content Links
 
-- [Connecting](#connecting)
-- [Built In Functions](#built-in-functions)
+- [Connecting Via USB3c](#connecting)
+- [FunBoard Built-In Functions](#built-in-functions)
 - [MicroPython General Docs](http://docs.micropython.org/en/latest/)
 - [MicroPython ESP32 Quick Reference](http://docs.micropython.org/en/latest/esp32/quickref.html)
 
 ## Connecting
+
+### USB 3 Type C
+
+The FunBoard connects to your laptop or desktop using a **USB 3 Type C** cable. When connected, the USB port is converted to TTY serial by a **Silicon Labs CP210x USB to UART Bridge IC**. If you are using Linux or OSX, these drivers should be included in the Kernel (or you definitely need an update). For Windows you will need to install the driver. You can get it here:
+
+[Silicon Labs Drivers](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
 
 ### Putty
 
