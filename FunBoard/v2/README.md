@@ -8,6 +8,13 @@
 
 A work in progress.
 
+## Content Links
+
+- [Connecting](#connecting)
+- [Built In Functions](#built-in-functions)
+- [MicroPython General Docs](http://docs.micropython.org/en/latest/)
+- [MicroPython ESP32 Quick Reference](http://docs.micropython.org/en/latest/esp32/quickref.html)
+
 ## Connecting
 
 ### Putty
@@ -111,18 +118,11 @@ Here is the song-string syntax:
 - example - Middle C for 3 beats = 'C43'
 - example - A pause for 3 beats = 'P3' or 'P03'
 
+These are built in:
 - `beeper.jingle_notes` - Jingle (plays on boot) = 'e5 g5 b5 d6 p d5'
 - `beeper.jingle2_notes` - Jingle2 (plays after boot) = 'd7'
 - `beeper.shave_notes` - Included song *Shave and a Haircut* = 'c4 p g3 g3 a32 g32 p p b3 p c4'
 - `beeper.axelf_notes` - Included sing *Axel-F* = 'd44 f43 d42 d41 g42 d42 c42 d44 a43 d42 d41 a#42 a42 f42 d42 a42 d52 d41 c42 c41 a32 e42 d46'
-
-        # only "ABCDEFGP#0123456789" characters matter, others ignored
-        # example: "d44" == "D44" == "d 4 4" == "d, 4, 4" == "D4-4"
-        # example: "d44 a43 d42 d41 a#42 a42 f42"
-        # example: "d44a43d42d41a#42a42f42"
-
-        # middle C for 3 beats = 'C43'
-        # a pause for 3 beats = 'P3' or 'P03'
 
 
 
