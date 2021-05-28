@@ -4,6 +4,11 @@
 - **images** - this contains the last MicroPython image tested using FunBoard V2 code
 - **code** - this contains the code you need to run the FunBoard V1 (should be pre-loaded)
 
+# Glamour Shots
+
+![Front of V2 FunBoard](/images/v2_front.png)*The Front* ![Back of V2 FunBoard](/images/v2_back.png)*The Back*
+
+
 # Documentation
 
 A work in progress.
