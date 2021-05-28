@@ -6,7 +6,7 @@
 
 # Glamour Shots
 
-![Front of V2 FunBoard](/images/v2_front.png)*The Front* ![Back of V2 FunBoard](/images/v2_back.png)*The Back*
+![Front of V2 FunBoard](/FunBoard/v2/images/v2_front.png)*The Front* ![Back of V2 FunBoard](/FunBoard/v2/images/v2_back.png)*The Back*
 
 
 # Documentation
@@ -24,9 +24,7 @@ A work in progress.
 
 ### USB 3 Type C
 
-The FunBoard connects to your laptop or desktop using a **USB 3 Type C** cable. When connected, the USB port is converted to TTY serial by a **Silicon Labs CP210x USB to UART Bridge IC**. If you are using Linux or OSX, these drivers should be included in the Kernel (or you definitely need an update). For Windows you will need to install the driver. You can get it here:
-
-[Silicon Labs Drivers](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
+The FunBoard connects to your laptop or desktop using a **USB 3 Type C** cable. When connected, the USB port is converted to TTY serial by a **Silicon Labs CP210x USB to UART Bridge IC**. If you are using Linux or OSX, these drivers should be included in the Kernel (or you definitely need an update). For Windows you will need to install the driver. You can get it here: [Silicon Labs Drivers](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
 
 ### Putty
 
