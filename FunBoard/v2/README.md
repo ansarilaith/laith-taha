@@ -6,10 +6,10 @@
 
 # Glamour Shots
 
-<p float="left" style={align:center;}>
-  <img src="/FunBoard/v2/images/v2_front.jpg" width="400" />
-  <img src="/FunBoard/v2/images/v2_back.jpg"  width="400" />
-</p>
+<table><tr>
+<td width="50%"><img src="/FunBoard/v2/images/v2_front.jpg"/></td>
+<td width="50%"><img src="/FunBoard/v2/images/v2_back.jpg" /></td>
+</tr></table>
 
 # Documentation
 
