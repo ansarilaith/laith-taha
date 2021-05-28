@@ -19,6 +19,8 @@ class ESP32:
     @property
     def reset(self):
         print('HARDWARE RESET')
+        import time
+        from machine import Pin
         time.sleep_ms(100)
         if self.reset_pin:
             Pin(self.reset_pin,Pin.OUT,value=0)

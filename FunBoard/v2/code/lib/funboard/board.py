@@ -173,6 +173,17 @@ class BOARD:
             print('Be sure to check the documentation for details!')
             print('GitLab: https://gitlab.com/duder1966/youtube-projects')
 
+    def test(self):
+        led.on()
+        beeper.beep()
+        pixels.sweep('red',ontime=100,offtime=100)
+        st.tree()
+        pixels.sweep('blue',ontime=100,offtime=100)
+        wifi.scan()
+        pixels.sweep('green',ontime=100,offtime=100)
+        led.off()
+        esp32.reset()
+
 #-----------------------
 # end
 #-----------------------
