@@ -6,9 +6,9 @@
 
 # Glamour Shots
 
-<p float="left">
-  <img src="/FunBoard/v2/images/v2_front.jpg" />
-  <img src="/FunBoard/v2/images/v2_back.jpg"  />
+<p float="left" style={align:center;}>
+  <img src="/FunBoard/v2/images/v2_front.jpg" width="400" />
+  <img src="/FunBoard/v2/images/v2_back.jpg"  width="400" />
 </p>
 
 # Documentation
