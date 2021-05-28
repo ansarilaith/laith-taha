@@ -9,6 +9,10 @@
 ![Front of V2 FunBoard](/FunBoard/v2/images/v2_front.jpg)*The Front* ![Back of V2 FunBoard](/FunBoard/v2/images/v2_back.jpg)*The Back*
 
 
+<p float="left">
+  <img src="/FunBoard/v2/images/v2_front.jpg" width="200" />
+  <img src="/FunBoard/v2/images/v2_back.jpg" width="200" />
+</p>
 
 # Documentation
 
