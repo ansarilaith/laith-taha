@@ -6,7 +6,7 @@
 </tr></table>
 
 Everything you need to get started programming. 
-Lights, buzzer, wifi, SDcard, ESP32, MicroPython connected to your computer via USB.
+Lights, buzzer, wifi, SDcard, IO pins, buttons, ESP32, MicroPython connected to your computer via USB.
 No external power or peripherals needed.
 
 # This Directory
@@ -31,7 +31,7 @@ The FunBoard connects to your laptop or desktop using a **USB 3 Type C** cable. 
 
 ### Putty
 
-Coming soon to a theater near you.
+I will add this soon.
 
 ### Picocom
 
