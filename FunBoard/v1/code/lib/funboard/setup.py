@@ -69,7 +69,7 @@ def setup():
     from lib.funboard.beeper import BEEP
     builtins.beeper = BEEP(funboard.PIN_BUZZER)
     del BEEP
-    beeper.play(beeper.jingle_notes)
+    beeper.play(beeper.jingle_notes,vol=50)
 
     #-----------------------
     # micro pixels
@@ -134,7 +134,7 @@ def setup():
     # done
     #-----------------------
 
-    beeper.play(beeper.jingle2_notes)
+    beeper.play(beeper.jingle2_notes,vol=50)
     led.off()
 
     funboard.info

@@ -40,7 +40,7 @@ class RTCTOOLS:
             return True
 
         except Exception as e:
-            #sys.print_exception(e)
+            sys.print_exception(e)
             try:
                 del settime
             except:

@@ -130,9 +130,6 @@ These are built in:
 - `beeper.shave_notes` - Included song *Shave and a Haircut* = 'c4 p g3 g3 a32 g32 p p b3 p c4'
 - `beeper.axelf_notes` - Included sing *Axel-F* = 'd44 f43 d42 d41 g42 d42 c42 d44 a43 d42 d41 a#42 a42 f42 d42 a42 d52 d41 c42 c41 a32 e42 d46'
 
-
-
-
 ### funboard
 FunBoard **Help** and information.
 - `funboard.info` - FunBoard version data.
