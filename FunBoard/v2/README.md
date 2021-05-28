@@ -1,20 +1,21 @@
+# The FunBoard V2
+
+<table><tr>
+<td width="50%"><img alt="front" src="/FunBoard/v2/images/v2_front.jpg"/></td>
+<td width="50%"><img alt="back"  src="/FunBoard/v2/images/v2_back.jpg" /></td>
+</tr></table>
+
+Everything you need to get started programming. 
+Lights, buzzer, wifi, SDcard, ESP32, MicroPython connected to your computer via USB.
+No external power or peripherals needed.
+
 # This Directory
 
 - **applications** - this contains application code from YouTube videos which use the FunBoard V2
 - **images** - this contains the last MicroPython image tested using FunBoard V2 code
-- **code** - this contains the code you need to run the FunBoard V1 (should be pre-loaded)
-
-# Glamour Shots
-
-<table><tr>
-<td width="50%"><img src="/FunBoard/v2/images/v2_front.jpg"/></td>
-<td width="50%"><img src="/FunBoard/v2/images/v2_back.jpg" /></td>
-</tr></table>
+- **code** - this contains the code you need to run the FunBoard V2 (should be pre-loaded)
 
 # Documentation
-
-A work in progress.
-
 ## Content Links
 
 - [Connecting Via USB3c](#connecting)
