@@ -6,7 +6,8 @@
 
 # Glamour Shots
 
-![Front of V2 FunBoard](/FunBoard/v2/images/v2_front.png)*The Front* ![Back of V2 FunBoard](/FunBoard/v2/images/v2_back.png)*The Back*
+![Front of V2 FunBoard](/FunBoard/v2/images/v2_front.jpg)*The Front* ![Back of V2 FunBoard](/FunBoard/v2/images/v2_back.jpg)*The Back*
+
 
 
 # Documentation
