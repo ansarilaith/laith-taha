@@ -42,7 +42,19 @@ class WIFI:
             else:
                 False
             print('Network AP:',[ssid,bssid,channel,RSSI,authmode,hidden])
-        wlan.active(state) # return to pervious state
+        wlan.active(state) # return to previous state
+
+    def ip(self,full=False):
+        wlan = network.WLAN(network.STA_IF)
+        if full:
+            return wlan.ifconfig()
+        return wlan.ifconfig()[0]
+
+    def isconnected(self):
+        wlan = network.WLAN(network.STA_IF)
+        if wlan.isconnected():
+            return True
+        return False        
 
     def connect(self,essid=None,password=None,timeout=15):
         essid = essid or self.essid

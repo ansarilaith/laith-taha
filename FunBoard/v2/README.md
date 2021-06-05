@@ -217,7 +217,8 @@ The **System Tools** module provides a range of convenience functions for workin
 ### wifi
 **WiFi Connect** functions.
 - `wifi.scan()` - Print available wifi networks to the screen.
-- `wifi.connect(essid=None,password=None,timeout=15)` - Connect to a wifi access point with ID `essid` using the given `password` or None if the network is open. 
+- `wifi.connect(essid=None,password=None,timeout=15)` - Connect to a wifi access point with ID `essid` using the given `password` or None if the network is open.
+- `wifi.ip(full=False)` - Return current assigned IP address. If `full` return a 4-tuple `(ip, subnet, gateway, dns)`.
 - `wifi.disconnect(timeout=15)` - Disconnect from wifi.
 
  

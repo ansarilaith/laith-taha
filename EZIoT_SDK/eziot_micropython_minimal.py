@@ -225,8 +225,8 @@ def delete_data(rowids=[],before=None,xall=False):
 
 # get dnsid,redirect_url, and hit count
 def get_dns():
-##    '''Get current dnsid,url,hitcount.
-##    RETURN: (dnsid,url,hits) or (None,None,0)'''
+##    '''Get current dnsid,link,url,hitcount.
+##    RETURN: (dnsid,link,url,hits) or (None,None,0)'''
 
     # make request
     code,jdata = _make_request('dns/get',{})

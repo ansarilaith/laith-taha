@@ -24,7 +24,7 @@ The `eziot.py` SDK in combination with the `eziot.link` API will allow you to up
 
 1. **Pass Data Between Devices** - You can easily send commands to devices and pass data between devices by using the `group` and `device` values. Just post data using a specific group and device, and then the target device can get that data using the same group and device. Easy.
 
-1. **Locate Device on the Internet** - In other words: **Dynamic DNS**. You can let `eziot.link` create a dynamic link to your device so that it will be visible to others and easy for you to find.
+1. **Locate a Device on the Internet** - In other words: **Dynamic DNS**. You can let `eziot.link` create a dynamic link to your device so that it will be visible to others and easy for you to find.
 
 
 ## What Can't I Do?
@@ -284,13 +284,13 @@ Now you should be able to set up dynamic DNS and get to your device.
 
 `eziot.get_dns()`
 
-Get a tuple of current `(dnsid,url,hitcount)` or `(None,None,0)` for your DNS setup. See `eziot.set_dns`.
+Get a tuple of current `(dnsid,link,url,hitcount)` or `(None,None,None,0)` for your DNS setup. See `eziot.set_dns`.
 
 `eziot.set_dns(https=False,port=None,plus=None,dnsid=None)`
 
 Create a dynamic DNS record and forwarding URL. Return the DNS ID you were assigned.
 The forwarding URL will look similar to this: `http://eziot.link/dns/clayton`
-Use `eziot.get_dns()` to get the forwarding URL you can use/share to reach your device.
+Use `eziot.get_dns()` to get the forwarding URL link you can use/share to reach your device.
 
 - https: BOOLEAN (True|False). Create forwarding URL with `https://`. Set to True if your device is handling secure sockets.
 - port: an INTEGER. Set the port that your router is forwarding to your device (default is `80`).
