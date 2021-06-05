@@ -158,6 +158,10 @@ The [EZIoT.link](https://eziot.link/) cloud data API is included. Be sure to che
 - `eziot.post_data(group=None,device=None,data1=None,data2=None,data3=None,data4=None)` - Post some data.
 - `eziot.get_data(count=1,after=None,group=None,device=None)` - Get some data.
 - `eziot.delete_data(rowids=[],before=None,xall=False)` - Delete some data.
+- `eziot.get_dns()` - Get current dynamic DNS setup variables.
+- `eziot.set_dns(https=False,port=None,plus=None,dnsid=None)` - Set and start dynamic DNS service.
+- `eziot.unset_dns()` - Stop the dunamic DNS service.
+
 
 ### led
 Control the **Blue LED**.

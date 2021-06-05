@@ -1,3 +1,10 @@
+# Deprecated
+
+See the `README` for the FunBoard v2.
+
+You can use all the same coded **except** `board.py`.
+
+
 # This Directory
 
 - **applications** - this contains application code from YouTube videos which use the FunBoard V1
