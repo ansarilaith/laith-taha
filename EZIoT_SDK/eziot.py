@@ -80,6 +80,20 @@ def stats():
     # return dict
     return jdata.get('stats',{})
 
+# may be used at a later date
+def report():
+    '''Undocumented. Experimental.'''
+
+    # make request
+    code,jdata = _make_request('report')
+
+    # error
+    _check_error(code,jdata)
+
+    # get, print, return
+    report = jdata.get('report','No report available.')
+    print(report)
+
 # a meta function to watch for updates
 # this uses get_data() in an economical way
 def watch(startrows=10,update=10,group=None,device=None):
@@ -236,6 +250,94 @@ def delete_data(rowids=[],before=None,xall=False):
 
     # return rowid count
     return jdata.get('rows',0)
+
+#----------------------------------------------
+# dns functions
+#----------------------------------------------
+
+# get dnsid,redirect_url, and hit count
+def get_dns():
+    '''Get current dnsid,url,hitcount.
+    RETURN: (dnsid,url,hits) or (None,None,0)'''
+
+    # make request
+    code,jdata = _make_request('dns/get',{})
+
+    # error
+    _check_error(code,jdata)
+
+    # make link
+    dnsid,url,hits = jdata.get('dns',(None,None,0))
+    if dnsid:
+        link = 'http://eziot.link/dns/{}'.format(dnsid)
+    else:
+        link = None
+
+    # done
+    return dnsid,link,url,hits
+
+# set dns, return actual dnsid
+def set_dns(https=False,port=None,plus=None,dnsid=None):
+    '''Create a DNS entry, based on current IP, given port, and suggested DNSID.
+    RETURN: the actual 'dnsid' value (may have numbers appended to make it unique).
+    The 301 redirect IP will be "http{s}://{ip}:{port}/{plus}"'''
+
+    # build data
+    # only send non-None values
+    data = {}
+
+    # check general data types and string lengths
+    # this is a pre-check, the server also checks
+    https = not not https
+    for name,value,check in (('https',https,bool),
+                              ('port',port,int),
+                              ('plus',plus,64),
+                              ('dnsid',dnsid,29)):
+        if value != None:
+            if type(value) == str:
+                assert len(value) <= check
+            else:
+                assert type(value) == check
+            data[name] = value
+
+    # make request
+    code,jdata = _make_request('dns/set',data)
+
+    # error
+    _check_error(code,jdata)
+
+    # return dnsid
+    return jdata.get('dnsid',None)
+
+# unset dns, return True|False
+def unset_dns():
+    '''Set DNS "url" to None. Preserve current "dnsid" value.
+    Use this to stop DNS service but keep your current ID.
+    RETURN: True'''
+
+    # make request
+    code,jdata = _make_request('dns/unset',{})
+
+    # error
+    _check_error(code,jdata)
+
+    # return dnsid
+    return jdata.get('success',False)
+
+# delete dns entry, return True|False
+def delete_dns():
+    '''Delete DNS entry. Delete current "dnsid" value.
+    If you use this function, you might lose your current DNS ID.
+    RETURN: True'''
+
+    # make request
+    code,jdata = _make_request('dns/delete',{})
+
+    # error
+    _check_error(code,jdata)
+
+    # return dnsid
+    return jdata.get('success',False)
 
 #----------------------------------------------
 # network functions

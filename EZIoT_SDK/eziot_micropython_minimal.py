@@ -50,8 +50,8 @@ upython = True
 
 # get stats for data table
 def stats():
-    '''Get the current state of your data.
-    RETURN: dict of item:value pairs'''
+##    '''Get the current state of your data.
+##    RETURN: dict of item:value pairs'''
 
     # make request
     code,jdata = _make_request('stats')
@@ -68,16 +68,24 @@ def watch(startrows=10,update=10,group=None,device=None):
 
     # tracking variables
     last_rowid = 0
-    update = int(update*1000)
-    next_loop = time.ticks_ms()
+    if upython:
+        update = int(update*1000)
+        next_loop = time.ticks_ms()
+    else:
+        next_loop = int(time.time())
 
     # infinite loop
     while 1:
 
         # wait until time
-        while time.ticks_diff(time.ticks_ms(),next_loop) < 0:
-            time.sleep_ms(int(update/100))
-        next_loop = time.ticks_add(next_loop,update)
+        if upython:
+            while time.ticks_diff(time.ticks_ms(),next_loop) < 0:
+                time.sleep_ms(int(update/100))
+            next_loop = time.ticks_add(next_loop,update)
+        else:
+            while time.time() < next_loop:
+                time.sleep(update/100)
+            next_loop += update
 
         # get rows
         if not last_rowid:
@@ -98,8 +106,8 @@ def watch(startrows=10,update=10,group=None,device=None):
 
 # insert a row of data, return rowid of insert
 def post_data(group=None,device=None,data1=None,data2=None,data3=None,data4=None):
-    '''Insert a row of data. No values are required.
-    RETURN: rowid (id number) if inserted data'''
+##    '''Insert a row of data. No values are required.
+##    RETURN: rowid (id number) if inserted data'''
 
     # build data
     # only send non-None values
@@ -131,15 +139,15 @@ def post_data(group=None,device=None,data1=None,data2=None,data3=None,data4=None
 
 # get rows of data
 def get_data(count=1,after=None,group=None,device=None):
-    '''Get the "count" most-recent rows of data.
-    Limit return using "after", "group", "device".
-    count = 1-1024 (how many rows to return)
-    after = rowid (only rows after this rowid)
-    group = "groupname" (only rows with this group name)
-    device = "devicename" (only rows with this device name)
-    RETURN: list of data row lists [[row],[row],...]
-    row = [rowid,epoch,gmt,ip,group,device,data1,date2,data3,data4]
-    '''
+##    '''Get the "count" most-recent rows of data.
+##    Limit return using "after", "group", "device".
+##    count = 1-1024 (how many rows to return)
+##    after = rowid (only rows after this rowid)
+##    group = "groupname" (only rows with this group name)
+##    device = "devicename" (only rows with this device name)
+##    RETURN: list of data row lists [[row],[row],...]
+##    row = [rowid,epoch,gmt,ip,group,device,data1,date2,data3,data4]
+##    '''
 
     # build data
     # only send non-None values
@@ -174,12 +182,12 @@ def get_data(count=1,after=None,group=None,device=None):
 
 # delete rows of data, return count of rows deleted
 def delete_data(rowids=[],before=None,xall=False):
-    '''Delete rows of data. !!!This is PERMANENT!!!
-    rowids = int or list (a rowid of a list of rowids)
-    before = rowid (delete all rowids before this rowid)
-    xall = True|False (delete all rows)
-    RETURN: count of deleted rows
-    '''
+##    '''Delete rows of data. !!!This is PERMANENT!!!
+##    rowids = int or list (a rowid of a list of rowids)
+##    before = rowid (delete all rowids before this rowid)
+##    xall = True|False (delete all rows)
+##    RETURN: count of deleted rows
+##    '''
 
     # build data
     # only send non-None values
@@ -210,6 +218,94 @@ def delete_data(rowids=[],before=None,xall=False):
 
     # return rowid count
     return jdata.get('rows',0)
+
+#----------------------------------------------
+# dns functions
+#----------------------------------------------
+
+# get dnsid,redirect_url, and hit count
+def get_dns():
+##    '''Get current dnsid,url,hitcount.
+##    RETURN: (dnsid,url,hits) or (None,None,0)'''
+
+    # make request
+    code,jdata = _make_request('dns/get',{})
+
+    # error
+    _check_error(code,jdata)
+
+    # make link
+    dnsid,url,hits = jdata.get('dns',(None,None,0))
+    if dnsid:
+        link = 'http://eziot.link/dns/{}'.format(dnsid)
+    else:
+        link = None
+
+    # done
+    return dnsid,link,url,hits
+
+# set dns, return actual dnsid
+def set_dns(https=False,port=None,plus=None,dnsid=None):
+##    '''Create a DNS entry, based on current IP, given port, and suggested DNSID.
+##    RETURN: the actual 'dnsid' value (may have numbers appended to make it unique).
+##    The 301 redirect IP will be "http{s}://{ip}:{port}/{plus}"'''
+
+    # build data
+    # only send non-None values
+    data = {}
+
+    # check general data types and string lengths
+    # this is a pre-check, the server also checks
+    https = not not https
+    for name,value,check in (('https',https,bool),
+                              ('port',port,int),
+                              ('plus',plus,64),
+                              ('dnsid',dnsid,29)):
+        if value != None:
+            if type(value) == str:
+                assert len(value) <= check
+            else:
+                assert type(value) == check
+            data[name] = value
+
+    # make request
+    code,jdata = _make_request('dns/set',data)
+
+    # error
+    _check_error(code,jdata)
+
+    # return dnsid
+    return jdata.get('dnsid',None)
+
+# unset dns, return True|False
+def unset_dns():
+##    '''Set DNS "url" to None. Preserve current "dnsid" value.
+##    Use this to stop DNS service but keep your current ID.
+##    RETURN: True'''
+
+    # make request
+    code,jdata = _make_request('dns/unset',{})
+
+    # error
+    _check_error(code,jdata)
+
+    # return dnsid
+    return jdata.get('success',False)
+
+# delete dns entry, return True|False
+def delete_dns():
+##    '''Delete DNS entry. Delete current "dnsid" value.
+##    If you use this function, you might lose your current DNS ID.
+##    RETURN: True'''
+
+    # make request
+    code,jdata = _make_request('dns/delete',{})
+
+    # error
+    _check_error(code,jdata)
+
+    # return dnsid
+    return jdata.get('success',False)
 
 #----------------------------------------------
 # network functions
