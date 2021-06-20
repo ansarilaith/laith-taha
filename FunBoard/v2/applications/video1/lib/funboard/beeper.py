@@ -85,7 +85,7 @@ class BEEP:
                        duty or self.duty,
                        pixel,color)
 
-    def beepn(self,count=1,wait=None,freq=None,secs=None,vol=None,duty=None,pixel=None,color=None):
+    def beepn(self,count=1,freq=None,secs=None,vol=None,duty=None,pixel=None,color=None,wait=None):
         if self.pin is not None:
             wait = int(1000*(wait or (secs or self.secs)/2))
             for x in range(count):

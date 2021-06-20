@@ -1,8 +1,8 @@
 # example main.py
 
 # connect to wifi
-#wifi.essid = 'your_wifi_network'
-#wifi.password = 'your_wifi_password'
+#wifi.essid = 'youressid'
+#wifi.password = 'yourpassword'
 #wifi.scan()
 ##wifi.connect()
 

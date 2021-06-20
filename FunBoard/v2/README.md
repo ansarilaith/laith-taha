@@ -114,10 +114,10 @@ Here are default values:
 - `beeper.beat` - Beat length for `play` = 0.125
 
 Here are the functions:
-- `beeper.beep(freq=None,secs=None,vol=None,duty=None)` - Beep the buzzer. No values are required (will use defaults). 
-- `beeper.beepn(count=1,freq=None,secs=None,vol=None,duty=None,wait=None)` - Beep the buzzer `n` times. No values are required (will beep once using defaults).
+- `beeper.beep(freq=None,secs=None,vol=None,duty=None,pixel=None,color=None)` - Beep the buzzer. No values are required (will use defaults). The `pixel` and `color` values can be used to turn on a micropixel while the note is played. Use the micropixel index 7-0 and a color string from `pixels.colors`.
+- `beeper.beepn(count=1,wait=None,freq=None,secs=None,vol=None,duty=None,pixel=None,color=None,wait=None)` - Beep the buzzer `n` times. No values are required (will beep once using defaults). Works the same as `beep` except for the `count` and `wait` values.
 - `beeper.beep2(freq=None,freq2=None,secs=None,vol=None,duty=None,fcps=100)` - Beep the buzzer, but change from `freq` to `freq2` over `secs` seconds. No values are required (will use defaults).
-- `beeper.play(notestring=None,root=None,beat=None,vol=None,duty=None)` - Play a song (a string of notes). No values are required (will play `beeper.shave_notes`).
+- `beeper.play(notestring=None,root=None,beat=None,vol=None,duty=None,dopixels=False)` - Play a song (a string of notes). No values are required (will play `beeper.shave_notes`). If `dopixels` is set to `True`, notes will be displayed on the micropixels while they play.
 
 Here is the song-string syntax:
 - notestring - Any string of a `note/pause + optional_sharp + octave + beats` sequences.
