@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Beaker's ESP32 Web Server</title>
+<script>
+function loadpage(url,elementid) {
+    var xhttp = new XMLHttpRequest();
+    xhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            var value = xhttp.responseText;          
+            document.getElementById(elementid).innerHTML = value;
+            };
+        };
+    xhttp.open("GET",url,true);
+    xhttp.send();
+};
+function loadextra() {
+    loadpage("/app/guestlist","guestlist");
+    loadpage("/app/pagecount","pagecount");
+};
+</script>
+<style>
+@import url('https://fonts.googleapis.com/css?family=Short+Stack');
+body {
+    background-color: black;
+    color: silver;
+    text-align: center;
+    font-size: 1em;
+    font-family: "Short Stack", monospace;
+    }
+div {
+    display: block;
+    background-color: inherit; 
+    text-align: center;
+    border: solid silver 0px; 
+    margin: 8px auto;
+    padding: 8px;
+    }
+img {
+    margin: 4px; 
+    padding: 4px;
+    border: solid silver 1px;
+    vertical-align: middle;
+    }
+a         {color:dodgerblue; text-decoration:none;}
+a:visited {color:dodgerblue; text-decoration:none;}
+a:hover   {color:purple; text-decoration:none;}
+a:active  {color:purple; text-decoration:none;}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout:fixed;    
+    }
+td {
+    text-align: left;
+    overflow: hidden;
+    border: solid red 0px;
+    }
+td.r {
+    text-align: right;
+    }
+input {
+    font-family: inherit;
+    font-size: 90%;
+    margin: 0px 2px;
+    }
+div.main{
+    width: 640px;
+    border: solid silver 1px;
+    }
+div.header {
+    font-size: 120%;
+    }
+div.content {}
+div.guests {
+    text-align: left;
+    }
+div.form {
+    border: solid black 0px;
+    border-radius: 16px; 
+    padding: 8px;
+    color: black;
+    background-color: silver;
+    }
+div.guestlist {
+    font-size: 90%;
+    }
+div.guestlist table {
+    table-layout:fixed;    
+    }
+div.guestlist td {
+    vertical-align: top;
+    word-wrap: break-word;
+    border: solid #222 1px;
+    }
+div.guestlist td.nw {
+    white-space: nowrap;
+    }
+div.guestlist td:last-child {
+    width: 40%;}
+div.footer {
+    text-align: right;
+    font-size: 80%;   
+    }
+</style>
+</head><body onload="javascript:loadextra()">
+<div class="main">
+<div class="header">
+<img alt="Beaker" src="/beaker.jpg" width="25%">
+<br>
+I Am Beaker
+</div>
+
+<div class="content">
+<p>Hi. My name is Beaker. I'm very surprised to see you here.</p>
+<p>This web page is being served by a <a href="https://cpcb.shop/">FunBoard v1 ESP32</a> microcontroller running <a href="https://micropython.org/">MicroPython</a>.</p>
+<p>Everything is created and stored on the ESP32. I am using the <a href="http://eziot.link/">EZIoT.link</a> dynamic DNS feature to help you find me.</p>
+</div>
+
+<div class="guests">
+Please sign the guest list:
+<div class="form">
+<form method="POST" action="/app/guest">
+<table>
+<tr><td width="15%">Name:     </td><td><input type="text" name="name" maxlength="32" size="20"></td></tr>
+<tr><td width="15%">From:     </td><td><input type="text" name="from" maxlength="32" size="20"></td></tr>
+<tr><td width="15%">Message:  </td><td><input type="text" name="mesg" maxlength="64" size="42"></td></tr>
+<tr><td width="15%">Log Visit:</td><td><input type="submit" value="SUBMIT"></td></tr>
+</table>
+</form>
+</div>
+<br>
+Recent guests:
+<div class="guestlist" id="guestlist">
+loading...
+</div>
+</div>
+
+<div class="footer">
+Requests Since Re-Boot: <span id="pagecount">---</span>
+</div>
+
+</div>
+</body>
+</html>
