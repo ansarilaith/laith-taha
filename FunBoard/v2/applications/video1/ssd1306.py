@@ -426,11 +426,15 @@ class SSD1306:
                 if xindex + X >= self.width:
                     break
 
+    #-------------------------------------------
+    # extra 
+    #-------------------------------------------
+
     def test(self,ontime=1000):
         self.frame_clear()
         self.rect(1,1,self.width,self.height,1)
         self.frame_show()
-        self.place_text('iotery',64,32,scale=2,center=True,middle=True,value=1)
+        self.place_text('FUNBOARD',64,32,scale=2,center=True,middle=True,value=1)
         self.frame_show()
         time.sleep_ms(int(ontime/3))
         self.invert()
@@ -531,13 +535,23 @@ class SSD1306_I2C(SSD1306):
 
         try:
 
+            self.frame_clear()
+
+            # for i2c, prevents too many shows
+            show_every = 2
+
             while 1:
 
-                self.frame_clear()
+                show_every = 60
+                bc = 0
+                for x,y,z in ft.rrain():
+                    self.bitset(x,y,z)
+                    bc += 1
+                    if not bc % show_every:
+                        self.frame_show()
+                self.frame_show()
 
-                # for i2c, prevents too many shows
                 show_every = 2
-
                 bc = 0
                 for x,y in ft.rtree(64,0): # start point
                     self.bitset(x,y)
@@ -547,8 +561,8 @@ class SSD1306_I2C(SSD1306):
                 self.frame_show()
 
                 time.sleep_ms(1000)
-                self.port_clear()
-                time.sleep_ms(250)
+##                self.port_clear()
+##                time.sleep_ms(250)
 
         except KeyboardInterrupt:
             pass

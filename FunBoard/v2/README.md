@@ -1,15 +1,35 @@
 # The FunBoard V2
 
+The Funboard is designed to be a low-cost solution for learning to program and experimenting with embedded devices and the Internet-of-Things (IoT).
+The board and open-source software package provides everything you need to get started programming using Python and MicroPython, some of the most popular and practical programming languages in use today.
+You can easily develop your basic programming skills and knowledge base (i.e. variables, functions, loops, etc.) using the on-board LEDs, MicroPixels and buzzer.
+And when you are ready, you can move on to advance topics and projects like IoT devices and network programming, all using the built-in IO pins, microSD card, and WiFi capability.
+Whatever your programming level, a creative mind will never run out of projects for the FunBoard.
+I've been programming for 20 years, and I use FunBoards everyday for developing and experimenting.
+
+Here are some of the FunBoard's features:
+
+- USB powered
+- USB interface
+- ESP32 processor
+- WiFi
+- two switches (reset and programmable)
+- microSD card slot
+- 13 extra IO pins
+- SPI, I2C, UART
+- programmable LED
+- buzzer
+- 8 programmable MicroPixels
+- MicroPython
+- full support software
+- ongoing support and tutorials
+
 <table><tr>
 <td width="50%"><img alt="front" src="/FunBoard/v2/images/v2_front.jpg"/></td>
 <td width="50%"><img alt="back"  src="/FunBoard/v2/images/v2_back.jpg" /></td>
 </tr></table>
 
-Everything you need to get started programming. 
-Lights, buzzer, wifi, SDcard, IO pins, buttons, ESP32, MicroPython connected to your computer via USB.
-No external power or peripherals needed.
-
-# This Directory
+# In This Repository
 
 - **applications** - this contains application code from YouTube videos which use the FunBoard V2
 - **images** - this contains the last MicroPython image tested using FunBoard V2 code
@@ -22,6 +42,7 @@ No external power or peripherals needed.
 - [FunBoard Built-In Functions](#built-in-functions)
 - [MicroPython General Docs](http://docs.micropython.org/en/latest/)
 - [MicroPython ESP32 Quick Reference](http://docs.micropython.org/en/latest/esp32/quickref.html)
+- [ClaytonDarwin on YouTube](https://www.youtube.com/claytondarwin)
 
 ## Connecting
 

@@ -1,6 +1,8 @@
 # example using eziot.link/dns and microserver
 # originally by claytondarwin@gmail.com
 
+# this is what runs beaker's server
+
 #-------------------------------
 # variables
 #-------------------------------

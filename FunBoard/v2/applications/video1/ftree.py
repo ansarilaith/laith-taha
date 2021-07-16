@@ -12,7 +12,7 @@ import os # os.urandom
 from math import sin, cos, radians
 
 #-----------------------
-# fractal tree drawer
+# fractal tree point iterator
 #-----------------------
 
 class FTree:
@@ -21,25 +21,41 @@ class FTree:
     canvas_width  = 128
     canvas_height = 64
 
-    # make random tree
+    # fill frame with rain
+    # iterator that return points (x,y)
+    def rrain(self):
+        xs = [x for x in range(1,self.canvas_width,3)]
+        while xs:
+            x = xs.pop(self.randint(len(xs)-1))
+            for y in range(self.canvas_height,-1,-1):               
+                yield x,y,1
+                yield x,y+1,0
+                yield x,y-1,0
+                yield x-1,y+1,0
+                yield x+1,y+1,0
+                
+
+    # make a random tree
+    # iterator that return points (x,y)
     def rtree(self,sx,sy):
 
         angle2  = 10 + self.randint(45) # branch angle
-        length1 = self.canvas_height//4# + self.randint(self.canvas_height//8) # start length of trunk
+        length0 = 1+self.randint(self.canvas_height//4) # trunk length
+        length1 = self.canvas_height//4 # first branch length
         length2 = (68 + self.randint(16))/100 # decimal reduction factor 
         width1  = 1 # not implemented
         width2  = 1 # not implemented
         left2right = self.randint(1) # draw left to right
 
-        print('RTREE:',[angle2,length1,length2,width1,width2,left2right])
+        print('RTREE:',[angle2,length0,length1,length2,width1,width2,left2right])
 
-        yield from self.trunk(sx,sy,90,angle2,length1,length2,width1,width2,left2right)
+        yield from self.trunk(sx,sy,90,angle2,length0,length1,length2,width1,width2,left2right)
 
     # start a tree (angle1 ignored)
-    def trunk(self,sx,sy,angle1,angle2,length1,length2,width1,width2,left2right):
+    def trunk(self,sx,sy,angle1,angle2,length0,length1,length2,width1,width2,left2right):
 
-        yield from self.draw_branch(sx,sy,sx,sy+length1,width1)
-        yield from self.branch(sx,sy+length1,90,angle2,length1,length2,width1,width2,left2right)
+        yield from self.draw_branch(sx,sy,sx,sy+length0,width1)
+        yield from self.branch(sx,sy+length0,90,angle2,length1,length2,width1,width2,left2right)
 
     # recursive branch function
     def branch(self,sx,sy,angle1,angle2,length1,length2,width1,width2,left2right):
@@ -138,7 +154,7 @@ class FTree:
         # the random.randint() returns the same value after start
         # this does better at returning mixed values
 
-        return int(ord(os.urandom(1))*min(256,maximum+1)/256)
+        return int(ord(os.urandom(1))*min(256,int(maximum)+1)/256)
 
 #-----------------------
 # end

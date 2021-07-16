@@ -77,7 +77,7 @@ def setup():
     from lib.funboard.beeper import BEEP
     builtins.beeper = BEEP(funboard.PIN_BUZZER)
     del BEEP
-    beeper.play(beeper.jingle_notes,vol=50,dopixels=True)
+    beeper.play(beeper.jingle_notes,vol=50,dopixels=False)
 
     #-----------------------
     # micro pixels test
@@ -139,13 +139,12 @@ def setup():
     #-----------------------
     # done
     #-----------------------
-
-    beeper.play(beeper.jingle2_notes,vol=50)
+    print(funboard.ASCIIART)
+    beeper.play(beeper.jingle2_notes,vol=50,dopixels=False)
     led.off()
-
     funboard.info
     print('For help try "funboard.help".')
-    print('Ready to Go!')
+    print('Funboard is ready to go!\n\n')
 
 # run
 setup()

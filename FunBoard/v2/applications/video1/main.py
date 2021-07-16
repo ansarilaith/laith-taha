@@ -1,45 +1,171 @@
+#-----------------------
+# notify
+#-----------------------
+
+print('RUN: main.py')
+
+#-----------------------
+# imports
+#-----------------------
+
 import time
+import gc
+import ssd1306
+import ftree
 
-# pause for editing
-time.sleep_ms(4000)
- 
-# led on-off
-led.on()
+#-----------------------
+# setup
+#-----------------------
+
+# the buffer is big, so clear memory as much as possible
+gc.collect()
+
+# make oled device
+oled = ssd1306.SSD1306_I2C()
+
+# change pins (these are the funboard defaults)
+oled.scl = 25
+oled.sda = 26
+
+# change baud 100K is default, 400K generally works
+oled.baudrate = 400000
+
+# set screen resolution position
+# 1306 defaults to 128x64 (it's max value)
+
+# use these for smaller
+oled.width = 128
+oled.height = 64
+oled.xoffset = 0
+oled.yoffset = 0
+
+# do this if you changed screen size
+oled.__init__()
+
+# open the port
+oled.port_open(test=False)
+
+# set display values
+oled.contrast(255) # brightness 0 to 255
+oled.r180() # rotate screen 180
+# oled.unr180() # un-rotate screen 180
+# also flip, unflip, mirror, unmirror, invert, uninvert
+
+# run a test pattern
+oled.test()
+
+# clear screen to start
+oled.frame_clear() # this clears the frame
+oled.frame_show() # this pushes the frame to the device
+
+#-----------------------
+# connect to REPL
+#-----------------------
+
+oled.repl_connect()
+for x in range(11):
+    print('Hello REPL',x)
+oled.repl_disconnect()
+oled.frame_clear()
+oled.frame_show()
+
+#-----------------------
+# basic functions
+#-----------------------
+
+# (1,1) is the top left
+# (128,64) is the bottom right
+
+# oled.on() # turns oled on
+# oled.off() # turns oled off
+# oled.port_clear() # clear the oled (not the internal frame)
+
+# oled.frame_clear() # clears internal display buffer (not the oled)
+# oled.frame_fill()  # fills the internal display buffer
+# oled.frame_show()  # sends internal frame to the oled
+
+# oled.bitset(x,y)
+# oled.bitclear(x,y)
+
+#-----------------------
+# shapes
+#-----------------------
+
+# oled.hline(X,Y,L,value=1) # horizontal line from XY length L
+# oled.vline(X,Y,L,value=1) # vertical
+
+# oled.line(X1,Y1,X2,Y2,value=1) # line between two points
+# oled.ray(X,Y,length=32,angle=45,value=1) # ray
+
+# oled.rect(X1,Y1,X2,Y2,value=1) # rectangle between opposite corners
+
+# oled.poly(X,Y,R,value=1,sides=8,start=0,end=360) # center XY, radius, sides, start angle, end angle
+# use a poly to draw an approx circle
+
+# hint: draw the same object a second time with value=0 to remove it and not the whole frame
+
+#-----------------------
+# text
+#-----------------------
+
+# 1: clear the frame
+# 2: place your text
+# 3: send frame to oled (show)
+
+# (0,0) is the top left
+# base your text (x,y) on this
+
+# base font is 7 pixels tall
+# can be scaled by whole numbers
+# if not center, then top
+# if not middle, then left
+# value == 1 == pixels on
+
+# if line is too long to display
+# right side is truncated (i.e. no wrap)
+
+time.sleep_ms(250)
+
+oled.frame_clear()
+oled.place_text('Tiny'   ,64,14,scale=2,center=True,middle=True,value=1)
+oled.place_text('Fractal',64,32,scale=2,center=True,middle=True,value=1)
+oled.place_text('Trees'  ,64,50,scale=2,center=True,middle=True,value=1)
+oled.frame_show()
+
 time.sleep_ms(1000)
-led.off()
+oled.port_clear()
+
+oled.frame_clear()
+oled.place_text('ESP32',64,32,scale=4,center=True,middle=True,value=1)
+oled.frame_show()
+
 time.sleep_ms(1000)
-led.on()
+oled.port_clear()
+
+oled.frame_clear()
+oled.place_text('OLED',64,16,scale=3,center=True,middle=True,value=1)
+oled.place_text('128x64 0.96in',64,48,scale=1,center=True,middle=True,value=1)
+oled.frame_show()
+
 time.sleep_ms(1000)
-led.off()
+oled.port_clear()
 
-# pause for editing
-time.sleep_ms(4000)
+#-----------------------
+# fractal trees
+#-----------------------
 
-# led pwm
-led.pwm2(0,100,10)
-led.pwm2(100,0,10)
-time.sleep_ms(1000)
-led.pwm2(0,100,10)
-led.pwm2(100,0,10)
+try:
+    oled.do_trees()
+except KeyboardInterrupt:
+    pass
 
-# pause for editing
-time.sleep_ms(4000)
+#-----------------------
+# done
+#-----------------------
 
-# count binary
-for x in range(1,256):
-    for b in range(8):
-        if x & (1<<b):
-            pixels.setp(b,'green',8)
-        else:
-            pixels.setp(b,'off')
-    time.sleep_ms(int(1000/x))
-pixels.off()
+oled.port_close()
+oled.frame_clear()
 
-# pause for editing
-time.sleep_ms(4000)
-
-# play songs
-beeper.play(beeper.axelf_notes,dopixels=True)
-time.sleep_ms(1000)
-beeper.play(beeper.shave_notes,dopixels=True)
-
+#-----------------------
+# end
+#-----------------------
