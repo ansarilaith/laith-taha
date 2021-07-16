@@ -42,6 +42,9 @@ Here are some of the FunBoard's features:
 
 - [Connecting Via USB3c](#connecting)
 - [FunBoard Built-In Functions](#built-in-functions)
+- [How to Load Code-Scripts-Files](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/code)
+- [How to Load a MicroPython Image](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/bin)
+
 - [MicroPython General Docs](http://docs.micropython.org/en/latest/)
 - [MicroPython ESP32 Quick Reference](http://docs.micropython.org/en/latest/esp32/quickref.html)
 - [ClaytonDarwin on YouTube](https://www.youtube.com/claytondarwin)
