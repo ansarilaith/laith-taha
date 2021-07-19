@@ -266,7 +266,7 @@ Here is the song-string syntax:
 - notestring - Any string of a `note/pause + optional_sharp + octave + beats` sequences.
 - note - Any character in "ABCDEFG" or "abcdefg".
 - sharp - The pound character "#" makes a note sharp (there are no flats, so use a sharp).
-- octave - Any digit 0-9. This designates the octave to use. Note that octaves 0, 1, 2 and 9 may not play of be audible to adults.
+- octave - Any digit 0-9. This designates the octave to use. Note that octaves 0, 1, 2 and 9 may not be playable on the buzzer or audible to adults.
 - beats - Any non-negative integer. This is the duration of the note in beats (default is 1). There are no partials, so make your `beeper.beat` length match the smallest partial note.
 - pause - Either a "P" or "p" character. Works the same as a note, but does nothing for the given beat.
 - caps-spaces-other - Ignored. "d44" == "D44" == "d 4 4" == "d, 4, 4" == "D4-4"
@@ -277,7 +277,7 @@ These are built in:
 - `beeper.jingle_notes` - Jingle (plays on boot) = 'e5 g5 b5 d6 p d5'
 - `beeper.jingle2_notes` - Jingle2 (plays after boot) = 'd7'
 - `beeper.shave_notes` - Included song *Shave and a Haircut* = 'c4 p g3 g3 a32 g32 p p b3 p c4'
-- `beeper.axelf_notes` - Included sing *Axel-F* = 'd44 f43 d42 d41 g42 d42 c42 d44 a43 d42 d41 a#42 a42 f42 d42 a42 d52 d41 c42 c41 a32 e42 d46'
+- `beeper.axelf_notes` - Included song *Axel-F* = 'd44 f43 d42 d41 g42 d42 c42 d44 a43 d42 d41 a#42 a42 f42 d42 a42 d52 d41 c42 c41 a32 e42 d46'
 
 ### funboard
 FunBoard **Help** and information.
