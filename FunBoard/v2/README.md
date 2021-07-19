@@ -40,25 +40,134 @@ Here are some of the FunBoard's features:
 # Documentation
 ## Content Links
 
+### Local Links:
+- [Safety Precautions](#safety)
+- [Peripherals](#peripherals)
 - [Connecting Via USB3c](#connecting)
 - [FunBoard Built-In Functions](#built-in-functions)
-- [How to Load Code,Scripts, and Files](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/code)
+- [How to Load Code, Scripts, and Files](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/code)
 - [How to Load a MicroPython Image](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/bin)
+
+### External Links
 - [MicroPython General Docs](http://docs.micropython.org/en/latest/)
 - [MicroPython ESP32 Quick Reference](http://docs.micropython.org/en/latest/esp32/quickref.html)
 - [ClaytonDarwin on YouTube](https://www.youtube.com/claytondarwin)
 
+### Where to Buy a FunBoard
+- [The PCBWay Store](https://www.pcbway.com/project/gifts_detail/The_FunBoard_V2.html) - use this if you are outside the U.S.
+- [Clayton's PCB Shop](https://cpcb.shop/) - if you are in the U.S. this might be cheaper.
+
+## Safety
+
+These precautions should be followed to avoid permanently damaging your FunBoard:
+1. **USB-Power Only** - the FunBoard should be powered **ONLY** via a USBc connector attached to a regulated 5V 500+mA power supply.
+1. **3V GPIO Only** - the GPIO pins **MUST NOT** be connected to a voltage source greater than 3v.
+1. **25mA Max on GPIO Pins** - the current per GPIO pin **MUST BE LIMITED** to 25mA.
+1. **100mA Max on Source Pins** - the current per source pins (+5V, 3.3V) **MUST BE LIMITED** to 100mA.
+1. **No Shorts** - be careful to not allow an unintended short (direct connection) between any of the GPIO pins. 
+Be careful not to accidentally connect pins with metal tools, wires, liquids, or any other conductive material.
+1. **Always Clean and Dry** - the FunBoard is not water resistant. Always keep it clean and dry in a protective case. 
+
+## FunBoard Peripherals
+
+### USB Connector
+
+The **USB 3 Type C** connector on the FunBoard has two functions.
+First, it provides power to the FunBoard. 
+It should always be connected to a regulated 5V source that can provide at least 500mA current. 
+This is the only recommended method for powering your FunBoard.
+
+Second, the USB connecor creates a serial connection via a **Silicon Labs CP210x USB to UART Bridge IC** that you can use to interact with the ESP32 (see [Connecting](#connecting) below). 
+If you are using Linux or OSX, the required drivers should be included in the Kernel (or you definitely need an update). 
+For Windows you will need to install the driver. 
+You can get it here: [Silicon Labs Drivers](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
+
+### Switches
+
+There are two push-button switches on the funboard:
+
+- RESET - pushing this will cause a hard reset of the ESP32. 
+You can accomplish the same thing using the `esp32.reset` function (see [esp32](#esp32) below).
+
+- PROG - holding this button down while pushing the RESET button to put the ESP32 into program mode (see [Images](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/bin) for more information).
+Any other time, this button is connected to GPIO 0 and can be used as a user input.
+
+### MicroSD Card Slot
+
+The MicroSD card slot has been tested with SD cards from 4GB to 16GB.
+Most seem to function well, but if you are having issues, try a different card.
+
+You can mount and access the SD card using the built-in `sdcard.xxx` functions (see [sdcard](#sdcard) below). 
+
+### LEDs
+
+There are two LEDs in the top-left corner of the FunBoard.
+The green one is on whenever power is connected to the FunBoard.
+You can control the blue one using the built-in `led.xxx` functions (see [led](#led) below).
+
+### MicroPixels
+
+There are 8 MicroPixels along the lower edge of the FunBoard.
+They are labeled 7-0, which it the normal way to label bits (MSB order).
+You can control the MicroPixels directly (set their color and brightness) using the built-in `pixels.xxx` functions (see [pixels](#pixels) below).
+The MicroPixels can also be connected to the `beeper.play()` function by setting `dopixels=True`. This will cause the pixels to light up according to the note and octave being played.
+
+### Buzzer
+
+The buzzer on the FunBoard can be used as in indicator, or to play simple musical tunes. 
+There are a lot of built-in functions that will help you get started. 
+See the `beeper.xxx` functions below (see [beeper](#beeper)). 
+
+### GPIO Pins
+
+- 16 - GPIO - UART RX (input) 
+- 17 - GPIO - UART TX (output)
+- 5 - GPIO - SPI-2 CS (chip select) -
+- 18 - GPIO - SPI-2 CL (clock) -
+- 19 - GPIO - SPI-2 DI (MISO data in) -
+- 23 - GPIO - SPI-2 DO (MOSI data out) -
+- 25 - GPIO - I2C-1 CL (clock) -
+- 26 - GPIO - I2C-1 DA (data) -
+- 35 - Input Only - ADC1-7 
+- 39 - Input Only - ADC1-3
+- +5V - 5V 100mA (max) source for peripheral device
+- G - GND - gound pin for peripheral device
+- 3.3V - 3.3V 100mA (max) source for peripheral device
+- G - GND - gound pin for peripheral device
+- G - GND - gound pin for peripheral device
+- 21 - GPIO 
+- 22 - GPIO  
+- 33 - GPIO - ADC1-5
+- 34 - Input Only - ADC1-6
+- 36 - Input Only - ADC1-0
+
 ## Connecting
 
-### USB 3 Type C
+Here is the basic information you need to get connected to your FunBoard and load your programs. 
+Keep in mind that there are other ways to do this. 
+Any software designed for an ESP32-plus-MicroPython setup will probably work for the FunBoard, so no harm in trying.
+
+### Serial REPL via the USB Connector
 
 The FunBoard connects to your laptop or desktop using a **USB 3 Type C** cable. When connected, the USB port is converted to TTY serial by a **Silicon Labs CP210x USB to UART Bridge IC**. If you are using Linux or OSX, these drivers should be included in the Kernel (or you definitely need an update). For Windows you will need to install the driver. You can get it here: [Silicon Labs Drivers](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
 
-### Putty
+Here are the basic serial-port specifications:
+- 115200 baud
+- 8 bits
+- No parity bit
+- 1 stop bit
 
-I will add this soon.
+Once you connect, you will be attached to the MicroPython REPL (read-evaluate-print-loop). 
+This will function just like a Python command-line prompt and allow you to run scripts and see output.
 
-### Picocom
+And here are some different methods for connecting to the FunBoard via a serial port:
+
+#### Putty
+
+For the Windows OS, most people use the [Putty](https://www.putty.org/) software.
+I will add some instructions soon (once I have had a change to test it).
+
+#### Picocom
 
 In Linux, you must add your username to the `dialout` group and then **log out** or **reboot**.
 ```
@@ -80,7 +189,7 @@ Disconnect:
 
 Use `ctrl-a crtl-x` to exit picocom and return to the command prompt.
 
-### Python + PySerial
+#### Python + PySerial
 
 Ref: [PySerial Docs](https://pythonhosted.org/pyserial/)
 
@@ -116,6 +225,15 @@ uart.read(1024)
 uart.write(b'some bytes')
 uart.close()
 ```
+
+### Loading Programs and Files
+
+Once you have established a connection to the FunBoard you will need to load your own programs and files.
+Again, keep in mind that there are different ways to do this (and new software coming out all the time). 
+Here are some links to separate pages that show you how I load files and images:
+
+- [How to Load Code, Scripts, and Files](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/code)
+- [How to Load a MicroPython Image](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/bin)
 
 ## Built In Functions
 

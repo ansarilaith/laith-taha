@@ -455,11 +455,11 @@ class SSD1306_I2C(SSD1306):
     isspi = False
 
     # I2C pins
-    scl = 22
-    sda = 21
+    scl = 25
+    sda = 26
 
     # I2C port
-    port = 1
+    port_id = 1
     freq = 100000 # low rate to start (try x4 for max)
     addr = None
 
@@ -472,7 +472,7 @@ class SSD1306_I2C(SSD1306):
 
         # port
         #self.port = I2C(self.port,scl=Pin(self.scl),sda=Pin(self.sda),freq=self.freq)
-        self.port = I2C(scl=Pin(self.scl),sda=Pin(self.sda),freq=self.freq)
+        self.port = I2C(self.port_id,scl=Pin(self.scl),sda=Pin(self.sda),freq=self.freq)
 
         # scan for address
         for x in self.port.scan():
