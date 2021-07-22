@@ -9,6 +9,7 @@ def setup():
     # imports
     #-----------------------
 
+    import os
     import time
     import builtins
     
@@ -16,7 +17,10 @@ def setup():
     # board variables
     #-----------------------
 
-    from lib.funboard.board import BOARD
+    if 'v1' in os.listdir('/lib/funboard'):
+        from lib.funboard.board_v1 import BOARD
+    else:
+        from lib.funboard.board_v2 import BOARD
     builtins.funboard = BOARD()
     del BOARD
 
@@ -44,7 +48,7 @@ def setup():
         2: 'HARDWARE',
         3: 'WATCHDOG',
         4: 'DEEPSLEEP',
-        5: 'SOFTWARE'}.get(reset_cause,'UNKNOWN'))
+        5: 'SOFTWARE'}.get(reset_why,'UNKNOWN: {}'.format(reset_why)))
     del reset_cause
 
     # software resets DO NOT clear peripherals
@@ -97,6 +101,7 @@ def setup():
                              mosi=funboard.PIN_SD_MOSI,
                              miso=funboard.PIN_SD_MISO)
     del SDCARD
+    print('Mounting SDcard')
     sdcard.mount()
 
     #-----------------------
@@ -143,8 +148,9 @@ def setup():
     beeper.play(beeper.jingle2_notes,vol=50,dopixels=False)
     led.off()
     funboard.info
+    print('Funboard is ready to go!')
     print('For help try "funboard.help".')
-    print('Funboard is ready to go!\n\n')
+    print('\n')
 
 # run
 setup()

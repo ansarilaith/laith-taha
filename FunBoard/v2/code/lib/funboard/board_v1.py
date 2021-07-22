@@ -10,17 +10,17 @@ from micropython import const
 
 class BOARD:
 
-    BOARD_NAME = 'FUNBOARD-V2'
-    BOARD_DATE = '2021-04-07'
+    BOARD_NAME = 'FUNBOARD-V1'
+    BOARD_DATE = '2021-01-06'
 
     # sdcard ref: https://docs.micropython.org/en/latest/library/machine.SDCard.html
     SDCARD_SLOT   = const( 3) #
-    PIN_SD_CS     = const(15) # SDCard Slot 3
+    PIN_SD_CS     = const(27) # SDCard non-standard 
     PIN_SD_SCL    = const(14) # SDCard Slot 3
     PIN_SD_MOSI   = const(13) # SDCard Slot 3
     PIN_SD_MISO   = const(12) # SDCard Slot 3
     
-    PIN_MANRST    = const(27) #  --> RESET
+    PIN_MANRST    = const(15) #  --> RESET
     PIN_LED       = const(32) # Blue LED
     PIN_PIXELS    = const( 4) # 8 Micro Pixels
     PIN_BUZZER    = const( 2) # Buzzer
@@ -61,12 +61,16 @@ class BOARD:
         led.off()
         led.blink(count) # blink "count" times
         led.pwm(percent) # use pwm to dim the led
-        led.pwm2(p1,p2) # change led from p1 to p2 
+        led.pwm2(p1,p2) # change led from p1 to p2
+        led.pwmx() # turn off pwm
 
     key 5 pixels control the funboard micro pixels
         set: pixels.brightness = 32 # 0-255, set global
         pixels.off() # all off
-        pixels.kill() # makes gpio pin an imput
+        pixels.set_brightness(brightness) # set brightness 0 to 255
+        pixels.kill() # makes gpio pin an input
+        pixels.clist() # see default colors from pixels.colors
+        pixels.get_color(color,brightness=None) # get color tuple
         pixels.setp(pixel,color,brightness) # set a pixel 0-7
         pixels.set_brightness(32) # set global, adjust current
         pixels.sweep(color,brightness) # like KITT from Knight Rider
@@ -82,6 +86,7 @@ class BOARD:
         set: password = "my_password"
         wifi.scan() # list available access points
         wifi.connect(essid,password) # or use set values
+        wifi.ip() # return current IP
         wifi.disconnect()
 
     key 8 rtc real time clock functions
@@ -96,10 +101,13 @@ class BOARD:
         set: eziot.api_secret = "my_account_secret"
         set: eziot.api_version = 1.0
         eziot.stats()
+        eziot.watch(startrows,update,group,device)
         eziot.post_data(group,device,data1,data2,data3,data4)
         eziot.get_data(count,after,group,device)
         eziot.delete_data(rowids,before,xall)
-        eziot.watch(startrows,update,group,device)
+        eziot.get_dns() # get current DNS setup
+        eziot.set_dns(port,dnsid) # set and start DNS
+        eziot.unset_dns() # stop DNS service        
 
     key 10 st system tools for dirs, file, etc.
         st.tree() # print directory tree structure
@@ -115,7 +123,7 @@ class BOARD:
         st.reload(module) # reload module
         st.du() # show disk usage
         st.memp() # clean memory and show usage percent
-        st. ... # more functions, see the docs
+        st.???() # more functions, see the docs
         
             '''
 
@@ -125,7 +133,7 @@ class BOARD:
  | |__ _   _ _ ___| |_| |_____  __ _ ____ ___| |  / (.) (.) \
  |  __| | | | '_  |  _ <|  _  |/ _' |  __|  _  | (  _     _  )
  | |  | |_| | | | | |_| | |_| | |_| | |  | |_| |  \  \___/  /
- |_|  |_____|_| |_|_____|_____|___,_|_|  |_____|   \_______/
+ |_|  |_____|_| |_|_____|_____|___,_|_|  |_____|   \_______/ v1 
 
           From ClaytonDarwin on YouTube
     '''
@@ -194,6 +202,7 @@ class BOARD:
         pixels.sweep('green',ontime=100,offtime=100)
         led.off()
         esp32.reset()
+
 
 #-----------------------
 # end

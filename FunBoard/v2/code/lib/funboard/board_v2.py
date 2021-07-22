@@ -10,17 +10,17 @@ from micropython import const
 
 class BOARD:
 
-    BOARD_NAME = 'FUNBOARD-V1'
-    BOARD_DATE = '2021-01-06'
+    BOARD_NAME = 'FUNBOARD-V2'
+    BOARD_DATE = '2021-04-07'
 
     # sdcard ref: https://docs.micropython.org/en/latest/library/machine.SDCard.html
     SDCARD_SLOT   = const( 3) #
-    PIN_SD_CS     = const(27) # SDCard non-standard 
+    PIN_SD_CS     = const(15) # SDCard Slot 3
     PIN_SD_SCL    = const(14) # SDCard Slot 3
     PIN_SD_MOSI   = const(13) # SDCard Slot 3
     PIN_SD_MISO   = const(12) # SDCard Slot 3
     
-    PIN_MANRST    = const(15) #  --> RESET
+    PIN_MANRST    = const(27) #  --> RESET
     PIN_LED       = const(32) # Blue LED
     PIN_PIXELS    = const( 4) # 8 Micro Pixels
     PIN_BUZZER    = const( 2) # Buzzer
@@ -133,7 +133,7 @@ class BOARD:
  | |__ _   _ _ ___| |_| |_____  __ _ ____ ___| |  / (.) (.) \
  |  __| | | | '_  |  _ <|  _  |/ _' |  __|  _  | (  _     _  )
  | |  | |_| | | | | |_| | |_| | |_| | |  | |_| |  \  \___/  /
- |_|  |_____|_| |_|_____|_____|___,_|_|  |_____|   \_______/ v1 
+ |_|  |_____|_| |_|_____|_____|___,_|_|  |_____|   \_______/ v2 
 
           From ClaytonDarwin on YouTube
     '''
@@ -202,7 +202,6 @@ class BOARD:
         pixels.sweep('green',ontime=100,offtime=100)
         led.off()
         esp32.reset()
-
 
 #-----------------------
 # end
