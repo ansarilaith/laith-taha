@@ -21,7 +21,6 @@ eziot_dnsid = 'yourdnsid'
 #-------------------------------
 
 import time
-import _thread
 from microserver import MicroServer
 
 #-------------------------------
@@ -68,7 +67,7 @@ class SERVER(MicroServer):
     def client_on(self,rc=None):
         # rc = remote connection count
         #pass
-        beeper.beep()
+        beeper.beep(vol=50)
         pixels.setp(0,'red')
 
     # called when client disconnects
@@ -171,6 +170,8 @@ server = SERVER()
 
 # this is optional - reboots daily
 
+##import _thread
+##
 ##def reboot_thread_function():
 ##
 ##    print('REBOOT THREAD: start')
@@ -260,11 +261,11 @@ while 1:
     # keyboard kill
     except KeyboardInterrupt:
         print('MAIN: KeyboardInterrupt: end all')
-        try:
-            reboot_thread_kill = True
-            reboot_thread.exit()
-        except:
-            pass
+##        try:
+##            reboot_thread_kill = True
+##            reboot_thread.exit()
+##        except:
+##            pass
         break
 
     # any exception
