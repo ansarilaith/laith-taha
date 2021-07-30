@@ -21,6 +21,9 @@
 # class
 #-----------------------------------------------
 
+def rr(n):
+    return round(n,2)
+
 class MicroChart:
 
     # color order for 8 colors
@@ -84,7 +87,7 @@ xmlcode
 
         # labels
         xlabels=None, # True|False|None|list_of_labels
-        xlabrot=True,
+        xlabrot=0, # rotation angle degrees from x axis
         ylabels=True, # True|False
 
         # grids
@@ -103,7 +106,10 @@ xmlcode
 
         # points
         pdata=None,
-        plabs=None
+        plabs=None,
+
+        
+             
 
         ):
 
@@ -140,18 +146,16 @@ xmlcode
         # start with border
         xml = '<rect x="0.5" y="0.5" width="999" height="{}" stroke-width="1" stroke="#000" fill="#EEE"/>'.format(height-1)
 
-        # plot area
+        # plot area:
         # default margin = 10
         # ticks area = 10
         # xlabels = 25/50
         # ylabels = 50
         # title = 35 (including margin)
         # xytitle = 30 (including margin)
-
         py1 = 10
         if title:
             py1 = 35
-
         py2 = 0
         if xtics:
             py2 += 10
@@ -160,9 +164,9 @@ xmlcode
         if xlabels:
             py2 += 25
             if xlabrot:
-                py2 += 25
+                xlabrot = abs(float(xlabrot))
+                py2 += 35*(sin(radians(xlabrot)))
         py2 = height-py1-max(py2,10)            
-
         px1 = 0
         if ytics:
             px1 += 10
@@ -172,18 +176,17 @@ xmlcode
             px1 += 50
         px1 = max(px1,10)
         px2 = width-px1-10
-        xml += '\n<rect x="{}" y="{}" width="{}" height="{}" stroke-width="1" stroke="#000" fill="#FFF"/>'.format(px1,py1,px2,py2)
-        #xml += '\n<polyline points="{0},{1} {0},{3} {2},{3}" stroke-width="2" stroke="#000" fill="none" />'.format(px1,py1,px1+px2,py1+py2)
+        xml += '\n<rect x="{}" y="{}" width="{}" height="{}" stroke-width="1" stroke="#000" fill="#FFF"/>'.format(rr(px1),rr(py1),rr(px2),rr(py2))
 
-        # titles
+        # titles:
         if title:
             xml += '\n<text class="mm" x="500" y="21" font-size="30" fill="#000">{}</text>'.format(title.strip())
         if xtitle:
-            xml += '\n<text class="mm" x="{}" y="{}" font-size="20" fill="#000">{}</text>'.format(int(px1+(px2/2)),height-12,xtitle.strip())
+            xml += '\n<text class="mm" x="{}" y="{}" font-size="20" fill="#000">{}</text>'.format(rr(px1+(px2/2)),rr(height-12),xtitle.strip())
         if ytitle:
-            xml += '\n<text class="mm" x="17" y="{0}" font-size="20" fill="#000" transform="rotate(-90 17,{0})">{1}</text>'.format(int(py1+(py2/2)),ytitle.strip())
+            xml += '\n<text class="mm" x="17" y="{0}" font-size="20" fill="#000" transform="rotate(-90 17,{0})">{1}</text>'.format(rr(py1+(py2/2)),ytitle.strip())
 
-        # ranges
+        # ranges:
         xmax = 0
         if yzero:
             ymin,ymax = 0,0
@@ -212,6 +215,9 @@ xmlcode
             px2 += px1
         py2 += py1
 
+        # shorten values
+        px1,px2,py1,py2 = rr(px1),rr(px2),rr(py1),rr(py2)
+
         # x axis auto labeling
         if xlabels == True:
             if xmax <= 30:
@@ -234,14 +240,14 @@ xmlcode
             xlabels += [''] * (xmax-len(xlabels))
         step = (px2-px1)/xmax
         for tic in range(xmax):
-            x = px1 + tic*step
+            x = rr(px1 + tic*step)
             y = py2+20
             tl = 5
             if xlabels:
                 if xlabels[tic] != '':
                     tl = 10
                     if xlabrot:
-                        lr = ' transform="rotate(-45 {},{})"'.format(x,py2+20)
+                        lr = ' transform="rotate(-{} {},{})"'.format(xlabrot,x,py2+20)
                         tt = 'me'
                     else:
                         lr,tt = '','mm'
