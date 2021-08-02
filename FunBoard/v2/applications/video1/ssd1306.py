@@ -13,6 +13,7 @@ import gc
 import io
 
 from math import sin, cos, radians
+from random import random
 from machine import Pin
 from machine import I2C
 
@@ -197,6 +198,7 @@ class SSD1306:
             # write full frame
             self.writeto(self.frame)
 
+        print('PMOD:',self.page_mod)
         self.page_mod = [0]*8
     
     def bitset(self,X,Y,value=1):
@@ -230,6 +232,31 @@ class SSD1306:
 
             # update pages mod
             self.page_mod[p] = 1
+
+    def bitget(self,X,Y):
+
+        # see above
+        if 1 <= X <= self.width and 1 <= Y <= self.height:
+
+            # r is the column, just X-1
+            r = X-1
+
+            # p is the page (0-7)
+            p = (Y-1)//8
+
+            # b is the bit (0-1)
+            b = (Y-1)%8
+
+            # B is the byte to change
+            B = (p * self.width) + r
+
+            # is set
+            if self.frame[B] & (2**b):
+                return 1
+
+            # is clear
+            else:
+                return 0
 
     def bitclear(self,X,Y,value=0):
 
@@ -441,8 +468,100 @@ class SSD1306:
         time.sleep_ms(int(ontime/3))
         self.uninvert()
         time.sleep_ms(int(ontime/3))
+        self.dropout()
         self.frame_clear()
         self.frame_show()
+
+    def dropout(self,drop_each=1,pause=0,setval=1):
+
+        if setval == 1:
+            notval = 0
+        else:
+            notval = 1
+
+        w = self.width
+        h = self.height
+
+        # from bottom to top
+        for y in range(h,0,-1):
+
+            # get list of set pixels
+            sets = [(random(),x) for x in range(1,w+1) if self.bitget(x,y)==setval]
+            sets.sort()
+
+            # drop pixels in groups            
+            for g in range(0,len(sets),drop_each):
+
+
+                # move every row below y down 1 row
+                if y != h:
+                    for y2 in range(min(h-1,y+8),y,-1):
+                        self.dropline(y2)
+##                        for x in range(1,w+1):
+##                            self.bitset(x,y2+1,self.bitget(x,y2))
+##                            self.bitset(x,y2,notval)
+                        
+
+##                # move lower rows down
+##                for y2 in range(h,y,-1):
+##                    for x in range(1,w+1):
+##                        self.bitset(x,y2+1,self.bitget(x,y2))
+##                        self.bitset(x,y2,notval)
+
+
+                    
+
+##                    # move this row and below
+##                    # +1 for row below y
+##                    # -1 to get index to 0
+##                    Y = y -1 +1 
+##
+##                    # p is the page for the row (0-7)
+##                    p = Y//8
+##
+##                    # b is the bit for the row (0-7)
+##                    b = Y%8
+##
+##                    # pi is the start index of the page
+##                    pi = p * w
+##
+##                    # drop pages below current page
+##                    if p != self.pages-1:
+##                        for p2 in range(self.pages-1,p,-1):
+##                            pi2 = p2   * w
+##                            pi1 = p2-1 * w
+##                            for x in range(w):
+##                                self.frame[pi2+x] = (self.frame[pi2+x]<<1)&255
+##                                self.frame[pi2+x] |= self.frame[pi1+x] >> 7
+##
+##                                
+##                                #self.frame[pi2+x] = ((self.frame[pi2+x]<<1)&255) | (self.frame[pi1+x] >> 7)
+##                            self.page_mod[p2] = 1
+##                            
+##
+##                    # drop rows Y and below on this page
+##                    for x in range(w):
+##                        v = self.frame[pi+x]
+##                        self.frame[pi+x] = (v>>b<<(b+1))&255 | ((v<<(8-b))&255)>>(8-b)
+##                    self.page_mod[p] = 1
+
+
+
+
+                # drop group pixels to next row down
+                for _,x in sets[g:g+drop_each]:
+                    self.bitset(x,y,notval)
+                    self.bitset(x,y+1,setval)
+
+                # show and pause
+                self.frame_show()
+                time.sleep_ms(pause)
+
+##                # move lower rows down
+##                for y2 in range(h,y,-1):
+##                    for x in range(1,w+1):
+##                        self.bitset(x,y2+1,self.bitget(x,y2))
+##                        self.bitset(x,y2,notval)
 
 #-----------------------
 # I2C option
@@ -542,14 +661,15 @@ class SSD1306_I2C(SSD1306):
 
             while 1:
 
-                show_every = 60
-                bc = 0
-                for x,y,z in ft.rrain():
-                    self.bitset(x,y,z)
-                    bc += 1
-                    if not bc % show_every:
-                        self.frame_show()
-                self.frame_show()
+
+##                show_every = 60
+##                bc = 0
+##                for x,y,z in ft.rrain():
+##                    self.bitset(x,y,z)
+##                    bc += 1
+##                    if not bc % show_every:
+##                        self.frame_show()
+##                self.frame_show()
 
                 show_every = 2
                 bc = 0
@@ -563,6 +683,8 @@ class SSD1306_I2C(SSD1306):
                 time.sleep_ms(1000)
 ##                self.port_clear()
 ##                time.sleep_ms(250)
+
+                self.dropout()
 
         except KeyboardInterrupt:
             pass

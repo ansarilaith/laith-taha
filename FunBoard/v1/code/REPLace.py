@@ -30,7 +30,7 @@ except:
 version = 2.0
 port = None
 port_list = ['/dev/ttyUSB0', "/dev/tty.SLAB_USBtoUART", "COM3", "COM1"]
-smash = 3
+smash = 0
 smash_keep = False
 smash_all = False
 verbose = False
@@ -46,7 +46,6 @@ excludes = [
     # filse
     'REPLace.py',
     'notes.txt',
-    'README.md',
     'requirements.txt',
     'includes.json',
     'template_networks.csv',
@@ -84,7 +83,22 @@ notes:
   if a -l or -c file is given, the default is ignored
   if -i file.py is used, -l and -c are not
 
-list files:
+compiling:
+  if mpy-cross is installed, the default action is to compile .py files
+  main.py and boot.py never get compiled
+  use --xmpy to turn off compiling
+
+smash:
+  smashing reduces the size of files by removing whitespace and comments
+  the default smash level is 0 (i.e no smash)
+  use -s to set the smash level
+  smash level 1 removes any blank lines
+  smash level 2 removes lines starting with #
+  smash level 3 removes everything after # on a line
+  smash can really mess up text blocks and text with # characters
+  use -n to also smash non-python files  
+
+listing file:
   put one include file per line
   put one exclude file per line
   exclude files are preceded by "exclude"
@@ -92,7 +106,7 @@ list files:
   if a line starts with "end " the read stops
   use "end " to hide extra lines
 
-config files:
+config file:
   config files are JSON
   the file must contain a single object {{...}}
   the includes and excludes are in lists in the object
@@ -491,7 +505,7 @@ if loads:
         ext = os.path.splitext(p2)[1].lower()
 
         # mpy-cross
-        if smash >= 3 and ext == '.py' and use_mpy and mpy_cross and os.path.basename(p2) not in ('boot.py','main.py'):
+        if ext == '.py' and use_mpy and mpy_cross and os.path.basename(p2) not in ('boot.py','main.py'):
             print('Cross Compile:',os.path.basename(p2),end=' ')
             # rename files to .mpy
             temp = temp.replace('.py','.mpy')

@@ -1,278 +1,618 @@
 #!/usr/bin/python3
 
-# ----------------------------------------------------------------------------------
+# -----------------------
+# general imports
+# -----------------------
 
-# NOTE: You can also use the Adafruit ampy script or WebREPL to do the same thing.
+import os
+import sys
+import time
+import shutil
+import argparse
+import json
+import serial
+import traceback
 
-# replace.py = REPLace.py = REPL Ace Uploder
-# Copyright (c) 2019 Clayton Darwin
-# symple.design/clayton claytondarwin@gmail.com
+try:
+    import mpy_cross
+except:
+    mpy_cross = None
+    print()
+    print('ERROR: mpy-cross NOT installed. No pre-compile.')
+    print('IMPORTANT: Install mpy-cross.')
+    print('USE THIS: python3 -m pip install mpy-cross')
+    print()
 
-# This uses a serial connection to REPL to copy dirs/files to a MicroPython instance.
-# This is slow. It's just auto-writing Python commands to the REPL connection.
-# I've only tested this on Debian Linux, but it should work other places.
+# -----------------------
+# default variables
+# -----------------------
 
-# This REQUIRES the pyserial module: sudo pip3 install pyserial
-# Add your username to dialout: sudo adduser username dialout
-# You have to log out and back in or reboot after changing dialout.
-
-# Now just set the port:
-
-port = '/dev/ttyUSB0'
-
-# Given a local folder using the variable file_system_dir,
-# this overwrites the folder content to the flash of the MicroPython instance.
-# The file_system_dir folder becomes the root directory on the chip.
-# If file_system_dir is None, it will use the current working directory. 
-
-file_system_dir = None
-
-# Any directory or file whose basename matches an item in "excludes"
-# will not be copied to the MicroPython instance. So, you can run this
-# script from the file_system_dir folder.
-
-excludes = ['REPLace.py',
-            'archive',
-            'video',
-            'thumbs',
-            ]
-
-# FOR FILES: This is the opposite of excludes. If you list basenames here, then only
-# matches to these basenames will be loaded. You can use this if you are
-# editing only a few files. 
-
-includes = []
-includes.append('boot.py')
-includes.append('main.py')
-##includes.append('nettools.py')
-##includes.append('netcreds.py')
-##includes.append('bme280.py')
-##includes.append('urequests.py')
-
-# The following variable reduces upload size.
-# If True, this removes blank lines, comments, and right-side whitespace.
-# This is not a very smart process.
-# It removes the last # in a line and everything after it.
-# If a text # is in the line, put a comment # at the end of the line (level 3).
-# DO NOT use this if you have blocks of text where blank lines are significant.
-# DO NOT use this if you have long text with # in it.
-
-# remove extra space and comments
-smash = True
-
-# smash non.py files
+version = 2.0
+port = None
+port_list = ['/dev/ttyUSB0', "/dev/tty.SLAB_USBtoUART", "COM3", "COM1"]
+smash = 0
+smash_keep = False
 smash_all = False
+verbose = False
+use_mpy = True
+dry_run = False
+file_root = os.getcwd()
+file_lists = ['REPLace.lst']
+file_configs = ['includes.json']
+load_all = False
+includes = []
+excludes = [
 
-# just smash, don't load
-smash_only = False
+    # filse
+    'REPLace.py',
+    'notes.txt',
+    'requirements.txt',
+    'includes.json',
+    'template_networks.csv',
+    'template_config.json',
 
-# leave smashed copy of file
-smash_keep =  False
+    # directories
+    '__pycache__',
+    'archive',
+    'hidden',
+    'install',
+    'thumbs',
+    'video',
+    'examples',
+    'example',
 
-# smash level
-# 1 = blank lines, 2 = full comment lines, 3 = end comments
-# if 3, and text # is in line, you must put a # at the end of the line
-smash_level = 2
+    ]
 
-# Once you set the above variables, save and run this file.
-# Make sure that nothing else is using the serial port.
-# Watch the screen. You'll be able to see everything it does.
+# -----------------------
+# command line variables
+# -----------------------
 
-# Of course, you could import this, instantiate the uploader class,
-# set the variables, and then run uploader().upload(). If you want.
+epilog = f'''
+examples:
+  ./REPLace.py works the same as python3 REPLace.py in Linux
+  ./REPLace.py -a --> load all files but exceptions
+  ./REPLace.py -l --> load files in default list {file_lists}
+  ./REPLace.py -c --> load files in default config {file_configs}
+  ./REPLace.py -i file1.py file2.py --> load (i.e. include) just these
 
-# ----------------------------------------------------------------------------------
+notes:
+  you can use all the flags together, they logically cancel each other
+  you must use -a, -i, -l, or -c to load any files
+  if you use -a then -i, -l, -c are ignored
+  use -l or -c by itself to use the default list or config
+  if a -l or -c file is given, the default is ignored
+  if -i file.py is used, -l and -c are not
 
-# imports
+compiling:
+  if mpy-cross is installed, the default action is to compile .py files
+  main.py and boot.py never get compiled
+  use --xmpy to turn off compiling
 
-import os,sys,time,re,serial,shutil
+smash:
+  smashing reduces the size of files by removing whitespace and comments
+  the default smash level is 0 (i.e no smash)
+  use -s to set the smash level
+  smash level 1 removes any blank lines
+  smash level 2 removes lines starting with #
+  smash level 3 removes everything after # on a line
+  smash can really mess up text blocks and text with # characters
+  use -n to also smash non-python files  
 
-# self run
+listing file:
+  put one include file per line
+  put one exclude file per line
+  exclude files are preceded by "exclude"
+  for example "exclude junk.py"
+  if a line starts with "end " the read stops
+  use "end " to hide extra lines
 
-def run():
+config file:
+  config files are JSON
+  the file must contain a single object {{...}}
+  the includes and excludes are in lists in the object
+  {{"includes":["file","file"],
+   "excludes":["file","file"]}}
+_
+'''.strip()
 
-    uploader().upload()
-    input('Press ENTER to close.')
+parser = argparse.ArgumentParser(description='Load files to an ESP32 via the REPL',
+                                 formatter_class=argparse.RawTextHelpFormatter,
+                                 epilog=epilog)
 
-# main class
+parser.add_argument('--version', action='version',version=f'REPLace.py {version}')
+parser.add_argument('-p', dest='port', help='define the REPL port name')
+parser.add_argument('-r', dest='root', help='define ROOT dir for files')
 
-class uploader:
+parser.add_argument('-s', choices=['0', '1', '2', '3'], help='set the SMASH level')
+parser.add_argument('-n', action='store_true', help='flag: smash NON-python files')
+parser.add_argument('-k', action='store_true', help='flag: KEEP smashed files')
+parser.add_argument('-v', action='store_true', help='flag: verbose, show loaded bytes')
 
-    # fixed values
-    baudrate = 115200
-    timeout = 0.1
-    #fileblocksize = 1024
-    fileblocksize = 256
+parser.add_argument('-a', action='store_true', help='flag: load ALL non-exclude files')
+parser.add_argument('-l', nargs='*', help='define LISTING files')
+parser.add_argument('-c', nargs='*', help='define CONFIG files')
+
+parser.add_argument('-i', nargs='*', help='filenames to INCLUDE in load')
+parser.add_argument('-e', nargs='*', help='filenames to EXCLUDE from load')
+parser.add_argument('-x', nargs='*', help='filenames to XCLUDE from default excludes')
+
+parser.add_argument('--xmpy', action='store_true', help="flag: don't prefer .mpy files")
+parser.add_argument('--dryrun', action='store_true', help="flag: don't load files")
+
+args = parser.parse_args()
+
+# -----------------------
+# merge variables
+# -----------------------
+
+if args.port:
+    port = args.port
+
+if args.root:
+    file_root = os.path.abspath(args.root)
+
+if args.s:
+    smash = int(args.s)
+
+if args.n:
+    smash_all = True
+
+if args.k:
+    smash_keep = True
+
+if args.a:
+    load_all = True
+
+if args.v:
+    verbose = True
+
+if args.xmpy:
+    use_mpy = False
+
+if args.dryrun:
+    dry_run = True
+
+# file lists
+if load_all:
+    file_lists = []
+elif args.l == None:
+    file_lists = []
+elif args.l:
+    file_lists = args.l
+else:
+    pass  # use default
+
+# config lists
+if load_all:
+    file_configs = []
+elif args.c == None:
+    file_configs = []
+elif args.c:
+    file_configs = args.c
+else:
+    pass  # use default
+
+# includes
+if args.i:
+    includes = args.i
+
+# excludes
+if args.e:
+    for f in args.e:
+        if f not in excludes:
+            excludes.append(f)
+if args.x:
+    for f in args.x:
+        while f in excludes:
+            i = excludes.index(f)
+            excludes.pop(i)
+
+includes = set(includes)
+excludes = set(excludes)
+
+# -----------------------
+# print basics
+# -----------------------
+
+div = '-'*64
+
+print()
+print(f'REPLace.py {version}')
+
+print(div)
+print('PORT:', port)
+print('SMASH:', smash)
+print('SMASH_ALL:', smash_all)
+print('SMASH_KEEP:', smash_keep)
+print('LOAD_ALL:', load_all)
+print('FILE_ROOT:', file_root)
+print('FILE_LISTS:', file_lists)
+print('FILE_CONFIGS:', file_configs)
+
+# -----------------------
+# read lists
+# -----------------------
+
+if file_lists:
+    print(div)
+    for file in file_lists:
+        print(f'READ LIST: {file}', end=' ')
+        if os.path.isfile(file):
+            path = os.path.abspath(file)
+        elif os.path.isfile(os.path.join(file_root, file)):
+            path = os.path.join(file_root, file)
+        else:
+            print('NOT FOUND')
+            continue
+        ic, ec = 0, 0
+        with open(file) as f:
+            for line in f:
+                line = line.strip()
+                if line and line[0] != '#':
+                    line = line.split()
+                    if line[0].lower() == 'end':
+                        break
+                    elif line[0].lower() == 'exclude':
+                        if len(line) >= 2:
+                            excludes.add(os.path.basename(line[1]))
+                            ec += 1
+                    elif line[0].lower() == 'include':
+                        if len(line) >= 2:
+                            includes.add(os.path.basename(line[1]))
+                            ic += 1
+                    else:
+                        includes.add(os.path.basename(line[0]))
+                        ic += 1
+            f.close()
+        print(f'({ic} includes, {ec} excludes)')
+
+# -----------------------
+# read configs
+# -----------------------
+
+if file_configs:
+    print(div)
+    for file in file_configs:
+        print(f'READ CONFIG: {file}', end=' ')
+        if os.path.isfile(file):
+            path = os.path.abspath(file)
+        elif os.path.isfile(os.path.join(file_root, file)):
+            path = os.path.join(file_root, file)
+        else:
+            print('NOT FOUND')
+            continue
+        ic, ec = 0, 0
+        try:
+            with open(file) as f:
+                data = json.load(f)
+                f.close()
+        except:
+            print('BAD JSON')
+            continue
+        if data.get('load_all', False):
+            load_all = True
+        for filename in data.get('includes', []):
+            includes.add(os.path.basename(filename))
+            ic += 1
+        for filename in data.get('excludes', []):
+            excludes.add(os.path.basename(filename))
+            ec += 1
+            f.close()
+        print(f'({ic} includes, {ec} excludes)')
+
+# -----------------------
+# print excludes
+# -----------------------
+
+if excludes:
+    excludes = list(excludes)
+    excludes.sort()
+    print(div)
+    for f in excludes:
+        print('EXCLUDE:', f)
+
+# -----------------------
+# iter over root
+# -----------------------
+
+if load_all:
+    includes = set()
+
+loads = []
+alldirs = set()
+
+if load_all or includes:
+    for root,dirs,files in os.walk(file_root):
+
+        # drop bad dirs
+        for x in dirs[:]:
+            if x in excludes:
+                dirs.remove(x)
+
+        # save good files
+        files_saved_from_this_dir = set()
+        for file in files:
+
+            keepit = False
+
+            # no smash files
+            if root == file_root and file.startswith('smash_'):
+                continue
+            
+            # no specific excludes
+            elif file in excludes:
+                continue
+
+            # specific include
+            elif file in includes:
+                keepit = True
+
+            # all
+            elif load_all:
+                keepit = True
+
+            # save
+            if keepit:
+
+                # prefer existing .mpy only if not mpy_cross 
+                name,ext = os.path.splitext(file)
+                if use_mpy and mpy_cross and ext.lower() == '.py':
+                    if os.path.isfile(os.path.join(root,name+'.mpy')):
+                        file = name+'.mpy'
+
+                # make/save paths
+                if file not in files_saved_from_this_dir:
+                    path1 = os.path.join(root,file)
+                    path2 = os.path.normpath(path1.replace(file_root,'').strip(os.sep))
+                    loads.append((path2,path1))
+                    alldirs.add(os.path.dirname(path2))
+                    files_saved_from_this_dir.add(file)
+
+alldirs = list(alldirs)
+alldirs.sort()
+
+# -----------------------
+# print loads (includes)
+# -----------------------
+
+if loads:
+    loads.sort()
+    print(div)
+    for p1,p2 in loads:
+        print('INCLUDE:',p1)
+
+# -----------------------
+# dry run
+# -----------------------
+
+if dry_run:
+
+    print(div)
+    print(f'DRY RUN: 0 files loaded')
+    print()
+    exit(0)
+
+# -----------------------
+# serial
+# -----------------------
+
+rbuffer = ''
+
+def recv():
+
+    # clear recv into rbuffer
+
+    global rbuffer
+    while 1:
+        data = connection.read(1024)
+        if not data:
+            break
+        else:
+            rbuffer += data.decode(encoding='utf-8', errors='?')
+
+
+def send(line='',show=False,validate=None):
+
+    global rbuffer
+
+    connection.write([ord(x) for x in line+'\r'])
+    time.sleep(0.1)
+    recv()
+
+    if validate and not rbuffer.rstrip().endswith(validate.strip()):
+        print('VALIDATE:',[validate.strip()])
+        print('R_BUFFER:',[rbuffer.rstrip()[-64:]])
+        raise IOError('RECV buffer FAILED validation.')
+
+    if show:
+        print('BLOCK:', [' '.join(rbuffer.split(' '))])
+
     rbuffer = ''
 
-    def __init__(self):
+if verbose:
+    print(div)
 
-        # port
-        self.port = port
-        if not self.port:
-            self.port = '/dev/ttyUSB0'
+baudrate = 115200
+timeout = 0.1
 
-        # local file system dir
-        self.file_system_dir = file_system_dir
-        if not self.file_system_dir:
-            self.file_system_dir = os.getcwd()
+if port:
+    connection = serial.Serial(port=port, baudrate=baudrate, timeout=timeout)
+elif port_list:
+    connection = None
+    for p in port_list:
+        try:
+            connection = serial.Serial(port=p, baudrate=baudrate, timeout=timeout)
+            break
+        except:
+            print(f'PORT UNAVAILABLE: {p}')
+if connection == None:
+    raise Exception('SERIAL POER ERROR: Use -p PORT to specify a serial port.')
 
-        # excludes
-        self.excludes = excludes
-        if not self.excludes:
-            self.excludes = []
-        elif type(self.excludes) == str:
-            self.excludes = excludes.split()
-        self.excludes = set([os.path.basename(x) for x in self.excludes])
+connection.flush()
+connection.write([3])  # clear = ctrl-c = 0x03
+time.sleep(0.2)
+connection.write([3])  # clear = ctrl-c = 0x03
+time.sleep(0.2)
+connection.write([3])  # clear = ctrl-c = 0x03
+time.sleep(0.2)
+send(show=verbose)
 
-        # includes
-        self.includes = includes
-        if not self.includes:
-            self.includes = []
-        elif type(self.includes) == str:
-            self.includes = includes.split()
-        self.includes = set([os.path.basename(x) for x in self.includes])
+send('import os', show=verbose)
+send('os.chdir("/")', show=verbose)
 
-        # notify
-        print()
-        print('REPL-Ace Uploader - Copyright (c) 2017 Clayton Darwin')
-        print('ClaytonDarwin.com - claytondarwin@gmail.com')
-        print('Port: {} Speed: {} Timeout: {}'.format(self.port,self.baudrate,self.timeout))
-        print('System Root: {}'.format(self.file_system_dir))
-        print('Exclude: {}'.format(list(self.excludes)))
-        print('Include: {}'.format(list(self.includes)))
-        print()
+# -----------------------
+# load files
+# -----------------------
 
-    def upload(self):
+fc = 0
+fileblocksize = 1024
 
-        # end message
-        print('STARTING UPLOAD...')
+if loads:
 
-        # create connection
-        if not smash_only:
-            self.connection = serial.Serial(port=self.port,baudrate=self.baudrate,timeout=self.timeout)
-            self.connection.flush()
-            self.connection.write([3,3]) # clear = ctrl-c
-            #self.connection.write([4]) # soft reboot = ctrl-d
-            self.recv(done=True) # full read
-
-            # imports
-            self.send('import os')
-
-        # iterate through file system        
-        for root,dirs,files in os.walk(self.file_system_dir):
-
-            # drop bad dirs
-            for x in dirs[:]:
-                if x in self.excludes:
-                    dirs.remove(x)
-                #elif includes and x not in includes:
-                #    dirs.remove(x)
-
-            # drop bad files
-            for x in files[:]:
-                if x in self.excludes:
-                    files.remove(x)
-                elif includes and x not in includes:
-                    files.remove(x)
-
-            # sort
-            dirs.sort()
-            files.sort()
-
-            # dirs that need creating
-            if not smash_only:
-                for d in dirs:
-                    path1 = os.path.join(root,d)
-                    path2 = path1.replace(self.file_system_dir,'').lstrip('/')
-                    dirname,basename = os.path.split(path2)
-                    if dirname:
-                        self.send("if '{1}' not in os.listdir('{0}'): os.mkdir('{0}/{1}')".format(dirname,basename))
+    # make dirs
+    if alldirs:
+        print(div)
+        dirsmade = set()
+        for d in alldirs:
+            subdirs = [x.strip() for x in d.split(os.sep) if x.strip()]
+            if subdirs:
+                for x in range(len(subdirs)):
+                    d2 = os.path.join(*subdirs[:x+1])
+                    if d2 in dirsmade:
+                        continue
                     else:
-                        self.send("if '{0}' not in os.listdir(): os.mkdir('{0}')".format(basename))
-                    self.send()
-                    self.send("print('LIST:','{0}',os.listdir('{0}'))".format(dirname))
+                        print('MAKE DIR:',d2)
+                        dirname, basename = os.path.split(d2)
+                        if dirname:
+                            send(f"if '{basename}' not in os.listdir('{dirname}'): os.mkdir('{dirname}/{basename}')\r\n",show=verbose)
+                            send(f"'{basename}' in os.listdir('{dirname}')",show=verbose,validate='True\r\n>>>')
+                        else:
+                            send(f"if '{basename}' not in os.listdir(): os.mkdir('{basename}')\r\n",show=verbose)
+                            send(f"'{basename}' in os.listdir()",show=verbose,validate='True\r\n>>>')
+                        send()
+                        dirsmade.add(d2)
 
-            # files in dirs already created
-            for file in files:
+    # make files
+    for p1, p2 in loads:
 
-                # make a temp file
-                path1 = os.path.join(root,file)
-                infile = open(path1)
-                path2 ='smash_'+file
-                # smash files
-                if smash and (smash_all or os.path.splitext(file)[1].lower() == '.py'):
-                    outfile = open(path2,mode='w')
+        print(div)
+        print('LOADING:', p1)
+
+        # make temp file
+        temp = 'smash_'+os.path.basename(p1)
+
+        # ext
+        ext = os.path.splitext(p2)[1].lower()
+
+        # mpy-cross
+        if ext == '.py' and use_mpy and mpy_cross and os.path.basename(p2) not in ('boot.py','main.py'):
+            print('Cross Compile:',os.path.basename(p2),end=' ')
+            # rename files to .mpy
+            temp = temp.replace('.py','.mpy')
+            p1 = p1.replace('.py','.mpy')
+            if os.path.isfile(temp):
+                os.remove(temp)
+            mpy_cross.run('-o',temp,p2).wait() # doesn't raise errors, use file existence
+            print('done')
+            if not os.path.isfile(temp):
+                print('ERROR:',os.path.basename(p2),'does not compile.')
+                print()
+                print('COMPILE ERROR! REPLace.py STOPPED.')
+                print()
+                break
+
+        # old smash
+        elif smash and ext != '.mpy' and (smash_all or ext == '.py'):
+            with open(p2) as infile:
+                with open(temp,mode='w',newline='\n') as outfile:
                     for line in infile:
-                        line2 = line.strip()
+                        line2 = line.strip() # this will remove \r
                         if not line2:
                             pass
-                        elif line2.startswith('#') and smash_level >= 2:
+                        elif line2 == '# end':
+                            break
+                        elif line2.startswith('#') and smash >= 2:
                             pass
-                        elif '#' in line2 and smash_level >= 2:
-                            outfile.write(line.rstrip().rsplit('#',1)[0]+'\n')
+                        elif '#' in line2 and smash >= 3:
+                            outfile.write(line.rstrip().rsplit('#', 1)[0]+'\n')
                         else:
                             outfile.write(line.rstrip()+'\n')
                     outfile.close()
-                    infile.close()
-                # don't smash
-                else:
-                    shutil.copyfile(path1,path2)
+                infile.close()
 
-                # send temp file
-                if not smash_only:
-                    path3 = path1.replace(self.file_system_dir,'').lstrip('/')
-                    self.send("outfile=open('{}',mode='wb')".format(path3))
-                    infile = open(path2,mode='rb')
-                    while 1:
-                        data = infile.read(self.fileblocksize)
-                        if not data:
-                            break
-                        self.send("outfile.write({})".format(data))
-                    self.send("outfile.close()")
+        # no smash
+        else:
+            shutil.copyfile(p2,temp)
 
-                # remove temp file
-                if not (smash_only or smash_keep):
-                    os.remove(path2)
-
-        # close connection
-        if not smash_only:
-            self.connection.write([3,3]) # clear
-            self.recv(done=True) # full read
-            self.connection.close()
-
-        # end message
-        print('UPLOAD COMPLETE!')
-
-    def replace_strings(self,match_object):
-        return 'X' * len(match_object.group())
-
-    def send(self,line=''):
-
-        self.connection.write([ord(x) for x in line+'\r'])
-        self.recv()       
-
-    def recv(self,done=False):
-
-        # collect return from serial
-        while 1:
-            data = self.connection.read(1024)
-            if not data:
+        # send temp file
+        send_error = False
+        for x in range(3):
+            try:
+                bc = 0
+                send(f"outfile = open('{p1}',mode='wb')", show=verbose)
+                infile = open(temp, mode='rb')
+                while 1:
+                    data = infile.read(fileblocksize)
+                    if not data:
+                        break
+                    bc += len(data)
+                    send(f"outfile.write({data})",show=verbose,validate=f'{len(data)}\r\n>>>')
+                send("outfile.close()", show=verbose)
+                if send_error:
+                    print('RELOAD OKAY')
+                print(f'LOADED: {bc} bytes OKAY')
+                send_error = False
                 break
-            else:
-                self.rbuffer += data.decode(encoding='utf-8',errors='?')
-        self.rbuffer = self.rbuffer.replace('\r','')
+            except Exception as e:
+                send("outfile.close()",show=False)
+                print(traceback.format_exc())
+                if x <= 1:
+                    print('RELOADING')
+                send_error = True
+                connection.write([3]) # clear = ctrl-c = 0x03
+                time.sleep(0.2)
+                connection.write([3]) # clear = ctrl-c = 0x03
+                time.sleep(0.2)
+                connection.write([3]) # clear = ctrl-c = 0x03
+                time.sleep(0.2)             
+        if send_error:
+            raise Exception('FILE LOAD ERROR:',os.path.basename(p2))
 
-        # print return lines
-        while '\n' in self.rbuffer:
-            i = self.rbuffer.index('\n')
-            line = self.rbuffer[:i]
-            self.rbuffer = self.rbuffer[i+1:]
-            print(line)
+        # remove temp file
+        if not smash_keep:
+            if os.path.isfile(temp):
+                os.remove(temp)
 
-        # done
-        if done:
-            print(self.rbuffer)
+        # count
+        fc += 1
 
-if __name__ == '__main__':
-    run()
+        # try a pause
+        #time.sleep(0.1)
+
+# -----------------------
+# serial
+# -----------------------
+
+if verbose:
+    print(div)
+
+connection.write([3])  # clear = ctrl-c = 0x03
+time.sleep(0.2)
+connection.write([3])  # clear = ctrl-c = 0x03
+time.sleep(0.2)
+connection.write([3])  # clear = ctrl-c = 0x03
+time.sleep(0.2)
+send(show=verbose)
+connection.close()
+
+# -----------------------
+# print done
+# -----------------------
+
+print(div)
+print(f'DONE: {fc} files loaded')
+print()
+
+# -----------------------
+# end
+# -----------------------

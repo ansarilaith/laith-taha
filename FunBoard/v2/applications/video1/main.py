@@ -51,6 +51,17 @@ oled.r180() # rotate screen 180
 # oled.unr180() # un-rotate screen 180
 # also flip, unflip, mirror, unmirror, invert, uninvert
 
+lc = 0
+while 1:
+    lc+=1
+    print('loop',lc)
+    oled.frame_clear()
+    oled.place_text('LOOP {}'.format(lc),64,32,scale=4,center=True,middle=True,value=1)
+    #oled.invert()
+    oled.frame_show()
+    oled.dropout()
+    time.sleep(1)
+
 # run a test pattern
 oled.test()
 
