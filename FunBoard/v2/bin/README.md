@@ -122,7 +122,7 @@ You should be able to see the test file you created and its size.
 See **ERROR 7**.
 
 1. The next test is for WiFi.
-During this test, the ESP32 will 1) scan local access points and print them to the terminal, 2) connect to the access point with essid `youressid`, 3) set the local time using NTP (10 tries), and 4) download data from eziot.link.
+During this test, the ESP32 will 1: scan local access points and print them to the terminal, 2: connect to the access point with essid `youressid`, 3: set the local time using NTP (10 tries), and 4: download data from eziot.link.
 If data is downloaded from eziot.link, WiFi is OKAY.
 See **ERROR 8**.
 
