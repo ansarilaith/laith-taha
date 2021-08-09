@@ -362,7 +362,9 @@ The **System Tools** module provides a range of convenience functions for workin
 - `st.memp(show=True,collect=True,rt=False)` - Show the current memory usage after a garbage collect.
 
 ### wifi
+
 WiFi requires a **2.4 GHz** access point.
+
 **WiFi Connect** functions.
 - `wifi.scan()` - Print available wifi networks to the screen.
 - `wifi.connect(essid=None,password=None,timeout=15)` - Connect to a wifi access point with ID `essid` using the given `password` or None if the network is open.
