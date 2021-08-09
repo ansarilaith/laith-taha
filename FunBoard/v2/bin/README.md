@@ -70,6 +70,8 @@ You can actually use any hex address range for the read. Range `0x1000` to `0x3f
 
 This is the install and test procedure for new boards. It tests the basic functions of the ESP32 and circuits on the FunBoard.
 
+Here is a video of me going through the install and test sequence: [Install and Test Video](https://www.youtube.com/watch?v=H8-ObIHnE7s&t=50s)
+
 ## Procedure
 
 1. Create a **2.4 GHz** Wifi access point with the essid `youressid` and the password `yourpassword`. The access point **MUST HAVE INTERNET ACCESS**. That it, it cannot be unconnected (a dead end) The ESP32 must be able to access the https://eziot.link website.
