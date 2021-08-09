@@ -123,11 +123,11 @@ See **ERROR 7**.
 
 1. The next test is for WiFi.
 During this test, the ESP32 will
-1) scan local access points and print them to the terminal,
-2) connect to the access point with essid `youressid`,
-3) set the local time using NTP (10 tries),
+ 1) scan local access points and print them to the terminal,
+ 2) connect to the access point with essid `youressid`,
+ 3) set the local time using NTP (10 tries),
 and 4) download data from eziot.link.
-If data is downloaded from eziot.link, WiFi id OKAY.
+If data is downloaded from eziot.link, WiFi is OKAY.
 See **ERROR 8**.
 
 1. Finally, you will be prompted to re-write the test version of `main.py` with a regular version.
