@@ -78,21 +78,21 @@ This is the install and test procedure for new boards. It tests the basic functi
 
 1. Download the most recent `install_funboard_20??????.bin` image (see files above).
 
-1. Install `esptool.py` to your desktop computer following the instructions in the (#requirements)[Requirements] section above.
+1. Install `esptool.py` to your desktop computer following the instructions in the [Requirements](#requirements) section above.
 
-1. Connect the FunBoard to your desktop computer via the USBc connector (see (https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2#connecting)[Connecting]).
+1. Connect the FunBoard to your desktop computer via the USBc connector (see [Connecting](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2#connecting)).
 The green LED should illuminate.
 See **ERROR 4**.
 
 1. Determine which TTY port is being used by the FunBoard connection.
 See **ERROR 1**.
 
-1. Load the `.bin` image to the ESP32 following the (#load-the-image)[Load Image] instructions above. 
+1. Load the `.bin` image to the ESP32 following the [Load Image](#load-the-image) instructions above. 
 Be sure to set the correct port and `.bin` file name.
 See **ERROR 2**.
 
 1. Connect to the FunBoard using `picocom` or a similar terminal program using the correct port (same as for loading).
-See (https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2#connecting)[Connecting].
+See [Connecting](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2#connecting).
 Initially you will not see any data on the screen from the FunBoard.
 However, your terminal program should connect with no errors because the USB connection is being handled by the CP2104 chip.
 See **ERROR 1**.
@@ -142,7 +142,7 @@ After booting you should end up with a python prompt `>>>`.
 ## ERRORS
 
 1. If you are unable to determine the port (the TTY connection doesn't register).
-If using Windows, insure you have the proper drivers installed (see (https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2#connecting)[Connecting]).
+If using Windows, insure you have the proper drivers installed (see [Connecting](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2#connecting)).
 You may also need to switch USB ports and/or logout/reboot in order to get the device to register.
 If the port will still not register, the error will be associated with the USBc connector or CP2104 chip.
 
