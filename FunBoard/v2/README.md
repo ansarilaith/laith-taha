@@ -1,7 +1,7 @@
 # The FunBoard V2
 
 The Funboard is designed to be a low-cost solution for **learning to program** and experimenting with **embedded devices** and the **Internet-of-Things** (IoT).
-The board and open-source software package provides everything you need to get started programming using Python and MicroPython, some of the most popular and practical programming languages in use today.
+The board and its open-source software package provides everything you need to get started programming using Python and MicroPython, some of the most popular and practical programming languages in use today.
 You can easily develop your basic programming skills and knowledge base (i.e. variables, functions, loops, etc.) using the on-board LEDs, MicroPixels and buzzer.
 And when you are ready, you can move on to advance topics and projects like IoT devices and network programming, all using the built-in IO pins, microSD card, and WiFi capability.
 Whatever your programming level, a creative mind will never run out of projects for the FunBoard.
@@ -10,7 +10,7 @@ I've been programming for 20 years, and I use FunBoards everyday for developing 
 Here are some of the FunBoard's features:
 
 - USB powered
-- USB interface
+- USB interface (serial TTY)
 - ESP32 processor
 - WiFi
 - two switches (reset and programmable)
@@ -21,7 +21,7 @@ Here are some of the FunBoard's features:
 - buzzer
 - 8 programmable MicroPixels
 - MicroPython
-- full support software
+- full support software for peripherals
 - ongoing support and tutorials
 
 <table><tr>
@@ -52,10 +52,19 @@ Here are some of the FunBoard's features:
 - [MicroPython General Docs](http://docs.micropython.org/en/latest/)
 - [MicroPython ESP32 Quick Reference](http://docs.micropython.org/en/latest/esp32/quickref.html)
 - [ClaytonDarwin on YouTube](https://www.youtube.com/claytondarwin)
+- [EZIoT.link](https://eziot.link)
+- [Clayton's Server on a FunBoard](http://eziot.link/dns/clayton)
 
 ### Where to Buy a FunBoard
 - [The PCBWay Store](https://www.pcbway.com/project/gifts_detail/The_FunBoard_V2.html) - use this if you are outside the U.S.
 - [Clayton's PCB Shop](https://cpcb.shop/) - if you are in the U.S. this might be cheaper.
+
+### Videos
+
+- [A FunBoard Server](https://www.youtube.com/watch?v=SktBsA3xvDI)
+- [Quick Preview: FunBoard V2](https://www.youtube.com/watch?v=H8-ObIHnE7s)
+- [UnBoxing the FunBoard V1](https://www.youtube.com/watch?v=AA9ynxTzcaQ)
+- More coming soon!
 
 ## Safety
 
@@ -165,7 +174,7 @@ And here are some different methods for connecting to the FunBoard via a serial 
 #### Putty
 
 For the Windows OS, most people use the [Putty](https://www.putty.org/) software.
-I will add some instructions soon (once I have had a change to test it).
+I will add some instructions soon (once I have had a chance to test it).
 
 #### Picocom
 
