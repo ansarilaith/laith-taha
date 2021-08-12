@@ -1,11 +1,11 @@
 # The FunBoard V2
 
 The Funboard is designed to be a low-cost solution for **learning to program** and experimenting with **embedded devices** and the **Internet-of-Things** (IoT).
-The board and its open-source software package provides everything you need to get started programming using Python and MicroPython, some of the most popular and practical programming languages in use today.
+The board and its open-source software package provides everything you need to quickly get started programming using Python and MicroPython, some of the most popular and practical programming languages in use today.
 You can easily develop your basic programming skills and knowledge base (i.e. variables, functions, loops, etc.) using the on-board LEDs, MicroPixels and buzzer.
 And when you are ready, you can move on to advance topics and projects like IoT devices and network programming, all using the built-in IO pins, microSD card, and WiFi capability.
 Whatever your programming level, a creative mind will never run out of projects for the FunBoard.
-I've been programming for 20 years, and I use FunBoards everyday for developing and experimenting.
+Although I've been programming for 20 years, and I use FunBoards everyday for developing and experimenting.
 
 Here are some of the FunBoard's features:
 
