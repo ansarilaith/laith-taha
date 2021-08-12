@@ -5,7 +5,7 @@ The board and its open-source software package provides everything you need to q
 You can easily develop your basic programming skills and knowledge base (i.e. variables, functions, loops, etc.) using the on-board LEDs, MicroPixels and buzzer.
 And when you are ready, you can move on to advance topics and projects like IoT devices and network programming, all using the built-in IO pins, microSD card, and WiFi capability.
 Whatever your programming level, a creative mind will never run out of projects for the FunBoard.
-Although I've been programming for 20 years, and I use FunBoards everyday for developing and experimenting.
+Although I've been programming for 20 years, I use FunBoards everyday for developing and experimenting.
 
 Here are some of the FunBoard's features:
 
