@@ -42,9 +42,9 @@ Here are some of the FunBoard's features:
 
 ### Local Links:
 - [Safety Precautions](#safety)
-- [Peripherals](#peripherals)
+- [Peripherals](#peripherals) - GPIO pins, LEDs, Buzzer, etc.
 - [Connecting Via USB3c](#connecting)
-- [FunBoard Built-In Functions](#built-in-functions)
+- [FunBoard Built-In Functions](#built-in-functions) - everything fun on the FunBoard
 - [How to Load Code, Scripts, and Files](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/code)
 - [How to Load a MicroPython Image](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/bin)
 
