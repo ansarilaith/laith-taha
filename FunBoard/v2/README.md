@@ -15,7 +15,7 @@ Here are some of the FunBoard's features:
 - WiFi
 - two switches (reset and programmable)
 - microSD card slot
-- 13 extra IO pins
+- 15 extra IO pins
 - SPI, I2C, UART
 - programmable LED
 - buzzer
@@ -81,7 +81,7 @@ Be careful not to accidentally connect pins with metal tools, wires, liquids, or
 
 ### USB Connector
 
-The **USB 3 Type C** connector on the FunBoard has two functions.
+The **USB Type C** connector on the FunBoard has two functions.
 First, it provides power to the FunBoard. 
 It should always be connected to a regulated 5V source that can provide at least 500mA current. 
 This is the only recommended method for powering your FunBoard.
@@ -98,7 +98,7 @@ There are two push-button switches on the funboard:
 - RESET - pushing this will cause a hard reset of the ESP32. 
 You can accomplish the same thing using the `esp32.reset` function (see [esp32](#esp32) below).
 
-- PROG - holding this button down while pushing the RESET button to put the ESP32 into program mode (see [Images](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/bin) for more information).
+- PROG - holding this button down while pushing the RESET button will put the ESP32 into program mode (see [Images](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/bin) for more information).
 Any other time, this button is connected to GPIO 0 and can be used as a user input.
 
 ### MicroSD Card Slot
@@ -158,7 +158,7 @@ Any software designed for an ESP32-plus-MicroPython setup will probably work for
 
 ### Serial REPL via the USB Connector
 
-The FunBoard connects to your laptop or desktop using a **USB 3 Type C** cable. When connected, the USB port is converted to TTY serial by a **Silicon Labs CP210x USB to UART Bridge IC**. If you are using Linux or OSX, these drivers should be included in the Kernel (or you definitely need an update). For Windows you will need to install the driver. You can get it here: [Silicon Labs Drivers](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
+The FunBoard connects to your laptop or desktop using a **USB Type C** cable. When connected, the USB port is converted to TTY serial by a **Silicon Labs CP210x USB to UART Bridge IC**. If you are using Linux or OSX, these drivers should be included in the Kernel (or you definitely need an update). For Windows you will need to install the driver. You can get it here: [Silicon Labs Drivers](https://www.silabs.com/developers/usb-to-uart-bridge-vcp-drivers)
 
 Here are the basic serial-port specifications:
 - 115200 baud
@@ -244,7 +244,7 @@ Here are some links to separate pages that show you how I load files and images:
 - [How to Load Code, Scripts, and Files](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/code)
 - [How to Load a MicroPython Image](https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2/bin)
 
-## Built In Functions
+## Built-In Functions
 
 The FunBoard comes with software to support all of the attached board peripherals like the MicroSD card, the leds, beeper, etc.
 There are also a lot of convenience functions included for common events such as connecting to WiFi, file and directory management, and using the Real-Time-Clock.
