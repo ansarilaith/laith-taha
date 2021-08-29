@@ -33,10 +33,10 @@ try:
     while 1:
 
         lc += 1
-        print(lc)
+        print('Stepper Test Loop',lc)
 
         s.play(s.jingle,sleep=True)
-        time.sleep(1)
+        time.sleep_ms(500)
         s.play(s.jingle2,sleep=True)
         time.sleep(1)
 
@@ -46,13 +46,14 @@ try:
         s.play(s.shave,sleep=True)
         time.sleep(1)
 
-        s.step(400,800)
+        print('  steps:',s.step( 400,800,sleep=True))
         time.sleep(1)
 
-        s.step(-400,800,sleep=True)
+        print('  steps:',s.step(-400,800,sleep=True))
         time.sleep(1)
 
         s.beepbeep(880,sleep=True)
+        time.sleep(1)
 
 except Exception as e:
     import sys
