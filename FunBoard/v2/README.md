@@ -150,6 +150,25 @@ See the `beeper.xxx` functions below (see [beeper](#beeper)).
 - 34 - Input Only - ADC1-6
 - 36 - Input Only - ADC1-0
 
+## Case
+
+### Acrylic Case
+
+<table><tr>
+<td width="75%"><img alt="case" src="/FunBoard/v2/images/case_assembly.jpg"/></td>
+</tr></table>
+
+Start by removing the protective film from the top and bottom acrylic pieces.
+Stack the pieces up like a sandwich with the FunBoard in the middle.
+Align the pieces together so that the SD Card cutouts line up and the holes in the top piece are over the push buttons on the Funboard. Now you are ready to assemble.
+
+1. Insert the long screws (10mm) into the bottom piece from the bottom up. 
+1. Add the nuts to hold them in place. Don't tighten the nuts really tight, just snug.
+1. Add the FunBoard onto the screws, and add the spacers to hold it in place (hand tight).
+1. Put the top piece in position and use the short screws (6mm) to hold it in place. The screws will go down from the top.
+
+Snug up all the screws and you are done.
+
 ## Connecting
 
 Here is the basic information you need to get connected to your FunBoard and load your programs. 
