@@ -71,7 +71,7 @@ Here are some of the FunBoard's features:
 ## Safety
 
 <table><tr>
-<td width="75%"><img alt="case" src="/FunBoard/v2/images/danger.jpg"/></td>
+<td width="75%"><img alt="case" height="96px" src="/FunBoard/v2/images/danger.jpg"/></td>
 </tr></table>
 
 
