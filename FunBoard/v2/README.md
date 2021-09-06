@@ -62,12 +62,18 @@ Here are some of the FunBoard's features:
 
 ### Videos
 
-- [A FunBoard Server](https://www.youtube.com/watch?v=SktBsA3xvDI)
 - [Quick Preview: FunBoard V2](https://www.youtube.com/watch?v=H8-ObIHnE7s)
 - [UnBoxing the FunBoard V1](https://www.youtube.com/watch?v=AA9ynxTzcaQ)
+- [A FunBoard Server](https://www.youtube.com/watch?v=SktBsA3xvDI)
+- [Using Stepper Motors](https://www.youtube.com/watch?v=aVaOmtFGesI)
 - More coming soon!
 
 ## Safety
+
+<table><tr>
+<td width="75%"><img alt="case" src="/FunBoard/v2/images/danger.jpg"/></td>
+</tr></table>
+
 
 These precautions should be followed to avoid permanently damaging your FunBoard:
 1. **USB-Power Only** - the FunBoard should be powered **ONLY** via a USBc connector attached to a regulated 5V 500+mA power supply.
