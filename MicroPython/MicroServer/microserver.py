@@ -13,7 +13,7 @@
 # does not take advantage of async functions
 # header lines <= 256 characters
 # input <= 1024 characters
-# not set up for https (but you coule ssl-wrap the client socket)
+# not set up for https (but you could ssl-wrap the client socket)
 # only handles common static file types (everything else is application/octet-stream)
 
 # APPLICATION:
@@ -27,6 +27,11 @@
 # client_data is a dict of item:value pairs
 # client_address is a tuple where index 0 is the client ip
 # client_count is the total number of client connections since restart
+
+# TEAPOT:
+# If a client asks for a non-existing path, assume they are fishing.
+# Send code 418 "I'm a teapot." and block the client IP for "teapot_lockout" seconds.
+# This reduces overhead and bandwith from fishing and crawlers.
 
 #-----------------------------------------------
 # setup
@@ -57,6 +62,7 @@ class MicroServer:
     max_requests = 5 # client sockets
     max_content = 1024 # from client socket
     socket_timeout = 30 # client socket
+    teapot_lockout = 20 # bad client lockout
     htdocs = '/htdocs'
 
     # static file cache directives
@@ -126,6 +132,9 @@ class MicroServer:
                 server_socket.listen(self.max_requests)
                 print('uServer socket listening +{} on addr {}.'.format(self.max_requests,self.server_address))
 
+                # last bad client address and time
+                teapot = (None,0)
+
                 # accept request loop
                 while 1:
 
@@ -140,49 +149,65 @@ class MicroServer:
                     t1 = time.ticks_ms()
                     now = '{}-{}-{}_{}:{}:{}'.format(*time.localtime()[:6])
                     self.rc += 1
-                    self.client_on(self.rc)
-                    client_socket.settimeout(self.socket_timeout) # 0
-                    print('uServer Client {}: {} - {} - M{}%.'.format(self.rc,client_address[0],now,self.memp()))
-                    bytecount = 0
 
-                    # parse all input data
-                    client_data = self.parse_socket_data(client_socket,client_address)
-                    print('uServer Client {} REQUEST: {} {} {} {} {}'.format(
-                        self.rc,
-                        client_data['SERVER_PROTOCOL'],
-                        client_data['REQUEST_METHOD'],
-                        client_data['PATH_INFO'],
-                        client_data['Content-Length'],
-                        client_data['Content-Type'],
-                        ))
+                    # teapot = do nothing and allow close
+                    if client_address[0] == teapot[0] and time.ticks_diff(t1,teapot[1]) < self.teapot_lockout*1000:
+                        print('uServer Teapot {}: {} - {} - M{}%.'.format(self.rc,client_address[0],now,self.memp()))
+                        teapot[1] = t1
 
-                    # path
-                    path = client_data['PATH_INFO'] or '/index.html'
-                    if path == '/':
-                        path = '/index.html'
-
-                    # static file
-                    if path and self.isfile(self.htdocs+path):
-                        cache = not (path in self.nocache)
-                        print('    File Request: {}'.format(path))
-                        for block in self.file_server(self.htdocs+path,cache=cache):
-                            bytecount += client_socket.write(block)
-
-                    # application iterator
-                    elif path and path[:5] in ('/app','/app/'):
-                        print('    Application Request')
-                        for block in self.application(client_data,client_address,self.rc):
-                            bytecount += client_socket.write(block)
-
-                    # unknown
+                    # non-teapot (good client)
                     else:
-                        print('    Unknown Request')
-                        bytecount += client_socket.write(bytes('HTTP/1.1 404 Not Found\nContent-Type: text/plain\nContent-Length: 14\n\n404 Not Found\n','utf8'))
+
+                        # clear teapot
+                        teapot = (None,0)
+
+                        # start client                        
+                        self.client_on(self.rc)
+                        client_socket.settimeout(self.socket_timeout) # 0
+                        print('uServer Client {}: {} - {} - M{}%.'.format(self.rc,client_address[0],now,self.memp()))
+                        bytecount = 0
+
+                        # parse all input data
+                        client_data = self.parse_socket_data(client_socket,client_address)
+                        print('uServer Client {} REQUEST: {} {} {} {} {}'.format(
+                            self.rc,
+                            client_data['SERVER_PROTOCOL'],
+                            client_data['REQUEST_METHOD'],
+                            client_data['PATH_INFO'],
+                            client_data['Content-Length'],
+                            client_data['Content-Type'],
+                            ))
+
+                        # path
+                        path = client_data['PATH_INFO'] or '/index.html'
+                        if path == '/':
+                            path = '/index.html'
+
+                        # static file
+                        if path and self.isfile(self.htdocs+path):
+                            cache = not (path in self.nocache)
+                            print('    File Request: {}'.format(path))
+                            for block in self.file_server(self.htdocs+path,cache=cache):
+                                bytecount += client_socket.write(block)
+
+                        # application iterator
+                        elif path and path[:5] in ('/app','/app/'):
+                            print('    Application Request')
+                            for block in self.application(client_data,client_address,self.rc):
+                                bytecount += client_socket.write(block)
+
+                        # unknown (bad client)
+                        else:
+                            print("    Unknown Request: I'm a teapot.")
+                            teapot = [client_address[0],t1]
+                            bytecount += client_socket.write(bytes("HTTP/1.1 418 I'm a teapot.\nContent-Type: text/plain\nContent-Length: 19\n\n418 I'm a teapot.\n",'utf8'))
+
+                        # end client
+                        self.client_off(path)
+                        print('uServer Client {}: {} - M{}% - {} bytes in {} secs.'.format(self.rc,client_address[0],self.memp(),bytecount,round(time.ticks_diff(time.ticks_ms(),t1)/1000.0,2)))
 
                     # close client socket
                     client_socket.close()
-                    self.client_off(path)
-                    print('uServer Client {}: {} - M{}% - {} bytes in {} secs.'.format(self.rc,client_address[0],self.memp(),bytecount,round(time.ticks_diff(time.ticks_ms(),t1)/1000.0,2)))
                     gc.collect()
                     
             # keyboard kill
@@ -280,7 +305,7 @@ class MicroServer:
     'gif':'image/gif',
     }
 
-    def parse_socket_data(self,client_socket,client_address,show=False):
+    def parse_socket_data(self,client_socket,client_address,show=True):
 
         # register client socket
         poller = poll()
@@ -302,17 +327,17 @@ class MicroServer:
             polldata = poller.poll(int(self.poll_timeout*1000))
             line = None
             if not polldata:
-                print('    HEADER <NO_DATA>')
+                print('  HEADER <NO_DATA>')
                 break
             elif polldata[0][1] in (POLLHUP,POLLERR):
-                print('    HEADER <POLLHUP_POLLERR>')
+                print('  HEADER <POLLHUP_POLLERR>')
                 break
             else:
                 line = client_socket.readline()[:256]
                 if not line or line == b'\r\n':
                     break
                 if show:
-                    print('    HEADER_LINE:',[line])
+                    print('  HEADER_LINE:',[line[:96]])
                 line = line.decode('utf8','replace').strip()
                 # GET
                 if line.startswith('GET '):
@@ -362,10 +387,10 @@ class MicroServer:
                 while dlen < clen:
                     polldata = poller.poll(int(self.poll_timeout*1000))
                     if not polldata:
-                        print('    POST <NO_DATA>')
+                        print('  POST <NO_DATA>')
                         break
                     elif polldata[0][1] in (POLLHUP,POLLERR):
-                        print('    POST <POLLHUP_POLLERR>')
+                        print('  POST <POLLHUP_POLLERR>')
                         break
                     else:
                         data += client_socket.recv(clen-dlen)
@@ -381,7 +406,7 @@ class MicroServer:
             keys = list(query_data.keys())
             keys.sort()
             for key in keys:
-                print('    INPUT:',key,str(query_data[key])[:96])
+                print('  INPUT:',key,str(query_data[key])[:96])
             del keys           
 
         # done
