@@ -4,8 +4,9 @@ The ESP32Mini is designed to be a low-cost, minimal solution for experimenting w
 The ESP32Mini is intended for intermediate to advanced users who are looking for a functional ESP32 development board with minimal size. 
 
 <table><tr>
-<td width="50%"><img alt="front" src="/ESP32Mini/v1/images/v1_front.jpg"/></td>
-<td width="50%"><img alt="back"  src="/ESP32Mini/v1/images/v1_back.jpg" /></td>
+<td width="33%"><img alt="front" src="/ESP32Mini/v1/images/v1_front.jpg"/></td>
+<td width="33%"><img alt="back"  src="/ESP32Mini/v1/images/v1_back.jpg" /></td>
+<td width="33%"><img alt="back"  src="/ESP32Mini/v1/images/esp32minispin.gif" /></td>
 </tr></table>
 
 Here are some of the ESP32Mini's features:
