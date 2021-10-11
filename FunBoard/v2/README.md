@@ -7,6 +7,11 @@ And when you are ready, you can move on to advance topics and projects like IoT 
 Whatever your programming level, a creative mind will never run out of projects for the FunBoard.
 Although I've been programming for 20 years, I use FunBoards everyday for developing and experimenting.
 
+<table><tr>
+<td width="50%"><img alt="front" src="/FunBoard/v2/images/v2_front.jpg"/></td>
+<td width="50%"><img alt="back"  src="/FunBoard/v2/images/v2_back.jpg" /></td>
+</tr></table>
+
 Here are some of the FunBoard's features:
 
 - USB powered
@@ -23,11 +28,6 @@ Here are some of the FunBoard's features:
 - MicroPython
 - full support software for peripherals
 - ongoing support and tutorials
-
-<table><tr>
-<td width="50%"><img alt="front" src="/FunBoard/v2/images/v2_front.jpg"/></td>
-<td width="50%"><img alt="back"  src="/FunBoard/v2/images/v2_back.jpg" /></td>
-</tr></table>
 
 # In This Repository
 
