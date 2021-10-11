@@ -70,7 +70,7 @@ Here are some of the ESP32Mini's features:
 ## Safety
 
 <table><tr>
-<td><img alt="case" height="96px" src="/ESP32Mini/v2/images/danger.jpg"/></td>
+<td><img alt="case" height="96px" src="/ESP32Mini/v1/images/danger.jpg"/></td>
 </tr></table>
 
 
