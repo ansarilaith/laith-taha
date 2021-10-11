@@ -3,6 +3,11 @@
 The ESP32Mini is designed to be a low-cost, minimal solution for experimenting with **embedded devices** and the **Internet-of-Things** (IoT).
 The ESP32Mini is intended for intermediate to advanced users who are looking for a functional ESP32 development board with minimal size. 
 
+<table><tr>
+<td width="50%"><img alt="front" src="/ESP32Mini/v1/images/v1_front.jpg"/></td>
+<td width="50%"><img alt="back"  src="/ESP32Mini/v1/images/v1_back.jpg" /></td>
+</tr></table>
+
 Here are some of the ESP32Mini's features:
 
 - 25.4mm x 31mm layout
@@ -23,11 +28,6 @@ Here are some of the ESP32Mini's features:
 - MicroPython (or any other RTOS)
 - full support software for peripherals
 - ongoing support and tutorials
-
-<table><tr>
-<td width="50%"><img alt="front" src="/ESP32Mini/v2/images/v1_front.jpg"/></td>
-<td width="50%"><img alt="back"  src="/ESP32Mini/v2/images/v1_back.jpg" /></td>
-</tr></table>
 
 # In This Repository
 
