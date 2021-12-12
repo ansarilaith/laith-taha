@@ -10,8 +10,8 @@ from micropython import const
 
 class BOARD:
 
-    BOARD_NAME = 'ESP32MINI-V1'
-    BOARD_DATE = '2021-09-15'
+    BOARD_NAME = 'ESP32MINI-V2'
+    BOARD_DATE = '2021-11-15'
 
     PIN_MANRST    = const(4) #  --> RESET
     PIN_LED       = const(2) # Blue LED
@@ -93,7 +93,7 @@ class BOARD:
  | |__ | |___| |_| | __| | __| | |   \/   |_ _ ___ _ 
  |  __||___  |  ___||__  |/ ___| | |\  /| | | '_  | |
  | |___ ___| | |    ___| | |___  | | \/ | | | | | | |
- |_____|_____|_|   |_____|_____| |_|    |_|_|_| |_|_| v1 
+ |_____|_____|_|   |_____|_____| |_|    |_|_|_| |_|_| v2
 
           From ClaytonDarwin on YouTube
     '''

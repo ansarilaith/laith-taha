@@ -1,12 +1,11 @@
-# The ESP32Mini V1
+# The ESP32Mini V2
 
 The ESP32Mini is designed to be a low-cost, minimal solution for experimenting with **embedded devices** and the **Internet-of-Things** (IoT).
 The ESP32Mini is intended for intermediate to advanced users who are looking for a functional ESP32 development board with minimal size. 
 
 <table><tr>
-<td width="33%"><img alt="front" src="/ESP32Mini/v1/images/v1_front.jpg"/></td>
-<td width="33%"><img alt="back"  src="/ESP32Mini/v1/images/v1_back.jpg" /></td>
-<td width="33%"><img alt="back"  src="/ESP32Mini/v1/images/esp32minispin.gif" /></td>
+<td width="48%"><img alt="front" src="/ESP32Mini/v2/images/v2_front.jpg"/></td>
+<td width="48%"><img alt="back"  src="/ESP32Mini/v2/images/v2_back.jpg" /></td>
 </tr></table>
 
 Here are some of the ESP32Mini's features:
@@ -39,9 +38,9 @@ And the ESP32-WROOM-32E in general:
 
 # In This Repository
 
-- **applications** - this contains application code from YouTube videos which use the ESP32Mini V1
-- **images** - this contains the last MicroPython image tested using ESP32Mini V1 code
-- **code** - this contains the code you need to run the ESP32Mini V1 (should be pre-loaded)
+- **applications** - this contains application code from YouTube videos which use the ESP32Mini V2
+- **images** - this contains the last MicroPython image tested using ESP32Mini V2 code
+- **code** - this contains the code you need to run the ESP32Mini V2 (should be pre-loaded)
 - **bin** - binary images (MicroPython + support software) you can load onto your ESP32Mini
 - **images** - pretty pictures of ESP32Minis 
 
@@ -53,8 +52,8 @@ And the ESP32-WROOM-32E in general:
 - [Peripherals](#peripherals) - GPIO pins, LEDs, etc.
 - [Connecting Via UART](#connecting)
 - [ESP32Mini Built-In Functions](#built-in-functions)
-- [How to Load Code, Scripts, and Files](https://gitlab.com/duder1966/youtube-projects/-/tree/master/ESP32Mini/v1/code)
-- [How to Load a MicroPython Image](https://gitlab.com/duder1966/youtube-projects/-/tree/master/ESP32Mini/v1/bin)
+- [How to Load Code, Scripts, and Files](https://gitlab.com/duder1966/youtube-projects/-/tree/master/ESP32Mini/v2/code)
+- [How to Load a MicroPython Image](https://gitlab.com/duder1966/youtube-projects/-/tree/master/ESP32Mini/v2/bin)
 
 ### External Links
 - [MicroPython General Docs](http://docs.micropython.org/en/latest/)
@@ -70,6 +69,7 @@ And the ESP32-WROOM-32E in general:
 ### Videos
 
 - [UnBoxing the ESP32Mini V1](https://www.youtube.com/watch?v=TyhTJ6KHVcI)
+- [UnBoxing the ESP32Mini V2 (Short)](https://www.youtube.com/watch?v=gXNJLEeIaY0)
 - [An ESP32 Server](https://www.youtube.com/watch?v=SktBsA3xvDI)
 - [Using Stepper Motors](https://www.youtube.com/watch?v=aVaOmtFGesI)
 - More coming soon!
