@@ -5,12 +5,11 @@ The ESP32Mini is intended for intermediate to advanced users who are looking for
 
 <table>
 <tr>
-<td width="48%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv1_front.jpg"/></td>
-<td width="48%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv2_front.jpg"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv1_front.jpg"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv2_front.jpg"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv2b_back.jpg"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv2_back.jpg"/></td>
 </tr>
-<tr>
-<td width="48%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv2b_back.jpg"/></td>
-<td width="48%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv2_back.jpg"/></td>
 </tr>
 </table>
 
@@ -83,7 +82,7 @@ And the ESP32-WROOM-32E in general:
 ## Safety
 
 <table><tr>
-<td><img alt="case" height="96px" src="/ESP32Mini/v2/images/danger.jpg"/></td>
+<td><img alt="danger" height="96px" src="/ESP32Mini/v2/images/danger.jpg"/></td>
 </tr></table>
 
 These precautions should be followed to avoid permanently damaging your ESP32Mini:
@@ -166,7 +165,7 @@ Here are the required pin connections:
 And you can optionally connect the 5v pin from the UART to the 5v on the ESP32Mini if your cable can supply enough current (usually they can supply 500ma on USB2). Here is a typical USB-to-TTY serial cable:
 
 <table><tr>
-<td><img alt="case" height="96px" src="/ESP32Mini/v2/images/USB_TTY_cable_labeled.jpg"/></td>
+<td><img alt="cable" width="75%" src="/ESP32Mini/v2/images/USB_TTY_cable_labeled.jpg"/></td>
 </tr></table>
 
 Here are the basic serial-port specifications:
