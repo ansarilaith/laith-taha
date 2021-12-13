@@ -163,7 +163,11 @@ Here are the required pin connections:
 - UART RX --> ESP32Mini pin 17 (TX)
 - UART Ground --> ESP32Mini GND (2 options)
 
-And you can optionally connect the 5v pin from the UART to the 5v on the ESP32Mini if your cable can supply enough current (usually they can supply 500ma on USB2).
+And you can optionally connect the 5v pin from the UART to the 5v on the ESP32Mini if your cable can supply enough current (usually they can supply 500ma on USB2). Here is a typical USB-to-TTY serial cable:
+
+<table><tr>
+<td><img alt="case" height="96px" src="/ESP32Mini/v2/images/USB_TTY_cable_labeled.jpg"/></td>
+</tr></table>
 
 Here are the basic serial-port specifications:
 - 115200 baud
