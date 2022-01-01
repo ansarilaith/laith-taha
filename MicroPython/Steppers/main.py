@@ -6,24 +6,24 @@ import steppers
 
 # set up motor
 
-s = steppers.HBRIDGE(5,18,19,23,   # A,a,B,b
-                     mode=3,       # see modes above
-                     reverse=False,# reverse motor default direction
-                     invert=False, # invert all mode pin states
-                     sleep=False,  # start in sleep mode
-                     sps=200,      # steps-per-second
-                     smax=10240,   # max step count allowed
-                     smin=-10240   # min step count allowed
-                     )
+##s = steppers.HBRIDGE(5,18,19,23,   # A,a,B,b
+##                     mode=3,       # see modes above
+##                     reverse=False,# reverse motor default direction
+##                     invert=False, # invert all mode pin states
+##                     sleep=False,  # start in sleep mode
+##                     sps=200,      # steps-per-second
+##                     smax=10240,   # max step count allowed
+##                     smin=-10240   # min step count allowed
+##                     )
 
-##s = steppers.A4899(18,          # step
-##                   19,          # direction
-##                   enable=5,    # enable pin
-##                   sleep=False, # start in sleep mode
-##                   sps=200,     # steps-per-second
-##                   smax=10240,  # max step count allowed
-##                   smin=-10240  # min step count allowed
-##                   )
+s = steppers.A4899(18,          # step
+                   19,          # direction
+                   enable=5,    # enable pin
+                   sleep=False, # start in sleep mode
+                   sps=200,     # steps-per-second
+                   smax=10240,  # max step count allowed
+                   smin=-10240  # min step count allowed
+                   )
 
 # test run
 try:

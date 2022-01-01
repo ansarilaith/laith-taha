@@ -20,7 +20,7 @@ def setup():
     if 'v1' in os.listdir('/lib/esp32mini'):
         from lib.esp32mini.board_v1 import BOARD
     else:
-        from lib.esp32mini.board_v1 import BOARD
+        from lib.esp32mini.board_v2 import BOARD
     builtins.esp32mini = BOARD()
     del BOARD
 

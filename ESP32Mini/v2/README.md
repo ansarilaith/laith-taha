@@ -262,7 +262,7 @@ Most of the class names are self-explanatory, but be sure to have a look at the 
 ### esp32mini
 ESP32Mini **Help** and information.
 - `esp32mini.info` - ESP32Mini version data.
-- `esp32mini` - List ESP32Mini extra modules.
+- `esp32mini.help` - List ESP32Mini extra modules.
 - `esp32mini.show(module=None)` - List functions for a given module based on the **string** name (i.e. use quotes)
 
 ### esp32
