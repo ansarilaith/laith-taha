@@ -1,6 +1,15 @@
-# This file is executed on every boot (including wake-boot from deepsleep)
+#-----------------------
+# funboard setup
+#-----------------------
 
-# notify
-print('RUN: boot.py')
+import funboard.setup as fs; del fs
+st.memp(show=False)
 
+#-----------------------
+# other setup
+#-----------------------
+
+#-----------------------
+# end
+#-----------------------
 

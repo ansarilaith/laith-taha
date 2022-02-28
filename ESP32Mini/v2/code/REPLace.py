@@ -43,13 +43,14 @@ load_all = False
 includes = []
 excludes = [
 
-    # filse
+    # files
     'REPLace.py',
     'notes.txt',
     'requirements.txt',
     'includes.json',
     'template_networks.csv',
     'template_config.json',
+    'README.md',
 
     # directories
     '__pycache__',

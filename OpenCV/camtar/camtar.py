@@ -4,7 +4,7 @@ import numpy as np
 import cv2
 
 # init camera
-camera = cv2.VideoCapture(0) ### <<<=== SET THE CORRECT CAMERA NUMBER
+camera = cv2.VideoCapture(2) ### <<<=== SET THE CORRECT CAMERA NUMBER
 camera.set(3,1280)             # set frame width
 camera.set(4,720)              # set frame height
 time.sleep(0.5)

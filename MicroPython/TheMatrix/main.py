@@ -1,107 +1,84 @@
+#-----------------------
 # notify
+#-----------------------
+
 print('RUN: main.py')
 
-import os,time
-from machine import Pin, SPI
-import sdcard
+#-----------------------
+# imports
+#-----------------------
+
+import sys
+import time
+import gc
 import ssd1306
+import ftree
 
-##############################
-### sd card init
-##############################
+#-----------------------
+# setup
+#-----------------------
 
-# IOMUX pins for SPI controllers
-# Note: Port 1 for 80Mhz (otherwise 40 max)
-# Note: Only the first device attaching to the bus can use CS0 pin.
-#          HSPI  VSPI
-# Pin Name GPIO Number
-# CS0*     15     5
-# SCLK     14    18
-# MISO     12    19
-# MOSI     13    23
-# QUADWP    2    22
-# QUADHD    4    21
+# the buffer is big, so clear memory as much as possible
+gc.collect()
 
-# this is for the TTGO-style ESP32 Dev Board
-# this is the pinout used for setup
-#                     ----
-#                    |    | RST
-#                    |    | 3V
-#                    |    | NC
-#                    |    | GND
-#                BAT |    | A00 DAC2
-#                 EN |    | A01 DAC1 
-#                USB |    | A02  G34 IN
-#            G13 A12 |    | A03  G39 IN
-#            G12 A11 |    | A04  G36 IN
-#            G27 A10 |    | A05  G04 
-#            G33 A09 |    | SCK  G05 --> CS
-#            G15 A08 |    | MOSI G18 --> SCK
-#            G32 A07 |    | MISO G19 --> MISO 
-#            G14 A06 |    | RX   G16 
-#            G22 SCL |    | TX   G17 
-#   MOSI <-- G23 DSA |    |      G21 
-#                     ----
+# make oled device
+oled = ssd1306.SSD1306_I2C()
 
+# change pins (these are the funboard defaults)
+oled.scl = 25
+oled.sda = 26
 
-# spi pins (including cs)
-mosi = 23
-miso = 19
-sck  = 18
-cs   =  5
+# change baud 100K is default, 400K generally works
+oled.baudrate = 400000
 
-# port
-sd = sdcard.SDCard(SPI(2,
-                       sck=Pin(sck),
-                       mosi=Pin(mosi),
-                       miso=Pin(miso)
-                       ),
-                   Pin(cs,mode=Pin.OUT))
+# set screen resolution position
+# 1306 defaults to 128x64 (it's max value)
 
-# mount
-os.mount(sd,'/sd')
-print(os.listdir())
+# use these for smaller oleds
+oled.width = 128
+oled.height = 64
+oled.xoffset = 0
+oled.yoffset = 0
 
-############################
-# oled init
-############################
+# do this if you changed screen size
+oled.__init__()
 
-oled = ssd1306.SSD1306_128X64_GRID()
-oled.port = 1
-oled.baudrate *= 8
+# open the port
 oled.port_open(test=False)
-oled.contrast(0)
-oled.flip()
 
-oled.randomflash(1028,0)
+# set display values
+oled.contrast(255) # brightness 0 to 255
+oled.r180() # rotate screen 180
+# oled.unr180() # un-rotate screen 180
+# also flip, unflip, mirror, unmirror, invert, uninvert
 
+# run a test pattern
+oled.test()
+
+# clear screen to start
+oled.frame_clear() # this clears the frame
+oled.frame_show() # this pushes the frame to the device
+
+#-----------------------
+# connect to REPL
+#-----------------------
+
+oled.repl_connect()
+for x in range(11):
+    print('hello repl',x)
+oled.repl_disconnect()
 oled.frame_clear()
-for n in range(4,0,-1):
-    for a in range(0,361,45):
-        oled.frame_clear()
-        oled.ray(64,32,32,a)
-        oled.poly(64,32,32,sides=16,start=0,end=a)
-        oled.place_text(n,64,32,scale=3,center=True,middle=True,value=1)
-        oled.frame_show()
-        #time.sleep(0.125)
-
-oled.blank()
-time.sleep(1)
-
-oled.frame_clear()
-oled.place_text('The',64,32-14,scale=1,center=True,middle=True,value=1)
-oled.place_text('Matrix',64,32+7,scale=2,center=True,middle=True,value=1)
 oled.frame_show()
-oled.fadeinout()
 
-oled.frame_clear()
-time.sleep(1)
+#-----------------------
+# test movie
+#-----------------------
 
-############################
-# play frames
-############################
+t1 = time.ticks_us()
+fc = 0
 
 try:
+
 
     ftime  = 23.976 # fps
     ftime = int(1000000/ftime)
@@ -113,65 +90,139 @@ try:
 
     while 1:
 
-        frame = infile.read(1024)
+        done = False
 
-        if not frame:
+        for p in range(8):
+            
+            page = infile.read(128)
+            if not page:
+                done = True
+                break
+
+            oled.command((0x22,p,p))
+            oled.port.writeto(oled.addr,bytearray((0x40,))+page)
+
+        if done:
             break
+            
 
         fc += 1
 
-        while time.ticks_us() < t1 + (ftime*fc):
-            pass
-
-        oled.write(frame)
+        #print('FRAME',fc)
+##        while time.ticks_us() < t1 + (ftime*fc):
+##            pass
 
     infile.close()
 
-except:
+except Exception as e:
+    sys.print_exception(e)
     print('STOP VIDEO')
 
 secs = time.ticks_diff(time.ticks_us(),t1)/1000000
 print('RATE:',fc,secs,fc/secs)
 
-oled.fadeout()
+oled.frame_clear()
+oled.frame_show()
 
-############################
+
+
+#-----------------------
+# basic functions
+#-----------------------
+
+# (1,1) is the top left
+# (128,64) is the bottom right
+
+# oled.on() # turns oled on
+# oled.off() # turns oled off
+# oled.port_clear() # clear the oled (not the internal frame)
+
+# oled.frame_clear() # clears internal display buffer (not the oled)
+# oled.frame_fill()  # fills the internal display buffer
+# oled.frame_show()  # sends internal frame to the oled
+
+# oled.bitset(x,y)
+# oled.bitclear(x,y)
+
+#-----------------------
+# shapes
+#-----------------------
+
+# oled.hline(X,Y,L,value=1) # horizontal line from XY length L
+# oled.vline(X,Y,L,value=1) # vertical
+
+# oled.line(X1,Y1,X2,Y2,value=1) # line between two points
+# oled.ray(X,Y,length=32,angle=45,value=1) # ray
+
+# oled.rect(X1,Y1,X2,Y2,value=1) # rectangle between opposite corners
+
+# oled.poly(X,Y,R,value=1,sides=8,start=0,end=360) # center XY, radius, sides, start angle, end angle
+# use a poly to draw an approx circle
+
+# hint: draw the same object a second time with value=0 to remove it and not the whole frame
+
+#-----------------------
+# text
+#-----------------------
+
+# 1: clear the frame
+# 2: place your text
+# 3: send frame to oled (show)
+
+# (0,0) is the top left
+# base your text (x,y) on this
+
+# base font is 7 pixels tall
+# can be scaled by whole numbers
+# if not center, then top
+# if not middle, then left
+# value == 1 == pixels on
+
+# if line is too long to display
+# right side is truncated (i.e. no wrap)
+
+time.sleep_ms(250)
+
+oled.frame_clear()
+oled.place_text('Tiny'   ,64,14,scale=2,center=True,middle=True,value=1)
+oled.place_text('Fractal',64,32,scale=2,center=True,middle=True,value=1)
+oled.place_text('Trees'  ,64,50,scale=2,center=True,middle=True,value=1)
+oled.frame_show()
+
+time.sleep_ms(1000)
+oled.port_clear()
+
+oled.frame_clear()
+oled.place_text('ESP32',64,32,scale=4,center=True,middle=True,value=1)
+oled.frame_show()
+
+time.sleep_ms(1000)
+oled.port_clear()
+
+oled.frame_clear()
+oled.place_text('OLED',64,16,scale=3,center=True,middle=True,value=1)
+oled.place_text('128x64 0.96in',64,48,scale=1,center=True,middle=True,value=1)
+oled.frame_show()
+
+time.sleep_ms(1000)
+oled.port_clear()
+
+#-----------------------
+# fractal trees
+#-----------------------
+
+try:
+    oled.do_trees()
+except KeyboardInterrupt:
+    pass
+
+#-----------------------
 # done
-############################
+#-----------------------
 
+oled.port_close()
 oled.frame_clear()
-oled.place_text('Meanwhile,',64,32-14,scale=1,center=True,middle=True,value=1)
-oled.place_text('back at the',64,32,scale=1,center=True,middle=True,value=1)
-oled.place_text('batcave ...',64,32+14,scale=1,center=True,middle=True,value=1)
-oled.frame_show()
-oled.fadeinout()
 
-oled.frame_clear()
-oled.place_text('Trouble is',64,32-7,scale=1,center=True,middle=True,value=1)
-oled.place_text('brewing!',64,32+7,scale=1,center=True,middle=True,value=1)
-oled.frame_show()
-oled.fadeinout()
-
-oled.blank()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+#-----------------------
+# end
+#-----------------------
