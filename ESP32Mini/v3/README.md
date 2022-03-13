@@ -1,14 +1,18 @@
-# The ESP32Mini V2
+# The ESP32Mini V3?
+
+**Just thinking about this one! Maybe someday soon I will make it.**
+
+**Most of the stuff below is just copied from the ESP32Mini V2.**
 
 The ESP32Mini is designed to be a low-cost, minimal solution for experimenting with **embedded devices** and the **Internet-of-Things** (IoT).
 The ESP32Mini is intended for intermediate to advanced users who are looking for a functional ESP32 development board with minimal size. 
 
 <table>
 <tr>
-<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv1_front.jpg"/></td>
-<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv2_front.jpg"/></td>
-<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv2b_back.jpg"/></td>
-<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/esp32miniv2_back.jpg"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/front.jpg"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/front.jpg"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/back.jpg"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/back.jpg"/></td>
 </tr>
 </tr>
 </table>
