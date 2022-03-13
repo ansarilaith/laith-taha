@@ -9,10 +9,10 @@ The ESP32Mini is intended for intermediate to advanced users who are looking for
 
 <table>
 <tr>
-<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/front.jpg"/></td>
-<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/front.jpg"/></td>
-<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/back.jpg"/></td>
-<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/back.jpg"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/front.png"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/front.png"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/back.png"/></td>
+<td width="25%"><img alt="front" src="/ESP32Mini/v2/images/back.png"/></td>
 </tr>
 </tr>
 </table>
