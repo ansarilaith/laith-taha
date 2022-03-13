@@ -10,8 +10,6 @@
 # the height will vary based on the height:width
 # ratio given to plot(). use html or css to vary
 # the display size.
-
-
  
 #-----------------------------------------------
 # setup
@@ -107,9 +105,6 @@ xmlcode
         # points
         pdata=None,
         plabs=None,
-
-        
-             
 
         ):
 
