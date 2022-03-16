@@ -55,7 +55,7 @@ It will probably handle 90% of IoT applications. But just to be clear, here are 
 
 <figure class="video_container">
 <iframe width="560" height="315" src="https://www.youtube.com/embed/exUgMxP_Zqg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-<figure class="video_container">
+</figure>
 
 1. [Introduction to EZIoT](https://www.youtube.com/watch?v=knoBnP5sdPM)
 1. [An Update Video: Using eziot.watch()](https://www.youtube.com/watch?v=exUgMxP_Zqg)
