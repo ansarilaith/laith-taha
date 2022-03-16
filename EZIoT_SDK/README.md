@@ -52,13 +52,8 @@ It will probably handle 90% of IoT applications. But just to be clear, here are 
 
 ## Some Videos to Get Started
 
-
 <figure class="video_container">
-<iframe width="560" height="315" src="https://www.youtube.com/embed/exUgMxP_Zqg" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-</figure>
-
-<figure class="video_container">
-  <iframe width="560" src="https://www.youtube.com/embed/exUgMxP_Zqg" frameborder="0" allowfullscreen="true"> </iframe>
+  <iframe src="https://www.youtube.com/embed/exUgMxP_Zqg" frameborder="0" allowfullscreen="true"> </iframe>
 </figure>
 
 1. [Introduction to EZIoT](https://www.youtube.com/watch?v=knoBnP5sdPM)
