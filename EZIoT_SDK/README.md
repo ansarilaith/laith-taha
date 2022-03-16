@@ -24,7 +24,7 @@ The `eziot.py` SDK in combination with the `eziot.link` API will allow you to up
 
 1. **Pass Data Between Devices** - You can easily send commands to devices and pass data between devices by using the `group` and `device` values. Just post data using a specific group and device, and then the target device can get that data using the same group and device. Easy.
 
-1. **Locate a Device on the Internet** - In other words: **Dynamic DNS**. You can let `eziot.link` create a dynamic link to your device so that it will be visible to others and easy for you to find.
+1. **Locate a Device on the Internet** - In other words: **Dynamic DNS**. You can let `eziot.link` create a dynamic link to your device so that it will be visible to others and easy for you to find. For example, here is a link to my ESP32 server: [https://eziot.link/dns/clayton](https://eziot.link/dns/clayton)
 
 
 ## What Can't I Do?
