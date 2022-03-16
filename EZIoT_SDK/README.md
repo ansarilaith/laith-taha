@@ -354,8 +354,8 @@ When it sees the command come through, it should set the neopixels and then dele
 rows = eziot.get_data(1024,group='command',device='FunBoard_1')
 
 for rowid,epoch,gmt,group,device,data1,data2,data3 in rows:
-do_command(data1,data2)
-eziot.delete_data(rowid)
+    do_command(data1,data2)
+    eziot.delete_data(rowid)
 ```
 
 If you wanted, you could have it send back a response that indicating it did as it was told:
