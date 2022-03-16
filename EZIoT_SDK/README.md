@@ -52,13 +52,9 @@ It will probably handle 90% of IoT applications. But just to be clear, here are 
 
 ## Some Videos to Get Started
 
-<figure class="video_container">
-  <iframe src="https://www.youtube.com/embed/exUgMxP_Zqg" frameborder="0" allowfullscreen="true"> </iframe>
-</figure>
-
-1. [Introduction to EZIoT](https://www.youtube.com/watch?v=knoBnP5sdPM)
-1. [An Update Video: Using eziot.watch()](https://www.youtube.com/watch?v=exUgMxP_Zqg)
-1. [Using DNS to make a Router](https://www.youtube.com/watch?v=SktBsA3xvDI)
+![Introduction to EZIoT](https://www.youtube.com/watch?v=knoBnP5sdPM)
+![An Update Video: Using eziot.watch()](https://www.youtube.com/watch?v=exUgMxP_Zqg)
+![Using DNS to make a Router](https://www.youtube.com/watch?v=SktBsA3xvDI)
 
 ## Installation (none)
 
