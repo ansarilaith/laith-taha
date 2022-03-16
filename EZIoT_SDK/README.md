@@ -56,13 +56,12 @@ It will probably handle 90% of IoT applications. But just to be clear, here are 
 1. [An Update Video: Using eziot.watch()](https://www.youtube.com/watch?v=exUgMxP_Zqg)
 1. [Using DNS to make a Router](https://www.youtube.com/watch?v=SktBsA3xvDI)
 
-## No Installation
+## Installation (none)
 
 ### Python Versions
 
-**Python:** Developed on 3.8. Should work on 3.5+.
-
-**MicroPython:** Developed on 1.13. Should work on 1.10+.
+1. **Python:** Developed on 3.8. Should work on 3.5+.
+1. **MicroPython:** Developed on 1.13. Should work on 1.10+.
 
 ### Setup Requirements
 
