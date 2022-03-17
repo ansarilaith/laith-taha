@@ -31,6 +31,7 @@ print('LOAD: microchart2.py')
 #-----------------------
 
 from math import sin,radians
+from math import cos,hypot,atan2 # for line smoothing
 
 #-----------------------------------------------
 # sub functions
@@ -42,7 +43,11 @@ from math import sin,radians
 
 def run():
 
-    data = [[1/x for x in range(-11,11,2)],[1/x for x in range(1,15)],[]]
+    data = [[1/x for x in range(1,11,1)],
+            [2/x for x in range(1,11,1)],
+            [2**(x/10) for x in range(1,11,1)],
+            [3**(x/10) for x in range(1,11,1)],
+            ]
 
     c = MicroChart()
 
@@ -59,8 +64,11 @@ def run():
                ytics=True,
                xgrid=True,
                ygrid=True,
+               yrv=2,
+               #bdata=data,
                ldata=data,
-               width=4,height=3,
+               smooth=True,
+               #width=4,height=3,
                html_taco=True):
             f.write(x)
         f.close()
@@ -76,7 +84,7 @@ class MicroChart:
     #---------------------------
 
     # color order for 8 colors
-    colors = 'red blue lime fuchsia maroon navy green purple'.split()
+    colors = 'firebrick royalblue limegreen maroon maroon navy green purple'.split()
 
     # footnote
     footnote = 'MicroChart2 - ClaytonDarwin on YouTube'
@@ -143,10 +151,28 @@ text.me {
     # xml file end
     xml2 = ''
 
+    # smoothing
+    smoothv = 0.15 # line smooth value
+
     # rounding
     svg_rnd = 2
     def sr(self,n):
         return round(n,self.svg_rnd)
+    def yr(self,n,yrv):
+        if yrv > 0:
+            return '{{:0<.{}f}}'.format(yrv).format(n)
+        else:
+            return str(round(int(n/10**-yrv),0))+'e{}'.format(abs(yrv))
+
+    # data fix
+    # all data (lines,bars,points) should be a list of lists
+    # the inner lists have the data points
+    def df(self,data,maxl):
+        if data and type(data[0]) not in (list,tuple):
+            data = [data]
+        while data and len(data) > maxl:
+            data.pop(-1)
+        return data
 
     #---------------------------
     # main function
@@ -174,7 +200,7 @@ text.me {
              ytics=True,   # True|False or target distance between tics
              ygrid=True,   # show grid lines
              yzero=True,   # insure 0 is included on y axis
-             ygrnd=2,      # round tic labels
+             yrv=2,        # round tic labels
 
              # line data
              ldata=None,
@@ -240,7 +266,7 @@ text.me {
         if ytitle:
             px1 += 30
         if ylabels:
-            ytics = True
+            ytics = ytics or True
             px1 += 50
         if ytics:
             px1 += 10
@@ -262,16 +288,10 @@ text.me {
         #---------------------------
 
         # fix data
-        # all data (lines,bars,points) should be a list of lists
-        # the inner lists have the data points
-        if ldata and type(ldata[0]) not in (list,tuple):
-            ldata = [ldata]
-        if bdata and type(bdata[0]) not in (list,tuple):
-            bdata = [bdata]
-        if pdata and type(pdata[0]) not in (list,tuple):
-            pdata = [pdata]
-        if plabs and type(plabs[0]) not in (list,tuple):
-            plabs = [plabs]
+        ldata = self.df(ldata,8)
+        bdata = self.df(bdata,4)
+        pdata = self.df(pdata,4)
+        plabs = self.df(plabs,4)
 
         # ranges:
         xmax = 0
@@ -294,20 +314,104 @@ text.me {
                         ymax = max(y,ymax)
 
         # adjust axis start-end points
-        if bdata:
-            bw = px2/xmax # bar width
-            px2 = px1 + px2 - bw/2
-            px1 += bw/2            
-        else:
-            px2 += px1
+        px2 += px1
         py2 += py1
 
         # shorten values
         px1,px2,py1,py2 = self.sr(px1),self.sr(px2),self.sr(py1),self.sr(py2)
 
         #---------------------------
+        # do y axis first
+        #---------------------------
+
+        # y axis step
+        if ytics and type(ytics) in (int,float):
+            ystep  = ytics
+        else:
+            spread = ymax-ymin
+            ystep = abs((spread)/19)
+            # convert y step to "whole" number
+            if ystep < 1: # steps are less than 1
+                ystep2 = 1
+                while ystep2 > ystep:
+                    ystep2 /= 2
+                    if ystep2 > ystep:
+                        ystep2 /= 2.5
+                        if ystep2 > ystep:
+                            ystep2 /= 2
+            else: # steps are greater than 1
+                ystep2 = 1
+                while ystep2 < ystep:
+                    ystep2 *= 2
+                    if ystep2 < ystep:
+                        ystep2 *= 2.5
+                        if ystep2 < ystep:
+                            ystep2 *= 2
+                    ystep2 = int(ystep2)
+            ystep = ystep2
+            del ystep2
+
+        # start location
+        if ymin % ystep == 0:
+            start = ymin
+        else:
+            start = ystep * (int(ymin//ystep))
+            ymin = start
+
+        # make labels
+        labels = [self.yr(start,yrv)]
+        label0 = self.yr(0,yrv)
+        end = start
+        while end < ymax:
+            end += ystep
+            labels.append(self.yr(end,yrv))
+        if ylabels and type(ylabels) in (list,tuple):
+            for x in range(min(len(labels),len(ylabels))):
+                labels[x] = ylabels[x]
+            ylabels = True
+
+        # yscale: pixels per step
+        yscale = (py2-py1)/(len(labels)-1)
+
+        # make tics and labels
+        if ytics or ylabels:
+            offset = -1
+            for label in labels:
+                offset += 1
+
+                # always make tic
+                tl = 5
+                y = self.sr(py2-offset*yscale)
+                yield '\n<line x1="{}" x2="{}" y1="{}" y2="{}" stroke-width="1" stroke="#000"/>'.format(px1-tl,px1,y,y)
+
+                # make grid
+                if ygrid and y != py1 and y != py2:
+                    if label == label0:
+                        stroke = 'AAA'
+                    else:
+                        stroke = 'EEE'
+                    yield '\n<line x1="{}" x2="{}" y1="{}" y2="{}" stroke-width="1" stroke="#{}"/>'.format(px1,px2,y,y,stroke)       
+
+                # make label
+                if ylabels:
+                    yield '\n<text class="me" x="{}" y="{}" font-size="12" fill="#000">{}</text>'.format(px1-tl-2,y,label)
+                    
+        #---------------------------
+        # adjust x spans
+        #---------------------------
+
+        # make bar center match line ends
+        if bdata:
+            xscale = (px2-px1)/(xmax-1)/2
+            px1 = self.sr(px1+xscale)
+            px2 = self.sr(px2-xscale)
+        
+        #---------------------------
         # make x labels
         #---------------------------
+
+        # xscale: pixels per step
+        xscale = (px2-px1)/(xmax-1)
 
         if xtics or xlabels:
 
@@ -317,9 +421,9 @@ text.me {
                     xlabels = [x for x in range(xmax)]
                 else:
                     skip = 1
-                    while xmax+1 / skip > 20:
+                    while (xmax+1)/skip > 30:
                         skip *= 5
-                        if xmax+1 / skip > 20:
+                        if (xmax+1)/skip > 30:
                             skip *= 2
                     xlabels = []
                     for x in range(xmax):
@@ -331,9 +435,8 @@ text.me {
             # x axis labeling
             if xlabels and len(xlabels) < xmax:
                 xlabels += [''] * (xmax-len(xlabels))
-            step = (px2-px1)/xmax
             for tic in range(xmax):
-                x = self.sr(px1 + tic*step)
+                x = self.sr(px1 + tic*xscale)
                 y = py2+20
                 tl = 5
                 if xlabels:
@@ -350,113 +453,108 @@ text.me {
                     yield '\n<line x1="{0}" x2="{0}" y1="{1}" y2="{2}" stroke-width="1" stroke="#EEE"/>'.format(x,py1,py2)
 
         #---------------------------
-        # y axis
+        # data
         #---------------------------
 
-        # y axis step
-        if ytics and type(ytics) in (int,float):
-            ystep = ytic
-        else:
-            spread = ymax-ymin
-            print('spread',spread)
-            ystep = abs((ymax-ymin)/19)
-        yscale = (py2-py1)/(len(labels)-1) # y per step
-        print('ystep',ystep)
-
-        # labels and tics
-        if ytics or ylabels:
-
-            # convert y step to "whole" number
-            if ystep < 1: # steps are less than 1
-                ystep2 = .1
-                while ystep2 > ystep:
-                    ystep2 /= 2
-                    if ystep2 > ystep:
-                        ystep2 /= 2.5
-                        if ystep2 > ystep:
-                            ystep2 /= 2
-            else: # steps are greater than 1
-                ystep2 = 1
-                while ystep2 < ystep:
-                    ystep2 *= 2
-                    if ystep2 < ystep:
-                        ystep2 *= 2.5
-                        if ystep2 < ystep:
-                            ystep2 *= 2
-                    ystep2 = int(ystep2)
-            print('ystep2',step2)
-
-            # start location
-            if ymin % step2 == 0:
-                start = ymin
-            else:
-                start = ystep2 * (int(ymin//ystep2))
-
-            # make labels
-            labels = []
-            while start < ymax:
-                labels.append(round(start,ygrnd))
-                start += ystep2
-            if ylabels and type(ylabels) in (list,tuple):
-                for x in range(min(len(labels),len(ylabels))):
-                    labels[x] = ylabels[x]
-            del ylabels
-
-            # add y tics
-            
-            offset = -1
-            for label in labels:
-                offset += 1
-
-                # make tic
-                tl = 5
-                y = self.sr(py2-offset*yps)
-                yield '\n<line x1="{}" x2="{}" y1="{}" y2="{}" stroke-width="1" stroke="#000"/>'.format(px1-tl,px1,y,y)
-
-                # make grid
-                if ygrid:
-                    if label == 0:
-                        stroke = 'AAA'
-                    else:
-                        stroke = 'EEE'
-                    yield '\n<line x1="{}" x2="{}" y1="{}" y2="{}" stroke-width="1" stroke="#{}"/>'.format(px1,px2,y,y,stroke)       
-
-                # make label
-                yield '\n<text class="me" x="{}" y="{}" font-size="12" fill="#000">{}</text>'.format(px1-tl,y,label)
+        # yscale: pixels per value
+        yscale = abs((py2-py1)/(end-start))
+        yzero = py2 - abs(ymin)*yscale
 
         #---------------------------
-        # bar data (loewst in stack)
+        # bar data (lowest in stack)
         #---------------------------
         if bdata:
-            pass
+            bl = len(bdata)
+            bi = 0
+            bw = xscale/(bl+0.24)
+            bo = -1 * bw*bl/2 + bw/2 # offset from center
+            for data in bdata:
+                color = self.colors[bi]
+                lastx = 0
+                for y in data:
+                    x = self.sr( (px1+lastx*xscale) + bo )
+                    lastx += 1
+                    try:
+                        y = self.sr( yzero - (y*yscale) )
+                    except:
+                        y = 0
+                    yield '\n<line x1="{}" x2="{}" y1="{}" y2="{}" stroke-width="{}" stroke="{}"/>'.format(x,x,yzero,y,bw,color)       
+                bi += 1
+                bo += bw
 
         #---------------------------
         # line data
         #---------------------------
 
         if ldata:
-            pass
-##            for a in range(len(ldata)):
-##                color = self.colors[a%len(self.colors)]
-##                points = len(ldata[a])
-##
-##                # straight lines
-##                if (not smooth) or points < 2:
-##                    coos = ''
-##                    b = 0
-##                    for  in range(points):
-##                        x = self.rnd(ldata[a][b])
-##                        y = self.rnd(yzero - values[b]*yscale)
-##                        coos += '{},{} '.format(x,y)
-##                    yield '\n<polyline points="{}" stroke="{}" stroke-width="{}" fill="none"/>'.format(coos.strip(),color,lwidth)
-##
-##                    
-##
-##
-##            
-##            ci = 0 # color index
-##            for data in ldata:
-                
+            ci = 0
+            for data in ldata:
+                color = self.colors[ci]
+                ci += 1
+
+                # straight lines
+                if (not smooth) or xmax < 2:
+                    coos = ''
+                    lastx = 0
+                    for y in data:
+                        x = self.sr(px1+lastx*xscale)
+                        lastx += 1
+                        try:
+                            y = self.sr( yzero - (y*yscale) )
+                        except:
+                            y = 0
+                        coos += '{},{} '.format(x,y)
+                    yield '\n<polyline points="{}" stroke="{}" stroke-width="{}" fill="none"/>'.format(coos.strip(),color,lwidth)
+
+                # curved lines
+                else:
+
+                    # coordinate pairs
+                    coos = []
+                    lastx = 0
+                    for y in data:
+                        x = self.sr(px1+lastx*xscale)
+                        lastx += 1
+                        try:
+                            y = yzero - (y*yscale)
+                        except:
+                            y = 0
+                        coos.append((x,y))
+
+                    # pad values with start and end values
+                    coos = coos[:1] + coos + coos[-1:]*2
+
+                    # start point
+                    yield '\n<path d="M{} {} '.format(*coos[1])
+
+                    # rest of points (using padded coos)
+                    for x in range(len(coos)-3):
+                        
+                        # previous point, this point, next point, next next point
+                        (x0,y0),(x1,y1),(x2,y2),(x3,y3) = coos[x:x+4]
+
+                        # first control point
+                        xdif = x2-x0
+                        ydif = y2-y0
+                        dist = hypot(xdif,ydif)
+                        rads = atan2(ydif,xdif)
+                        xc1 = self.sr( x1 + cos(rads) * dist * self.smoothv )
+                        yc1 = self.sr( y1 + sin(rads) * dist * self.smoothv )
+
+                        # second control point
+                        xdif = x1-x3
+                        ydif = y1-y3
+                        dist = hypot(xdif,ydif)
+                        rads = atan2(ydif,xdif)
+                        #rads += math.pi # reversed
+                        xc2 = self.sr( x2 + cos(rads) * dist * self.smoothv )
+                        yc2 = self.sr( y2 + sin(rads) * dist * self.smoothv )
+
+                        # add
+                        yield 'C {} {}, {} {}, {} {} '.format(xc1,yc1,xc2,yc2,x2,y2)
+
+                    # final
+                    yield '" stroke="{}" stroke-width="{}" fill="transparent"/>'.format(color,lwidth)
 
         #---------------------------
         # point data on top of stack
