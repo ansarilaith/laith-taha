@@ -1,6 +1,6 @@
 ## Face Detection
 
-This is the code I used to make the silly face detection video: [](https://www.youtube.com/watch?v=MDUA7L48JJw)
+This is the code I used to make the silly face detection video: [https://www.youtube.com/watch?v=MDUA7L48JJw](https://www.youtube.com/watch?v=MDUA7L48JJw)
 
 I last tested/updated this code using **OpenCV 4.4.0** and **Python 3.8** on **Linux** on **March 16, 2022**. All good.
 
