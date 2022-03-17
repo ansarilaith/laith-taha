@@ -1,6 +1,20 @@
-import os,sys,time,traceback
+# ------------------------------
+# Notice
+# ------------------------------
 
-from targeting_tools import *
+# Copyright 1966 Clayton Darwin claytondarwin@gmail.com
+
+# ------------------------------
+# Imports
+# ------------------------------
+
+import time
+import traceback
+
+import numpy as np
+import cv2
+
+import targeting_tools as tt
 
 # ------------------------------
 # Testing
@@ -27,7 +41,7 @@ def run():
         frame_rate = 20
 
         # camera 1
-        ct1 = Camera_Thread()
+        ct1 = tt.Camera_Thread()
         ct1.camera_source = left_camera_source
         ct1.camera_width = pixel_width
         ct1.camera_height = pixel_height
@@ -45,7 +59,7 @@ def run():
         # ------------------------------
 
         # cameras are the same, so only 1 needed
-        angler = Frame_Angles(pixel_width,pixel_height,angle_width,angle_height)
+        angler = tt.Frame_Angles(pixel_width,pixel_height,angle_width,angle_height)
         angler.build_frame()
 
         # ------------------------------
@@ -53,7 +67,7 @@ def run():
         # ------------------------------
 
         # motion camera1
-        targeter1 = Frame_Motion()
+        targeter1 = tt.Frame_Motion()
         targeter1.gaussian_blur = 15 # blur (must be positive and odd)
         targeter1.threshold = 15
         targeter1.dilation_value = 6
@@ -181,12 +195,6 @@ def run():
     except:
         pass
 
-    # close camera2
-    try:
-        ct2.stop()
-    except:
-        pass
-
     # kill frames
     cv2.destroyAllWindows()
 
@@ -194,13 +202,13 @@ def run():
     print('DONE')
 
 # ------------------------------
-# Testing
+# run
 # ------------------------------
 
 if __name__ == '__main__':
     run()
 
 # ------------------------------
-# End
+# end
 # ------------------------------
     
