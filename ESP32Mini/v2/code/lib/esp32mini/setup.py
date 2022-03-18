@@ -53,7 +53,7 @@ def setup():
 
     # software resets DO NOT clear peripherals
     # machine.reset() and WDT don't do full resets either
-    if reset_why >= 3:
+    if reset_why not in (1,2,4):
         esp32.reset
     del reset_why
 
