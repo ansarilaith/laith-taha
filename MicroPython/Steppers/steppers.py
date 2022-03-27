@@ -364,6 +364,9 @@ class A4899(HBRIDGE):
     # re-use as much of HBRIDGE as possible
     # keep all the function names the same
 
+    # disable value (sleep = disable)
+    sleepis = 1
+
     def __init__(self,
                  step,         # pin number for step
                  direction,    # pin number for direction
@@ -408,13 +411,14 @@ class A4899(HBRIDGE):
         self.smin = smin
 
     def sleep(self):
-        # disable == high
-        self.pe.value(1)
+        self.pe.value(self.sleepis)
         self.isoff = True
 
     def wake(self):
-        # enable == low
-        self.pe.value(0)
+        if self.sleepis:
+            self.pe.value(0)
+        else:
+            self.pe.value(1)
         self.isoff = False
 
     def step(self,steps,sps=None,sleep=False):
