@@ -13,18 +13,25 @@ print('LOAD: microchart2.py')
 # notes
 #-----------------------------------------------
 
-# this creates SVG charts (images) for html pages
-# use this to plot data right on your device
+# This creates SVG charts (images) for html pages
+# use this to plot data right on your device.
 
-# svg files are scalable, so the defined size of
+# SVG files are scalable, so the defined size of
 # the returned svg image is always 1000px wide.
-# the height will vary based on the height:width
-# ratio given to plot(). use html or css to vary
+# The height will vary based on the height:width
+# ratio given to plot(). Use html or css to vary
 # the display size.
 
-# in order to minimize memory use, MicroChart.make_svg() is an iterator
-# the full xml of an SVG plot might exceed available device memory
-# just write the yielded strings to an open socket/file
+# In order to minimize memory use, MicroChart.make_svg()
+# is an iterator. The full XML of an SVG plot might exceed
+# the available device memory. Just write the yielded strings
+# to an open socket or file.
+
+# There are 3 types of input data: bar, line, and scatter.
+# They can all be used at once if, for example, you want
+# bars with a line connecting them and lables at certain points.
+
+
 
 #-----------------------
 # imports
@@ -51,29 +58,18 @@ def run():
 
     data = [[1],[2],[3],[4]]
 
-    print('data:',data)
+
+
+
+    ldata = data
+    bdata = None#data
+    sdata = None#data
 
     c = MicroChart()
+    c.html_taco=True
 
     with open('microchart.html',mode='w',newline='\r\n') as f:
-        for x in c.plot(
-               title='TITLE of CHARTx',
-               xtitle='X Title and Such',
-               ytitle='Y Title and Such',
-               xlabels=True,
-               #xlabels=['cat','','dog','chicken','100000','hello','goodbye','the','end'],
-               xlabrot=45,
-               ylabels=True,
-               xtics=True,
-               ytics=True,
-               xgrid=True,
-               ygrid=True,
-               yrv=2,
-               bdata=data,
-               ldata=data,
-               smooth=1,
-               #width=4,height=3,
-               html_taco=True):
+        for x in c.plot(bdata=bdata,ldata=ldata,sdata=sdata):
             f.write(x)
         f.close()
 
@@ -87,8 +83,40 @@ class MicroChart:
     # config
     #---------------------------
 
+    # default values
+
+    title  = 'MicroChart', # string|None - main title at top
+    xtitle = None, # string|None - title below x axis
+    ytitle = None, # string|None - title to left of y axis (vertical)
+    footer = 'MicroChart - ClaytonDarwin on YouTube' # string|None - small title in lower right corner
+
+    width = 16 # numeric - used to form height-width ratio
+    height = 9 # numeric - used to form height-width ratio
+
+    xlabels = True, # True|False|list_of_labels - make (or not) labels on x axis or use given labels
+    ylabels = True, # True|False - make (or not) labels on y axis
+    xlabrot = 45, # degree - rotate xlabels this amount
+
+    xtics = True, # True|False - make tics on x axis (forced True if xlabels is True)
+    ytics = True, # True|False - make tics on y axis (forced True if ylabels is True)
+    xgrid = True, # True|False - draw lines across chart that match xtics
+    ygrid = True, # True|False - draw lines across chart that match ytics
+    yzero = False, # True|False - insure zero is somewhere on y axis
+    xzero = False, # True|False - insure zero is somewhere on x axis
+    yrv = 2, # +|- integer - round-to value for ylabels
+
+    ldata = None, # list of lists of points - line data
+    lwidth = 2, # numeric - line width
+    smooth = False, # True|False - smooth lines using bezier curves
+
+    bdata = None, # list of lists of points - bar data
+    sdata = None, # list of lists of points - scatter data
+
+    html_taco=False # wrap svg in a simple html page (for viewing with a browser)
+    xml_taco=False  # wrap svg in xml
+    srv = 2, # + integer - round-to for svg plot locations (not visible, shortens svg string)
+
     # color order for 8 colors
-    
     colors = '#e41a1c #377eb8 #4daf4a #984ea3 #ff7f00 #ffff33 #a65628 #f781bf'.split() # https://colorbrewer2.org
     #colors = '#07B #3BE #098 #E73 #C31 #E37 #BBB'.split() # https://personal.sron.nl/~pault/#sec:qualitative vibrant
 
@@ -161,14 +189,13 @@ text.me {
     smoothv = 0.15 # line smooth value
 
     # rounding
-    svg_rnd = 2
     def sr(self,n):
-        return round(n,self.svg_rnd)
-    def yr(self,n,yrv):
-        if yrv > 0:
-            return '{{:0<.{}f}}'.format(yrv).format(n)
+        return round(n,self.srv)
+    def yr(self,n):
+        if self.yrv > 0:
+            return '{{:0<.{}f}}'.format(self.yrv).format(n)
         else:
-            return str(round(int(n/10**-yrv),0))+'e{}'.format(abs(yrv))
+            return str(round(int(n/10**-self.yrv),0))+'e{}'.format(abs(self.yrv))
 
     # data fix
     # all data (lines,bars,points) should be a list of lists
@@ -184,67 +211,80 @@ text.me {
     # main function
     #---------------------------
 
-    def plot(self,
-
-             # default ratio (width will be 1000)
-             width=16,
-             height=9,
-            
-             #titles
-             title=None,  # string
-             xtitle=None, # string
-             ytitle=None, # string
-             
-             # x grid and labels
-             xlabels=True, # True|False or [list of labels]
-             xlabrot=0,    # label rotation angle
-             xtics=True,   # show tics
-             xgrid=True,   # show grid lines
-
-             # y grid and lables
-             ylabels=True, # True|False or [list of labels]
-             ytics=True,   # True|False or target distance between tics
-             ygrid=True,   # show grid lines
-             yzero=True,   # insure 0 is included on y axis
-             yrv=2,        # round tic labels
-
-             # line data
-             ldata=None,
-             lwidth=2,
-             smooth=False,
-
-             # bar data
-             bdata=None,
-
-             # scatter plot data
-             pdata=None,
-             plabs=None,
-
-             # wrappers
-             html_taco=False,
-             xml_taco=False
-             
-             ):
+    def plot(self,ldata=None,bdata=None,sdata=None):
 
         #---------------------------
         # start iterator (return some strings)
         #---------------------------
 
         # wrappers
-        if html_taco:
+        if self.html_taco:
             yield self.html1
-        elif xml_taco:
+        elif self.xml_taco:
             yield self.xml1
 
         # set width and height
-        height *= 1000/width
-        width = 1000
+        width  = 1000
+        height = int(1000*(self.height/self.width))
 
         # start svg
         yield self.svg1.replace('svgwidth',str(width),1).replace('svgheight',str(height),1)
-        
-        # border rectangle
         yield '<rect x="0.5" y="0.5" width="999" height="{}" stroke-width="1" stroke="#000" fill="#EEE"/>'.format(height-1)
+
+        # prep data
+        if xzero:
+            xmin,xmax = 0,0
+        else:
+            xmin,xmax = None,None
+        if yzero:
+            ymin,ymax = 0,0
+        else:
+            ymin,ymax = None,None
+        for data in (ldata,bdata,sdata):
+            if data:
+                
+        
+        
+fail # this is in the works
+
+
+
+        
+##        # ranges:
+##        xmax = 0
+##        if yzero:
+##            ymin,ymax = 0,0
+##            seed = True
+##        else:
+##            ymin,ymax = None,None
+##            seed = False
+##        for data in (ldata,bdata,pdata):
+##            if data:
+##                for l in data:
+##                    xmax = max(xmax,len(l))
+##                    if not seed:
+##                        y = l[0]
+##                        ymin,ymax = y,y
+##                        seed = True
+##                    for y in l:
+##                        ymin = min(y,ymin)
+##                        ymax = max(y,ymax)
+        
+
+
+
+
+
+
+        
+        ldata = self.df(ldata,8)
+        bdata = self.df(bdata,4)
+        pdata = self.df(pdata,4)
+        plabs = self.df(plabs,4)
+
+
+
+
 
         # plot area:
         # default margin = 10
@@ -579,7 +619,6 @@ text.me {
         #---------------------------
 
         if pdata:
-            print('POINT DATA not implemented.')
             pass
         
         #---------------------------
@@ -594,9 +633,9 @@ text.me {
         yield self.svg2
 
         # wrappers
-        if html_taco:
+        if self.html_taco:
             yield self.html2
-        elif xml_taco:
+        elif self.xml_taco:
             yield self.xml2
 
 #-----------------------------------------------

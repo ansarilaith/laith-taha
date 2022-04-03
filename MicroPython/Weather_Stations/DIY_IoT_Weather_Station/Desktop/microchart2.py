@@ -587,7 +587,6 @@ text.me {
         #---------------------------
 
         # add plot area border
-        print(pa)
         yield '\n<rect x="{}" y="{}" width="{}" height="{}" stroke-width="1" stroke="#000" fill="transparent"/>'.format(*pa)
 
         # end svg
