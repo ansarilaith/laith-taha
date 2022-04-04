@@ -19,7 +19,7 @@ wifi_password = 'yourpassword'
 eziot_api_key = 'EXAMPLE' 
 eziot_api_secret = 'EXAMPLE'
 eziot_group = 'WEATHER'
-eziot_device = "CLAYTON1"
+eziot_device = "CLAYTON2"
 
 i2c_scl = 25 # pin number
 i2c_sda = 26 # pin number
@@ -104,7 +104,15 @@ def run():
                 # wait for next loop
                 # you may want to add deep sleep here
                 print('Sleeping for 10 minutes.')
-                time.sleep(600)            
+                time.sleep(600)
+
+                # instead of just waiting, blink an LED on pin2
+                #for x in range(150):
+                #    Pin(2,Pin.OUT,value=1)
+                #    time.sleep_ms(200)
+                #    Pin(2,Pin.IN)
+                #    time.sleep_ms(3800)
+                    
 
         # end loop
         except KeyboardInterrupt:
