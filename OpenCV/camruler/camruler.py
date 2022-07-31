@@ -16,12 +16,62 @@ import frame_capture
 import frame_draw
 
 #-------------------------------
-# camera
+# default settings
+#-------------------------------
+
+# camera values
+camera_id = 0
+camera_width = 1920
+camera_height = 1080
+camera_frame_rate = 30
+#camera_fourcc = cv2.VideoWriter_fourcc(*"YUYV")
+camera_fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+
+# auto measure mouse events
+auto_percent = 0.2 
+auto_threshold = 127
+auto_blur = 5
+
+# normalization mouse events
+norm_alpha = 0
+norm_beta = 255
+
+#-------------------------------
+# read config file
+#-------------------------------
+
+# you can make a config file "camruler_config.csv"
+# this is a comma-separated file with one "item,value" pair per line
+# you can also use a "=" separated pair like "item=value"
+# you can use # to comment a line
+# the items must be named like the default variables above
+
+# read local config values
+configfile = 'camruler_config.csv'
+if os.path.isfile(configfile):
+    with open(configfile) as f:
+        for line in f:
+            line = line.strip()
+            if line and line[0] != '#' and (',' in line or '=' in line):
+                if ',' in line:
+                    item,value = [x.strip() for x in line.split(',',1)]
+                elif '=' in line:
+                    item,value = [x.strip() for x in line.split('=',1)]
+                else:
+                    continue                        
+                if item in 'camera_id camera_width camera_height camera_frame_rate camera_fourcc auto_percent auto_threshold auto_blur norm_alpha norm_beta'.split():
+                    try:
+                        exec(f'{item}={value}')
+                        print('CONFIG:',(item,value))
+                    except:
+                        print('CONFIG ERROR:',(item,value))
+
+#-------------------------------
+# camera setup
 #-------------------------------
 
 # get camera id from argv[1]
 # example "python3 camruler.py 2"
-camera_id = 0
 if len(sys.argv) > 1:
     camera_id = sys.argv[1]
     if camera_id.isdigit():
@@ -30,15 +80,12 @@ if len(sys.argv) > 1:
 # camera thread setup
 camera = frame_capture.Camera_Thread()
 camera.camera_source = camera_id # SET THE CORRECT CAMERA NUMBER
-#camera.camera_width,camera.camera_height =  640, 480
-#camera.camera_width,camera.camera_height = 1280, 720
-#camera.camera_width,camera.camera_height = 1280,1024
-camera.camera_width,camera.camera_height = 1920,1080
-camera.camera_frame_rate = 30
-#camera.camera_fourcc = cv2.VideoWriter_fourcc(*"YUYV")
-camera.camera_fourcc = cv2.VideoWriter_fourcc(*"MJPG")
+camera.camera_width  = camera_width
+camera.camera_height = camera_height
+camera.camera_frame_rate = camera_frame_rate
+camera.camera_fourcc = camera_fourcc
 
-# start camera thread
+#1 start camera thread
 camera.start()
 
 # initial camera values (shortcuts for below)
@@ -241,15 +288,6 @@ def key_event(key):
 mouse_raw  = (0,0) # pixels from top left
 mouse_now  = (0,0) # pixels from center
 mouse_mark = None  # last click (from center)
-
-# auto measure mouse events
-auto_percent = 0.2 
-auto_threshold = 127
-auto_blur = 5
-
-# normalization mouse events
-norm_alpha = 0
-norm_beta = 255
 
 # mouse callback
 def mouse_event(event,x,y,flags,parameters):
