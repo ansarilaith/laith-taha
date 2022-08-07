@@ -470,7 +470,7 @@ text.me {
 
         # yscale: pixels per value
         yscale = abs((py2-py1)/(end-start))
-        yzero = py2 - abs(ymin)*yscale
+        yzero = py2 + abs(ymin)*yscale
 
         #---------------------------
         # bar data (lowest in stack)
@@ -481,7 +481,6 @@ text.me {
             bw = (xscale-min(20,xscale*0.1))/bl
             bo = -1 * bw*bl/2 + bw/2 # offset from point
             bw = self.sr(bw)
-            print(xscale,bl,bo,bw)
             for data in bdata:
                 color = self.colors[bi]
                 lastx = 0

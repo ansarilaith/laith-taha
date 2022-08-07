@@ -73,7 +73,7 @@ def run():
 
             # set up i2c bus
             bus = bus_i2c.I2CBUS(scl=i2c_scl,sda=i2c_sda,freq=i2c_frq)
-            addrs = bus.scan()
+            #addrs = bus.scan()
             print('I2C DEVICES:',len(addrs),addrs)
 
             # set up bme

@@ -118,8 +118,8 @@ The ESP32Mini has a 5v to 3.3v regulator bridging the 5v and 3v pins. This allow
 
 ### GPIO Pins
 
-- 33 - GPI_ - input only - ADC1-5
-- 32 - GPI_ - input only - ADC1-4
+- 33 - GPI0 - ADC1-5
+- 32 - GPI0 - ADC1-4
 - 27 - GPIO - ADC2_7
 - 26 - GPIO - ADC2_9
 - 25 - GPIO - ADC2_8

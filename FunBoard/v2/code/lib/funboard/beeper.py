@@ -143,8 +143,14 @@ class BEEP:
         try:
 
             # init
-            #p = PWM(Pin(pin),int(freq),int(freq*(vol/100)*(duty/100)))
-            p = PWM(Pin(pin),int(freq),int(1024*(vol/100)*(duty/100)))
+            print('\nBEEP:',[pin,freq,secs,vol,duty])
+            duty = int(65535*(vol/100)*(duty/100))
+            print('DUTY:',duty)
+            p = PWM(Pin(pin),freq=int(freq),duty_u16=duty)
+            #p = PWM(Pin(pin),freq=int(freq),duty=int(freq*(vol/100)*(duty/100)))
+            #p = PWM(Pin(pin),freq=int(freq),duty=int(1024*(vol/100)*(duty/100)))
+            print('set',p.freq(),p.duty_u16())
+            print('setup',p)
 
             # wait with pixel = (index,color,...)
             if pixel != None:
@@ -157,10 +163,16 @@ class BEEP:
                 time.sleep_us(int(1000000*secs))
 
             # clear pin
+            print('clear',p.freq(),p.duty_u16())
+            p.duty_u16(0)
+            print('end',p.freq(),p.duty_u16())
             p.deinit()
-
+            
         # any error
-        except:
+        except Exception as e:
+            print('ERROR')
+            import sys
+            sys.print_exception(e)
             try:
                 p.deinit()
             except:
@@ -185,7 +197,7 @@ class BEEP:
             duty = int(1024*(vol/100)*(duty/100))
 
             # init
-            p = PWM(Pin(pin),int(freq),duty)
+            p = PWM(Pin(pin),freq=int(freq),duty=duty)
 
             # loop
             for x in range(steps):

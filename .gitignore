@@ -2,6 +2,7 @@
 .vscode
 .ipynb_checkpoints
 .*
+netcred*
 
 doc_assist*
 
