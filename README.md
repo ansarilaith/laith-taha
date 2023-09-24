@@ -1,8 +1,8 @@
-# Clayton's PCB Shop
+# YouTube Projects
 
-Welcome to Clayton's PCB Shop.
+Welcome to Clayton's YouTube Projects.
 
-This repository hosts the code and design files for projects you can find on my YouTube channel [ClaytonDarwin](https://www.youtube.com/claytondarwin) and in my online store [Clayton's PCB Shop](https://cpcb.shop/).
+This repository hosts the code and design files for projects you can find on my YouTube channel [ClaytonDarwin](https://www.youtube.com/claytondarwin).
 
 Please not that the code here may be "in progress". That is, it may or **may not be functional** depending on where I left it last. Also note that although I'm putting all my new projects here, some older projects have not been moved here yet. 
 
