@@ -99,7 +99,8 @@ class PIXELS:
     def make_color(self,color,brightness=None):
         if type(color) in (list,tuple):
             return tuple(list(color)+[0,0,0])[:3]
-        color = ''.join(str(color).split())
+        if brightness == 0:
+            return (0,0,0)
         v = self.cvalues.get(color,(255,0,0))
         b = brightness or self.brightness
         return tuple([int(x*b/255) for x in v])
@@ -112,7 +113,7 @@ class PIXELS:
             self.np.write()
 
     # write
-    def write():
+    def write(self):
         self.np.write()
 
     # blink
@@ -122,37 +123,6 @@ class PIXELS:
             time.sleep_ms(ontime)
             self.off()
             time.sleep_ms(offtime)
-
-    # random pixel blink
-    def rblink(self,colors=[],pixels=1,times=0,brightness=None,ontime=10,offtime=10):
-        from random import randint,choice
-        stop = self.npc-1
-        if not colors:
-            colors = [color for color in self.cvalues.keys() if color not in ('black','off')]
-        colors = [self.make_color(color,brightness) for color in colors]
-        try:
-            while 1:
-                used = []
-                while len(used) < pixels:
-                    pixel = randint(0,stop)
-                    if pixel not in used:
-                        used.append(pixel)
-                        color = choice(colors)
-                        self.np[pixel] = color
-                self.np.write()
-                time.sleep_ms(ontime)
-                for pixel in used:
-                    self.np[pixel] = (0,0,0)
-                self.np.write()
-                time.sleep_ms(offtime)
-                if times:
-                    times -= 1
-                    if times <= 0:
-                        break
-        except Exception as e:
-            self.off()
-            del randint,choice
-            raise e
 
     # run (test pattern)
     def run(self,color='red',brightness=None,ontime=10,offtime=1):
@@ -170,6 +140,37 @@ class PIXELS:
         except Exception as e:
             self.off()
             raise e
+
+##    # random pixel blink
+##    def rblink(self,colors=[],pixels=1,times=0,brightness=None,ontime=10,offtime=10):
+##        from random import randint,choice
+##        stop = self.npc-1
+##        if not colors:
+##            colors = [color for color in self.cvalues.keys() if color not in ('black','off')]
+##        colors = [self.make_color(color,brightness) for color in colors]
+##        try:
+##            while 1:
+##                used = []
+##                while len(used) < pixels:
+##                    pixel = randint(0,stop)
+##                    if pixel not in used:
+##                        used.append(pixel)
+##                        color = choice(colors)
+##                        self.np[pixel] = color
+##                self.np.write()
+##                time.sleep_ms(ontime)
+##                for pixel in used:
+##                    self.np[pixel] = (0,0,0)
+##                self.np.write()
+##                time.sleep_ms(offtime)
+##                if times:
+##                    times -= 1
+##                    if times <= 0:
+##                        break
+##        except Exception as e:
+##            self.off()
+##            del randint,choice
+##            raise e
 
 #-----------------------
 # end

@@ -37,7 +37,7 @@ bme_weather_us = True
 
 import sys
 import time
-from machine import Pin
+from machine import Pin, WDT
 
 import bus_i2c
 import sensor_bme280
@@ -73,7 +73,7 @@ def run():
 
             # set up i2c bus
             bus = bus_i2c.I2CBUS(scl=i2c_scl,sda=i2c_sda,freq=i2c_frq)
-            #addrs = bus.scan()
+            addrs = bus.scan()
             print('I2C DEVICES:',len(addrs),addrs)
 
             # set up bme
@@ -98,20 +98,23 @@ def run():
                 print('DATA:',[temp,pres,humi])
 
                 # post data to eziot
+                Pin(2,Pin.OUT,value=1)
                 eziot.post_data(group=eziot_group,device=eziot_device,data1=temp,data2=pres,data3=humi,data4=None)
+                Pin(2,Pin.IN)
                 print('LOADED to EZIOT')
 
-                # wait for next loop
-                # you may want to add deep sleep here
-                print('Sleeping for 10 minutes.')
-                time.sleep(600)
+##                # wait for next loop
+##                # you may want to add deep sleep here
+##                print('Sleeping for 10 minutes.')
+##                time.sleep(600)
 
                 # instead of just waiting, blink an LED on pin2
-                #for x in range(150):
-                #    Pin(2,Pin.OUT,value=1)
-                #    time.sleep_ms(200)
-                #    Pin(2,Pin.IN)
-                #    time.sleep_ms(3800)
+                for x in range(150):
+                    Pin(2,Pin.OUT,value=1)
+                    time.sleep_ms(100)
+                    Pin(2,Pin.IN)
+                    print()
+                    time.sleep_ms(3900)
                     
 
         # end loop
@@ -123,9 +126,15 @@ def run():
         except Exception as e:
             sys.print_exception(e)
             print('Major ERROR in main loop.')
-            print('Pause 10 seconds...',end=' ')
-            time.sleep(10)
-            print('continue.')
+
+        # clean up
+        finally:
+            Pin(2,Pin.IN)
+
+        # wait
+        print('Pause 10 seconds...',end=' ')
+        time.sleep(10)
+        print('continue.')
 
 #-----------------------
 # self run
