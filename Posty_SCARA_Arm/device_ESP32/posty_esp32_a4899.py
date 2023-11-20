@@ -12,7 +12,7 @@ print('RUN: POSTY posty.py')
 #-----------------------
 
 essid = 'DARWIN-NET-3'
-essid_password = 'claytondarwin'
+essid_password = 'what?'
 dhcp_hostname = 'posty'
 
 #-----------------------------------------------
