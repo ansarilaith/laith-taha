@@ -24,7 +24,7 @@ class FTree:
     # make random tree
     def rtree(self,sx,sy):
 
-        angle2  = 10 + self.randint(45) # branch angle
+        angle2  = 10 + self.randint(32) # branch angle
         length1 = self.canvas_height//4# + self.randint(self.canvas_height//8) # start length of trunk
         length2 = (68 + self.randint(16))/100 # decimal reduction factor 
         width1  = 1 # not implemented

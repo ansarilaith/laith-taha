@@ -7,43 +7,60 @@
 # variables
 #-------------------------------
 
-# network (add your credentials)
+# network credentials
 essid    = 'youressid'
 password = 'yourpassword'
 
-# eziot (add your credentials)
+# eziot credentials
 eziot_api_key = 'yourkey'
 eziot_api_secret = 'yoursecret'
 eziot_dnsid = 'yourdnsid'
+
+# server editor credentials
+server_edpw = 'youreditorpassword'
 
 #-------------------------------
 # imports
 #-------------------------------
 
+# general
 import time
+import os
+import sys
+
+# hardware
+from wlan import STA
+from beeper import MINIBEEP
+from pixels import PIXELS
+from sdcard import SLOT2
+
+# server
 from microserver import MicroServer
+import eziot_micropython_minimal as eziot
 
 #-------------------------------
-# not using a funboard
+# create hardware objects
 #-------------------------------
 
-# if you are not not using a funboard ...
+# these are required by local class/functions
 
-# you need to do these imports
-# import eziot
+# wifi
+wifi = STA()
 
-# you will need to create these functions
-# wifi.connect(essid,password)
-# rtc.ntp_set() is "from ntptime import settime"
-# esp32.reset()
+# beeper
+beeper = MINIBEEP(2)
+beeper.vol = 50
 
-# you can comment out these (or replace with pass)
-# beeper.beep()
-# pixels.setp(0,'red')
-# pixels.off()
+# pixels
+pixels = PIXELS(4,8)
 
-# you will need to set up the /sd/htdocs dir
-# you can do it on the esp32 of mount an sdcard
+# sdcard (mounted below)
+sdcard = SLOT2()
+sdcard.slot =  3 
+sdcard.cs   = 27 # non-standard funboard v1
+sdcard.sck  = 14 # default slot 3
+sdcard.mosi = 13 # default slot 3
+sdcard.miso = 12 # default slot 3
 
 #-------------------------------
 # create server with application
@@ -53,6 +70,8 @@ class SERVER(MicroServer):
 
     # server variables
     htdocs = '/sd/htdocs'
+    do_cache = False
+    edpw = 'okay'
 
     # guest data
     guestfile = '/sd/guests.csv'
@@ -61,14 +80,122 @@ class SERVER(MicroServer):
     guestcount = 0
     guestshow = 24
 
-    # redefine client thread open-close functions
+    # guestlist reader
+    def guestreader(self,lineno=None):
+
+        # no file
+        if not self.isfile(self.guestfile):
+            print('FILE READ ERROR: NO FILE',self.guestfile)
+            if lineno:
+                return ['']*6
+
+        # update
+        guestcount = 0
+        guestshow = self.guestshow
+        guestlist = []
+
+        # most-recent last
+        with open(self.guestfile,'r') as f:
+            for guest in f:
+                guest = [x.strip() for x in guest.split('|')[:6]]
+                if len(guest) == 6 and guest[0].isdigit():
+                    # target line
+                    if lineno == guest[0]:
+                        return guest[:6]
+                    guestcount = int(guest[0])
+                    guestlist.append(tuple(guest[:6]))
+                    guestlist = guestlist[-guestshow:]
+            
+        # target line not found
+        if lineno:
+            print('LINE LOOKUP FAILED')
+            return ['']*6
+
+        # most-recent first
+        guestlist.reverse()
+        self.guestlist = guestlist
+        self.guestcount = guestcount
+        self.guestread = True
+
+    # guestlist update
+    def guestwrite(self,data,new=False,delete=False):
+
+        try:
+
+            # data
+            data = [str(x).strip() for x in data]
+            if new and data[0] in ('','0','None'):
+                self.guestcount += 1
+                data[0] = str(self.guestcount)
+
+            # new line
+            if new:
+                with open(self.guestfile,'a') as f:
+                    f.write('{}|{}|{}|{}|{}|{}\n'.format(*data))
+                    f.close()
+
+            # update line
+            elif data[0] and self.isfile(self.guestfile):
+
+                # temp file
+                guestfile2 = self.guestfile+'.temp'
+
+                # make a backup
+                with open(self.guestfile) as f1:
+                    with open(guestfile2,'w') as f2:
+                        for guest in f1:
+                            f2.write(guest)
+                        f2.close()
+                    f1.close()
+
+                # make modified version from backup
+                with open(guestfile2) as f1:
+                    with open(self.guestfile,'w') as f2:
+                        for guest in f1:
+                            guest = [x.strip() for x in guest.split('|')[:6]]
+                            if len(guest) == 6:
+                                if guest[0] == data[0]:
+                                    if delete:
+                                        continue
+                                    guest = data
+                                f2.write('{}|{}|{}|{}|{}|{}\n'.format(*guest))
+                        f2.close()
+                    f1.close()
+
+                # reload
+                self.guestreader()
+
+            # done
+            return data[0]
+
+        except Exception as e:
+            sys.print_exception(e)
+            print('FILE WRITE ERROR:',self.guestfile)
+            return 0
+
+    # shortcut for application
+    def make_response(self,content='Hello World',codestring='200 OK',content_type='text/plain'):
+        content = str(content)
+        header = 'HTTP/1.1 {}\nContent-Type: {}\nContent-Length: {}\n\n'.format(codestring,content_type,len(content))
+        return bytes(header+content,'utf8')
+
+    #-------------------------------
+    # redefine microserver functions
+    #-------------------------------
+
+    # called when server starts
+    def server_init(self):
+
+        # read guests
+        self.guestreader()
+        print('GUEST INIT:',self.guestcount)
 
     # called when client connects
     def client_on(self,rc=None):
         # rc = remote connection count
         #pass
         beeper.beep(vol=50)
-        pixels.setp(0,'red')
+        pixels.setp(0,'green',write=True)
 
     # called when client disconnects
     def client_off(self,path=None):
@@ -76,13 +203,7 @@ class SERVER(MicroServer):
         #pass
         pixels.off()
 
-    # shortcut for application
-    def make_response(self,content='Hello World',codestring='200 OK'):
-        content = str(content)
-        header = 'HTTP/1.1 {}\nContent-Type: text/plain\nContent-Length: {}\n\n'.format(codestring,len(content))
-        return bytes(header+content,'utf8')
-
-    # i'm re-defining the application function to do what i want
+    # re-defining the application function
     def application(self,client_data,client_address,client_count):
 
         try:
@@ -94,28 +215,58 @@ class SERVER(MicroServer):
 
             # pagecount option
             if option == 'pagecount':
+                pixels.setp(7,'blue',write=True)
                 yield self.make_response(client_count)
+
+            # guestlist
+            elif option == 'guestlist':
+                pixels.setp(6,'green',write=True)
+
+                # read file into guestlist (if it hasn't been done)
+                if not self.guestread:
+                    self.guestreader()
+
+                # table parts
+                table1 = '<table>'
+                table2 = '\n</table>\n'
+                line = '\n<tr><td class="c1">{}</td><td class="c2">{}</td><td class="c3">{}</td><td class="c4">{}</td><td class="c5">{}</td><td class="c6">{}</td></tr>'
+
+                # work in blocks to save memory
+
+                # content length
+                cl = len(table1) + len(table2)
+                for guest in self.guestlist:
+                    cl += len(line.format(*guest))
+
+                # header and table1
+                yield bytes('HTTP/1.1 200\nContent-Type: text/plain\nContent-Length: {}\n\n{}'.format(cl,table1),'utf8')
+
+                # lines
+                for guest in self.guestlist:
+                    yield bytes(line.format(*guest),'utf8')
+
+                # end table2
+                yield bytes(table2,'utf8')
 
             # guest
             elif option == 'guest':
+                pixels.setp(5,'sun',write=True)
 
                 # register
                 name = client_data.get('name',[''])[0].replace('|',' ')[:32].strip()
                 if name:
-                    where = client_data.get('from',[''])[0].replace('|',' ')[:32].strip()
+                    # build
+                    home = client_data.get('from',[''])[0].replace('|',' ')[:32].strip()
                     mesg = client_data.get('mesg',[''])[0].replace('|',' ')[:64].strip()
-                    now = rtc.dtstamp.split()[0]
+                    date = wifi.dtstamp.split()[0]
                     self.guestcount += 1
-                    self.guestlist.append((now,name,where,mesg))
+                    data = (self.guestcount,date,name,home,mesg,'')
+                    # save to guestlist (most-recent first)
+                    self.guestlist.insert(0,data)
                     if len(self.guestlist) > self.guestshow:
-                        self.questlist = self.guestlist[-self.guestshow:]
-                    with open(self.guestfile,'a') as f:
-                        f.write('{}|{}|{}|{}\n'.format(now,name,where,mesg))
-                        f.close()
-
-                ## # send index
-                ## for block in self.file_server(self.htdocs+'/index.html',cache=False):
-                ##     yield block
+                        self.questlist = self.guestlist[:self.guestshow]
+                    # save to file (most-recent last)
+                    self.guestwrite(data,new=True)
 
                 # redirect (this resets the browser path too)
                 # but it does make an additional request 
@@ -123,158 +274,285 @@ class SERVER(MicroServer):
                 location = '\nLocation: /index.html'
                 yield self.make_response(content,content+location)
 
-            # guestlist
-            elif option == 'guestlist':
+            # edit
+            elif option == 'edit':
+                pixels.setp(4,'orange',write=True)
 
-                # read file
-                if (not self.guestread) and self.isfile(self.guestfile):
-                    guestcount = 0
-                    guestshow = self.guestshow
-                    guestlist = []
-                    with open(self.guestfile,'r') as f:
-                        for line in f:
-                            line = line.split('|',3)
-                            if len(line) == 4:
-                                guestcount += 1
-                                guestlist.append(tuple(line))
-                                guestlist = guestlist[-guestshow:]
-                    self.guestlist = guestlist
-                    self.guestcount = guestcount
-                    self.guestread = True
+                # check password first
+                edpw = client_data.get('pw',[''])[0]
+                if self.edpw and self.edpw != edpw:
+                    content = '501 Not Implemented'
+                    yield self.make_response(content,content)
 
-                # send data
-                table = '\n<table>'
-                for guest in self.guestlist[::-1]:
-                    table += '\n<tr><td class="nw">{}</td><td>{}</td><td>{}</td><td>{}</td></tr>'.format(*guest)
-                table += '\n<tr><td class="nw" colspan="4">Total Guests: {}</td></tr>'.format(self.guestcount)
-                table += '\n</table>\n'                
-                yield self.make_response(table)
+                # get data
+                save = client_data.get('save',[False])[0]
+                line = client_data.get('line',[''])[0][:8]
+                date = client_data.get('date',[''])[0][:10]
+                name = client_data.get('name',[''])[0][:16]
+                home = client_data.get('home',[''])[0][:24]
+                mesg = client_data.get('mesg',[''])[0][:62]
+                resp = client_data.get('resp',[''])[0][:62]
+
+                # parse/fix
+                if (not line) or (not line.isdigit()):
+                    line = ''
+                if resp == '!!!DELETE!!!':
+                    delete = True
+                else:
+                    delete = False
+                status = ''
+
+                # save function
+                if save == '1' and line:
+                    line2 = self.guestwrite((line,date,name,home,mesg,resp),delete=delete)
+                    if delete:
+                        status = ' DELETE:{}'.format(line2)
+                    else:
+                        status = ' SAVED:{}'.format(line2)
+
+                # data lookup
+                if line and not name:
+                     line,date,name,home,mesg,resp = self.guestreader(line)
+                     status += ' LOOKUP:{}'.format(line)
+
+                # html form page
+                # keep small, work in blocks to save memory
+
+                # start block
+                start = '''<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<title>Beaker's ESP32 Web Server EDIT</title>
+<style>
+@import url('https://fonts.googleapis.com/css?family=Short+Stack');
+body {
+background-color: black;
+color: silver;
+text-align: center;
+font-size: 1em;
+font-family: "Short Stack", monospace;
+}
+div {
+display: block;
+background-color: inherit; 
+text-align: left;
+border: solid silver 1px; 
+margin: 8px auto;
+padding: 8px;
+}
+td.c1 {
+color:#FFA150;
+}
+td.c2 {
+color:#82D182;
+}
+span.o {
+color:#FFA150;
+}
+</style>
+</head>
+<body>
+<div class="main" style="width: 720px">'''
+
+                # status div
+                status = '''
+Beaker's ESP32 Web Server <span class="o">EDITOR</span>
+<div>
+STATUS: {}
+</div>
+'''.format(status.strip() or None)
+
+                # lookup form div
+                form1 = '''
+<div class="form">
+<form method="POST" action="/app/edit">
+<input type="hidden" id="pw" name="pw" value="{}" />
+Line: <input type="text" name="line" maxlength="4" size="4" value="{}"> <input type="submit" value="FIND">
+</form>
+</div>'''.format(edpw,line)
+                
+                # modify form div
+                form2 = '''
+<div class="form">
+<form method="POST" action="/app/edit">
+<input type="hidden" id="pw" name="pw" value="{}" />
+<input type="hidden" id="save" name="save" value="1" />
+<input type="hidden" id="line" name="line" value="{}" />
+<input type="hidden" id="date" name="date" value="{}" />
+<table>
+<tr><td>Line:</td><td class="c1">{}</td></tr>
+<tr><td>Date:</td><td class="c2">{}</td></tr>
+<tr><td>Name:</td><td><input type="text" name="name" maxlength="15" size="15" value="{}"></td></tr>
+<tr><td>Home:</td><td><input type="text" name="home" maxlength="30" size="30" value="{}"></td></tr>
+<tr><td>Mesg:</td><td><input type="text" name="mesg" maxlength="60" size="60" value="{}"></td></tr>
+<tr><td>Resp:</td><td><input type="text" name="resp" maxlength="60" size="60" value="{}"></td></tr>
+<tr><td>     </td><td><input type="submit" value="UPDATE"></td></tr>
+</table>
+</form>
+</div>'''.format(edpw,line,date,line,date,name,home,mesg,resp)
+
+                # end block
+                end = '\n</div>\n</body>\n</html>\n'
+
+                # content length
+                cl = len(start)+len(status)+len(form1)+len(form2)+len(end)
+
+                # send
+                yield bytes('HTTP/1.1 200\nContent-Type: text/html\nContent-Length: {}\n\n'.format(cl),'utf8')
+                yield bytes(start,'utf8')
+                yield bytes(status,'utf8')
+                yield bytes(form1,'utf8')
+                yield bytes(form2,'utf8')
+                yield bytes(end,'utf8')
 
             # not implemented
             else:
+                pixels.setp(1,'red',write=True)
                 content = '501 Not Implemented'
                 yield self.make_response(content,content)
 
         except Exception as e:
+            pixels.setp(0,'red',write=True)
             import sys
             sys.print_exception(e)
             content = '500 Internal Server Error'
             yield self.make_response(content,content)        
 
-# make server instance
-server = SERVER()
-
 #-------------------------------
-# create a reboot thread
+# create eziot update thread
 #-------------------------------
 
-# this is optional - reboots daily
+class DNS():
 
-##import _thread
-##
-##def reboot_thread_function():
-##
-##    print('REBOOT THREAD: start')
-##
-##    reset_hour = 6 # gmt
-##
-##    # loop
-##    loops = 0
-##    while not reboot_thread_kill:
-##
-##        # gurrent gmt
-##        y,M,d,h,m,s = time.gmtime()[:6]
-##
-##        # notify every 10 minutes
-##        loops += 1
-##        if loops >= 600:
-##            loops = 0
-##            H = reset_hour - h
-##            if H < 0:
-##                H += 24
-##            print('REBOOT IN: {:0>2}hrs {:0>2}mins {:0>2}secs'.format(H,60-m,60-s))
-##
-##        # skip boot condition
-##        if (y,M,d) != (2000,1,1):
-##            # hour and minute correct 
-##            if h,m == reset_hour,0:
-##                # second is correct
-##                if 0 <= s <= 10:
-##                    print('REBOOT THREAD: reset')
-##                    esp32.reset()
-##
-##        # pause
-##        time.sleep_ms(100)
-##        
-##    print('REBOOT THREAD: end')
-##        
-##reboot_thread_kill = False
-##reboot_thread = _thread.start_new_thread(reboot_thread_function,())
+    running = False
+    kill = False
+    update_every = 600
+    thread = None
 
-#-------------------------------
-# loop forever
-#-------------------------------
-
-print('MAIN: start loop')
-
-while 1:
-
-    try:
-
-        # network
-        try:
-            assert wifi.connect(essid,password)
-        except:
-            print('Waiting on wifi connect.')
-            time.sleep_ms(1000)
-            continue
-
-        # set clock (may fail)
-        for x in range(100):
-            try:
-                assert rtc.ntp_set()
-                break
-            except:
-                pass
-
-        # eziot dns register
-        eziot.api_key = eziot_api_key
-        eziot.api_secret = eziot_api_secret
+    def start(self):
+        self.stop()
+        print('EZIoT DNS START')
+        self.kill = False
+        import _thread
+        self.thread = _thread.start_new_thread(self.run,())
+        del _thread
         for x in range(10):
+            if self.running:
+                return True
+            time.sleep_ms(100)
+        print('EZIoT DNS START:',self.running)
+        return self.running
+
+    def run(self):
+        try:
+            eziot.api_key = eziot_api_key
+            eziot.api_secret = eziot_api_secret
+            self.running = True
+            while 1:
+                if self.kill:
+                    break
+                dnsid = None
+                for x in range(10):
+                    if self.kill:
+                        break
+                    try:
+                        dnsid = eziot.set_dns(dnsid=eziot_dnsid)
+                        break
+                    except:
+                        time.sleep_ms(1000)
+                print('EZIoT DNS:',dnsid == eziot_dnsid.upper())
+                for x in range(self.update_every):
+                    if self.kill:
+                        break
+                    time.sleep_ms(1000)
+        except Exception as e:
+            sys.print_exception(e)
+        self.running = False
+        print('EZIoT DNS END')    
+
+    def stop(self):
+        print('EZIoT DNS STOP')
+        self.kill = True
+        for x in range(10):
+            if not self.running:
+                return True
+            time.sleep_ms(1000)
+        return not self.running
+
+#-------------------------------
+# 
+#-------------------------------
+
+def run():
+
+    print('MAIN:')
+
+    # make server instance
+    server = SERVER()
+
+    # make eziot instance
+    dns = DNS()
+
+    print('MAIN: start loop')
+
+    while 1:
+
+        try:
+
+            # sdcard
+            sdcard.unmount()
+            sdcard.mount()
+
+            # network
             try:
-                dnsid = eziot.set_dns(dnsid=eziot_dnsid)
-                print('EZIoT DNS:',dnsid)
-                break
+                assert wifi.connect(essid,password)
             except:
+                print('Waiting on wifi connect.')
                 time.sleep_ms(1000)
+                continue
 
-        # start server
-        server.serve()
+            # set clock (may fail)
+            for x in range(10):
+                try:
+                    assert wlan.set_rtc()
+                    break
+                except:
+                    pass
 
-        # cascade KeyboardInterrupt
-        if server.keyboard_interrupt:
-            raise KeyboardInterrupt
+            # eziot dns
+            if not dns.running:
+                dns.start()
 
-        # pause
-        time.sleep_ms(1000)
+            # start server
+            server.serve()
 
-    # keyboard kill
-    except KeyboardInterrupt:
-        print('MAIN: KeyboardInterrupt: end all')
-##        try:
-##            reboot_thread_kill = True
-##            reboot_thread.exit()
-##        except:
-##            pass
-        break
+            # cascade KeyboardInterrupt
+            if server.keyboard_interrupt:
+                raise KeyboardInterrupt
 
-    # any exception
-    except Exception as error:
-        print('MAIN: reset')
-        sys.print_exception(error)
+            # pause
+            time.sleep_ms(1000)
 
-print('MAIN: end')
+        # keyboard kill
+        except KeyboardInterrupt:
+            print('MAIN: KeyboardInterrupt: end all')
+            break
 
+        # any exception
+        except Exception as error:
+            print('MAIN: reset')
+            sys.print_exception(error)
+
+    # kill dns
+    dns.stop()
+
+    # done
+    print('MAIN: end')
+
+# start loop
+if __name__ == '__main__':
+    run()
 
 #-------------------------------
 # end

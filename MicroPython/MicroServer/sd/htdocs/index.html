@@ -54,11 +54,7 @@ table {
     }
 td {
     text-align: left;
-    overflow: hidden;
     border: solid red 0px;
-    }
-td.r {
-    text-align: right;
     }
 input {
     font-family: inherit;
@@ -66,7 +62,7 @@ input {
     margin: 0px 2px;
     }
 div.main{
-    width: 640px;
+    width: 720px;
     border: solid silver 1px;
     }
 div.header {
@@ -87,22 +83,37 @@ div.guestlist {
     font-size: 90%;
     }
 div.guestlist table {
-    table-layout:fixed;    
+    table-layout:auto;    
     }
 div.guestlist td {
     vertical-align: top;
     word-wrap: break-word;
     border: solid #222 1px;
     }
-div.guestlist td.nw {
+div.guestlist td.c1 {
     white-space: nowrap;
+    color:#FFA150;
     }
-div.guestlist td:last-child {
-    width: 40%;}
+div.guestlist td.c2 {
+    white-space: nowrap;
+    color:#82D182;
+    }
+div.guestlist td.c3 {
+    }
+div.guestlist td.c4 {
+    color:#81a2be;
+    }
+div.guestlist td.c5 {
+    /*color:#82D182;*/
+    }
+div.guestlist td.c6 {
+    color:#FFA150;
+    }
 div.footer {
     text-align: right;
     font-size: 80%;   
     }
+span.g {color: #82D182;}
 </style>
 </head><body onload="javascript:loadextra()">
 <div class="main">
@@ -114,7 +125,7 @@ I Am Beaker
 
 <div class="content">
 <p>Hi. My name is Beaker. I'm very surprised to see you here.</p>
-<p>This web page is being served by a <a href="https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2">FunBoard v1 ESP32</a> microcontroller running <a href="https://micropython.org/">MicroPython</a>.</p>
+<p>This web page is being served by a <a href="https://gitlab.com/duder1966/youtube-projects/-/tree/master/FunBoard/v2">FunBoard v1 ESP32</a> microcontroller running <a href="https://micropython.org/">MicroPython</a>. This server has been running since <span class="g">June 4, 2021</span>.</p>
 <p>Everything is created and stored on the ESP32. I am using the <a href="http://eziot.link/">EZIoT.link</a> dynamic DNS feature to help you find me.</p>
 </div>
 
@@ -123,9 +134,9 @@ Please sign the guest list:
 <div class="form">
 <form method="POST" action="/app/guest">
 <table>
-<tr><td width="15%">Name:     </td><td><input type="text" name="name" maxlength="32" size="20"></td></tr>
-<tr><td width="15%">From:     </td><td><input type="text" name="from" maxlength="32" size="20"></td></tr>
-<tr><td width="15%">Message:  </td><td><input type="text" name="mesg" maxlength="64" size="42"></td></tr>
+<tr><td width="15%">Name:     </td><td><input type="text" name="name" maxlength="15" size="15"></td></tr>
+<tr><td width="15%">From:     </td><td><input type="text" name="from" maxlength="30" size="30"></td></tr>
+<tr><td width="15%">Message:  </td><td><input type="text" name="mesg" maxlength="60" size="60"></td></tr>
 <tr><td width="15%">Log Visit:</td><td><input type="submit" value="SUBMIT"></td></tr>
 </table>
 </form>
@@ -138,7 +149,7 @@ loading...
 </div>
 
 <div class="footer">
-Requests Since Re-Boot: <span id="pagecount">---</span>
+Requests Since Re-Boot: <span class="g" id="pagecount">---</span>
 </div>
 
 </div>

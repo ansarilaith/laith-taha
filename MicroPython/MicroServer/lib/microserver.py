@@ -66,10 +66,11 @@ class MicroServer:
     htdocs = '/htdocs'
 
     # static file cache directives
+    do_cache = True
     # seconds for client to cache files/images
     cache_for = 60*60*24 # = 24 hours
     # non-cached files (send no-cache header)
-    nocache = ['/index.html']
+    no_cache = ['/index.html']
 
     # process variables
     keyboard_interrupt = False # loop ended on a KeyboardInterrupt
@@ -106,6 +107,10 @@ class MicroServer:
     def client_off(self,path=None):
         # path = request PATH_INFO
         pass
+
+    # called when server init
+    def server_init(self):
+        pass
     
     #-------------------------------------------
     # server (serve forever)
@@ -124,6 +129,9 @@ class MicroServer:
 
             # catch all
             try:
+
+                # external init functions
+                self.server_init()
 
                 # open server socket
                 server_socket = socket.socket()
@@ -185,8 +193,8 @@ class MicroServer:
 
                         # static file
                         if path and self.isfile(self.htdocs+path):
-                            cache = not (path in self.nocache)
-                            print('    File Request: {}'.format(path))
+                            cache = not (path in self.no_cache)
+                            print('    File Request: cache:{}: {}'.format(cache,path))
                             for block in self.file_server(self.htdocs+path,cache=cache):
                                 bytecount += client_socket.write(block)
 
@@ -269,12 +277,14 @@ class MicroServer:
 
         # make header
         header  = 'HTTP/1.1 200 OK\n'
-        if cache is True:
-            header += 'Cache-Control: max-age={}\n'.format(self.cache_for)      
-        elif cache in (None,0):
-            header += 'Cache-Control: no-cache\n'
-        elif type(cache) == int and cache > 0:
-            header += 'Cache-Control: max-age={}\n'.format(cache)
+        # cache
+        if self.do_cache:
+            if cache is True:
+                header += 'Cache-Control: max-age={}\n'.format(self.cache_for)      
+            elif cache in (None,0):
+                header += 'Cache-Control: no-cache\n'
+            elif type(cache) == int and cache > 0:
+                header += 'Cache-Control: max-age={}\n'.format(cache)
         header += 'Content-Type: {}\n'.format(self.file_types.get(ext,'application/octet-stream'))
         header += 'Content-Length: {}\n'.format(os.stat(path)[6])
 

@@ -2,58 +2,70 @@
 # notify
 #-----------------------
 
+# Copyright 2024 Clayton Darwin claytondarwin@gmail.com
+# Not really. Use it how you want.
+
 print('LOAD: ssd1306.py')
+
+#-----------------------
+# notes
+#-----------------------
+
+# These modules are based on clayton's old libraries.
+# They could use more improvements, but they are okay.
+
+# The ssd1306 can be run using SPI (faster) and i2c.
+# The module you buy will typically have 4 pins for i2c,
+# or 6 or 7 pins for SPI. The extra SPI pin is a reset.
+# See the notes in the SPI and I2C classes.
+
+# Most often modules run on 3.3v using a charge pump.
+# Sometimes modules will be blank if VCC is 5v.
+
+# Here is the general architecture:
+# SSD1306: handles the common/core frame or "drawing" functions
+# SSD1306_I2C(SSD1306): handles i2c communication and commands
+# SSD1306_SPI(SSD1306): handles SPI communication and commands
 
 #-----------------------
 # imports
 #-----------------------
 
-import os,sys,time
+import os
+import sys
+import time
 import gc
-import io
 
 from math import sin, cos, radians
 from machine import Pin
-from machine import I2C
 
-# these are based on clayton's old libraries
-# they could use some improvements
-
-# i have made some improvements, but... 
-# i2c is dreadfully slow compared to spi
-# but it works fine for simple things
+# These are imported with the respective class.
+#from machine import SPI
+#from machine import I2C
 
 #-----------------------
-# general ssd1306
+# fixed variables
 #-----------------------
 
-# see i2c and spi classes below
+from micropython import const
+
+# frame size
+_width  = const(128)
+_height = const(64)
+_pages  = const(_height//8)
+_fbytes = const(_width*_pages)
+
+#-----------------------
+# ssd1306 common class
+#-----------------------
 
 class SSD1306:
 
     # Note: Some modules require 3.3V (charge pump is active). Will be blank with 5V.
     # See command below: Enable charge pump regulator 8Dh, 14h
 
-    # FRAME:
-    width = 128
-    height = 64
-    xoffset = 0 # partial frames are centered in the 1306 memory space
-    yoffset = 0 # partial frames are in upper half of the 1306 memory space 
-
     # display variables 
     contrast_value = 255 # default to highest
-
-    def __init__(self):
-
-        self.frame = None
-        gc.collect()
-
-        self.pages  = self.height//8
-        self.fbytes = self.width*self.pages
-        self.frame  = bytearray(self.fbytes)
-        self.xoffset = (128-self.width)//2
-
-        print('INIT:',len(self.frame))
 
     #-------------------------------------------
     # ssd1306 init
@@ -61,6 +73,14 @@ class SSD1306:
 
     def ssd1306init(self):
 
+        # clear
+        self.frame = None
+        gc.collect()
+
+        # reset frame
+        self.frame  = bytearray(_fbytes)
+
+        # Setup options (not all are used)
         # Set MUX Ratio A8h 3Fh
         # Set Display Offset D3h 00h
         # Set Display Start Line 40h
@@ -68,7 +88,7 @@ class SSD1306:
         # Set COM Output Scan Direction C0h/C8h
         # Set Contrast Control 81h 7Fh
         self.command((0x81,self.contrast_value))
-        # Disable Entire Display On A4h
+        # Disable "Entire Display On" A4h
         self.command((0xA4,))       
         # Set Normal Display A6h
         self.command((0xA6,))
@@ -76,13 +96,15 @@ class SSD1306:
         # Enable charge pump regulator 8Dh, 14h
         self.command((0x8D,0x14))       
         # Set COM Pins hardware configuration DAh 02
-        # Display On AFh
+        # Enable "Entire Display On" AFh
         self.command((0xAF,))
-
         # Set Memory Addressing Mode
         self.command((0x20,0x00)) # horizontal addressing
-        self.command((0x21,self.xoffset,self.xoffset+self.width-1)) # row start,end # row start,end
-        self.command((0x22,self.yoffset,self.yoffset+self.pages-1)) # page start,end
+        self.command((0x21,0,_width-1)) # row start,end # row start,end
+        self.command((0x22,0,_pages-1)) # page start,end
+
+        # done
+        print('SSD1306 INIT: okay')
 
     #-------------------------------------------
     # set values
@@ -112,10 +134,8 @@ class SSD1306:
     # y-axis swap
     def flip(self):
         self.command((0xC8,))
-        self.yoffset = 8 - self.pages
     def unflip(self):
         self.command((0xC0,))
-        self.yoffset = 0
 
     # x and y axis swap
     def r180(self):
@@ -126,11 +146,11 @@ class SSD1306:
         self.unflip()
 
     def port_clear(self):
-        #self.writeto((0,) * self.fbytes) # inefficient memory management
-        self.command((0x21,self.xoffset,self.xoffset+self.width-1))
-        for p in range(self.pages):
+        #self.writeto((0,) * _fbytes) # inefficient memory management
+        self.command((0x21,0,_width-1))
+        for p in range(_pages):
             self.command((0x22,p,p))    
-            self.port.writeto(self.addr,bytearray((0x40,))+bytearray(self.width))
+            self.port.writeto(self.addr,bytearray((0x40,))+bytearray(_width))
     
     #-------------------------------------------
     # frame 
@@ -142,20 +162,20 @@ class SSD1306:
 
         n = min(8,max(1,n))
         
-        for x in range((n-1)*self.width,n*self.width):
+        for x in range((n-1)*_width,n*_width):
             self.frame[x] = 0
 
         self.page_mod[n-1] = 1
 
     def frame_clear(self):
-        #self.frame = bytearray(self.fbytes) # inefficient memory management
-        for x in range(self.fbytes):
+        #self.frame = bytearray(_fbytes) # inefficient memory management
+        for x in range(_fbytes):
             self.frame[x] = 0
         self.page_mod = [1]*8
 
     def frame_fill(self):
-        #self.frame = bytearray((0xFF,)*self.fbytes) # inefficient memory management
-        for x in range(self.fbytes):
+        #self.frame = bytearray((0xFF,)*_fbytes) # inefficient memory management
+        for x in range(_fbytes):
             self.frame[x] = 255
         self.page_mod = [1]*8
 
@@ -168,45 +188,48 @@ class SSD1306:
             self.frame_clear()
 
         else:
-            for x in range(0,(self.pages-n)*self.width):
-                self.frame[x] = self.frame[x+(self.width*n)]
-            for x in range((self.pages-n)*self.width,self.pages*self.width):
+            for x in range(0,(_pages-n)*_width):
+                self.frame[x] = self.frame[x+(_width*n)]
+            for x in range((_pages-n)*_width,_pages*_width):
                 self.frame[x] = 0
             self.page_mod = [1]*8
 
     def frame_show(self):
 
         # set start:end for row (same for both)
-        self.command((0x21,self.xoffset,self.xoffset+self.width-1))
+        self.command((0x21,0,_width-1))
         
+        # write i2c by page
         if self.isi2c:
-            for p in range(self.pages):
+            for p in range(_pages):
                 if self.page_mod[p]:
 
                     # set start:end pages (just 1 page)
                     self.command((0x22,p,p))
 
                     # write only page data
-                    self.port.writeto(self.addr,bytearray((0x40,))+self.frame[p*self.width:(p+1)*self.width])
+                    self.port.writeto(self.addr,bytearray((0x40,))+self.frame[p*_width:(p+1)*_width])
 
+        # write SPI by full page
         else:
 
             # set start:end pages
-            self.command((0x22,self.yoffset,self.yoffset+self.pages-1))
+            self.command((0x22,0,_pages-1))
 
             # write full frame
             self.writeto(self.frame)
 
+        # clear page mod flags
         self.page_mod = [0]*8
     
     def bitset(self,X,Y,value=1):
 
         # full grid
         # starting from top-left corner as (1,1)
-        # ending at bottom-right corner as (self.width,self.height)
+        # ending at bottom-right corner as (_width,_height)
 
         # values in range
-        if 1 <= X <= self.width and 1 <= Y <= self.height:
+        if 1 <= X <= _width and 1 <= Y <= _height:
 
             # r is the column, just X-1
             r = X-1
@@ -218,7 +241,7 @@ class SSD1306:
             b = (Y-1)%8
 
             # B is the byte to change
-            B = (p * self.width) + r
+            B = (p * _width) + r
 
             # set
             if value:
@@ -423,14 +446,14 @@ class SSD1306:
                                 yindex -= 1
                         xindex += 1
                 xindex += int(char_gap*scale)
-                if xindex + X >= self.width:
+                if xindex + X >= _width:
                     break
 
     def test(self,ontime=1000):
         self.frame_clear()
-        self.rect(1,1,self.width,self.height,1)
+        self.rect(1,1,_width,_height,1)
         self.frame_show()
-        self.place_text('iotery',64,32,scale=2,center=True,middle=True,value=1)
+        self.place_text('ssd1306',64,32,scale=2,center=True,middle=True,value=1)
         self.frame_show()
         time.sleep_ms(int(ontime/3))
         self.invert()
@@ -451,13 +474,13 @@ class SSD1306_I2C(SSD1306):
     isspi = False
 
     # I2C pins
-    scl = 22
-    sda = 21
+    scl = 25
+    sda = 26
 
     # I2C port
     port = 1
     freq = 100000 # low rate to start (try x4 for max)
-    addr = None
+    addr = 60 # default is 0x3c = 60
 
     # command buffer
     cbuffer = bytearray(2)
@@ -467,8 +490,9 @@ class SSD1306_I2C(SSD1306):
     def port_open(self,test=True):
 
         # port
-        #self.port = I2C(self.port,scl=Pin(self.scl),sda=Pin(self.sda),freq=self.freq)
+        from machine import I2C
         self.port = I2C(scl=Pin(self.scl),sda=Pin(self.sda),freq=self.freq)
+        del I2C
 
         # scan for address
         for x in self.port.scan():
@@ -517,8 +541,6 @@ class SSD1306_I2C(SSD1306):
 
     def do_trees(self,unr180=True):
 
-        self.repl_disconnect()
-
         import ftree
 
         # un-rotate screen 180
@@ -526,8 +548,8 @@ class SSD1306_I2C(SSD1306):
             self.unr180()
 
         ft = ftree.FTree()
-        ft.canvas_width = self.width
-        ft.canvas_height = self.height
+        ft.canvas_width = _width
+        ft.canvas_height = _height
 
         try:
 
@@ -561,19 +583,6 @@ class SSD1306_I2C(SSD1306):
         if unr180:
             self.r180()        
 
-    #-----------------------
-    # REPL
-    #-----------------------
-
-    def repl_connect(self):
-        self.repl_disconnect()
-        self.stream = STREAM(self)
-        os.dupterm(self.stream)
-
-    def repl_disconnect(self):
-        os.dupterm(None)
-        self.stream = None
-
 #-----------------------
 # SPI option
 #-----------------------
@@ -583,7 +592,7 @@ class SSD1306_I2C(SSD1306):
 ##class SSD1306_SPI(SSD1306):
 ##
 ##    ### UNTESTED ###
-##    # this was broght over from another clayton library
+##    # this was brought over from another clayton library
 ##
 ##    global SPI
 ##    from machine import SPI
@@ -680,106 +689,5 @@ class SSD1306_I2C(SSD1306):
 ##        self.CS.value(1)
 
 #-----------------------
-# IO stream class
-#-----------------------
-
-class STREAM(io.IOBase):
-
-    # base = https://github.com/micropython/micropython/blob/master/examples/bluetooth/ble_uart_repl.py
-
-    line = []
-
-    def __init__(self,device):
-        self.device = device
-
-    def _on_rx(self):
-        # for ESP32
-        if hasattr(os,'dupterm_notify'):
-            os.dupterm_notify(None)
-
-    def read(self,sz=None):
-        print('1306 STREAM READ:',[sz])
-        return b''
-        ##return self._uart.read(sz)
-
-    def readinto(self,buffer):
-        print('1306 STREAM READINTO:',[len(buffer)])
-        return None
-        ##avail = self._uart.read(len(buf))
-        ##if not avail:
-        ##    return None
-        ##for i in range(len(avail)):
-        ##    buf[i] = avail[i]
-        ##return len(avail)
-
-    def ioctl(self,op,arg):
-        print('1306 STREAM IOCTL:',[op,arg])
-        return 0
-        ##if op == _MP_STREAM_POLL:
-        ##    if self._uart.any():
-        ##        return _MP_STREAM_POLL_RD
-        ##return 0
-
-    def _flush(self):
-        print('1306 STREAM FLUSH')
-        pass
-        ##data = self._tx_buf[0:100]
-        ##self._tx_buf = self._tx_buf[100:]
-        ##self._uart.write(data)
-        ##if self._tx_buf:
-        ##    schedule_in(self._flush, 50)
-
-    def write(self,buffer):
-
-        try:
-
-            text = buffer.decode('ascii')
-            wrapped = False
-
-            for c in text:
-                
-                while len(self.line) >= 20:
-                    self.writeit(''.join(self.line[:20]))
-                    self.line = self.line[20:]
-                    self.device.frame_scroll()
-                    wrapped = True
-
-                if c in '\r\n':
-                    if self.line and not wrapped:
-                        self.writeit(''.join(self.line))
-                        self.line = []
-                        self.device.frame_scroll()
-                    
-                else:
-                    self.line.append(c)
-
-                self.wrapped = False
-
-            while len(self.line) > 20:
-                self.writeit(''.join(self.line[:20]))
-                self.line = self.line[20:]
-                self.device.frame_scroll()
-
-            self.writeit(''.join(self.line))
-
-        except Exception as e:
-            sys.print_exception(e)
-
-        return len(buffer)
-
-        # causes print-to-screen loop: print('1306 STREAM WRITE:',[buffer])       
-        ##empty = not self._tx_buf
-        ##self._tx_buf += buf
-        ##if empty:
-        ##    schedule_in(self._flush, 50)
-
-    def writeit(self,text):
-        self.device.page_clear(self.device.pages)
-        self.device.place_text(text,1,self.device.height-7,1,0,0)
-        self.device.frame_show()
-
-#-----------------------
 # end
 #-----------------------
-
-
