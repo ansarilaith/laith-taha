@@ -27,6 +27,7 @@ server_edpw = 'youreditorpassword'
 import time
 import os
 import sys
+from machine import Pin
 
 # hardware
 from wlan import STA
@@ -62,6 +63,11 @@ sdcard.sck  = 14 # default slot 3
 sdcard.mosi = 13 # default slot 3
 sdcard.miso = 12 # default slot 3
 
+# hard reset
+def reset():
+    p = Pin(15,Pin.OUT,value=0)
+    p.value(0)
+
 #-------------------------------
 # create server with application
 #-------------------------------
@@ -71,6 +77,7 @@ class SERVER(MicroServer):
     # server variables
     htdocs = '/sd/htdocs'
     do_cache = False
+    poll_timeout = 2
     edpw = 'okay'
 
     # guest data
@@ -141,14 +148,20 @@ class SERVER(MicroServer):
                 guestfile2 = self.guestfile+'.temp'
 
                 # make a backup
+                t1 = time.ticks_ms()
+                print('GUEST BACKUP:',end=' ')
                 with open(self.guestfile) as f1:
                     with open(guestfile2,'w') as f2:
                         for guest in f1:
                             f2.write(guest)
                         f2.close()
                     f1.close()
+                print('DONE',time.ticks_diff(time.ticks_ms(),t1))
 
                 # make modified version from backup
+                t1 = time.ticks_ms()
+                print('GUEST UPDATE:',end=' ')
+                guestcount = 0
                 with open(guestfile2) as f1:
                     with open(self.guestfile,'w') as f2:
                         for guest in f1:
@@ -158,12 +171,18 @@ class SERVER(MicroServer):
                                     if delete:
                                         continue
                                     guest = data
+                                guestcount += 1
+                                guest[0] = str(guestcount)
                                 f2.write('{}|{}|{}|{}|{}|{}\n'.format(*guest))
                         f2.close()
                     f1.close()
+                print('DONE',time.ticks_diff(time.ticks_ms(),t1))
 
                 # reload
+                t1 = time.ticks_ms()
+                print('GUEST RELOAD:',end=' ')
                 self.guestreader()
+                print('DONE',time.ticks_diff(time.ticks_ms(),t1))
 
             # done
             return data[0]
@@ -171,7 +190,7 @@ class SERVER(MicroServer):
         except Exception as e:
             sys.print_exception(e)
             print('FILE WRITE ERROR:',self.guestfile)
-            return 0
+            return '0'
 
     # shortcut for application
     def make_response(self,content='Hello World',codestring='200 OK',content_type='text/plain'):
@@ -305,15 +324,19 @@ class SERVER(MicroServer):
                 # save function
                 if save == '1' and line:
                     line2 = self.guestwrite((line,date,name,home,mesg,resp),delete=delete)
-                    if delete:
-                        status = ' DELETE:{}'.format(line2)
+                    if line != line2:
+                        status = ' <span class="r">ERROR:{}<span>'.format((line,line2))
                     else:
-                        status = ' SAVED:{}'.format(line2)
+                        if delete:
+                            status = ' <span class="o">DELETE:{}</span>'.format(line2)
+                        else:
+                            status = ' <span class="g">SAVED:{}</span>'.format(line2)
+                        save,line,date,name,home,mesg,resp = '','','','','','',''
 
                 # data lookup
                 if line and not name:
                      line,date,name,home,mesg,resp = self.guestreader(line)
-                     status += ' LOOKUP:{}'.format(line)
+                     status += ' <span class="g">LOOKUP:{}</span>'.format(line)
 
                 # html form page
                 # keep small, work in blocks to save memory
@@ -341,15 +364,11 @@ border: solid silver 1px;
 margin: 8px auto;
 padding: 8px;
 }
-td.c1 {
-color:#FFA150;
-}
-td.c2 {
-color:#82D182;
-}
-span.o {
-color:#FFA150;
-}
+td.c1 {color: #FFA150}
+td.c2 {color: #82D182}
+span.r {color: #FF3333}
+span.o {color: #FFA150}
+span.g {color: #82D182}
 </style>
 </head>
 <body>
@@ -382,8 +401,8 @@ Line: <input type="text" name="line" maxlength="4" size="4" value="{}"> <input t
 <input type="hidden" id="date" name="date" value="{}" />
 <table>
 <tr><td>Line:</td><td class="c1">{}</td></tr>
-<tr><td>Date:</td><td class="c2">{}</td></tr>
-<tr><td>Name:</td><td><input type="text" name="name" maxlength="15" size="15" value="{}"></td></tr>
+<tr><td>Date:</td><td><input type="text" name="date" maxlength="10" size="10" value="{}"></td></tr>
+<tr><td>Name:</td><td><input type="text" name="name" maxlength="30" size="30" value="{}"></td></tr>
 <tr><td>Home:</td><td><input type="text" name="home" maxlength="30" size="30" value="{}"></td></tr>
 <tr><td>Mesg:</td><td><input type="text" name="mesg" maxlength="60" size="60" value="{}"></td></tr>
 <tr><td>Resp:</td><td><input type="text" name="resp" maxlength="60" size="60" value="{}"></td></tr>
@@ -420,14 +439,13 @@ Line: <input type="text" name="line" maxlength="4" size="4" value="{}"> <input t
             yield self.make_response(content,content)        
 
 #-------------------------------
-# create eziot update thread
+# create dns+rtc update thread
 #-------------------------------
 
 class DNS():
 
     running = False
     kill = False
-    update_every = 600
     thread = None
 
     def start(self):
@@ -449,9 +467,13 @@ class DNS():
             eziot.api_key = eziot_api_key
             eziot.api_secret = eziot_api_secret
             self.running = True
+            lc = 0
             while 1:
+
                 if self.kill:
                     break
+
+                # dns update (1 loop == 10 mins)
                 dnsid = None
                 for x in range(10):
                     if self.kill:
@@ -462,10 +484,23 @@ class DNS():
                     except:
                         time.sleep_ms(1000)
                 print('EZIoT DNS:',dnsid == eziot_dnsid.upper())
-                for x in range(self.update_every):
+
+                # check clock
+                wifi.set_rtc(tries=10,only_if_needed=True)
+                print('EZIoT RTC:',wifi.dtstamp)
+
+                # force clock update (144 loops == 24 hours)
+                if lc >= 144:
+                    wifi.set_rtc(tries=10,only_if_needed=False)
+                    lc = 0
+
+                # loop time (600 secs == 10 mins)
+                for x in range(600):
                     if self.kill:
                         break
                     time.sleep_ms(1000)
+                lc += 1
+
         except Exception as e:
             sys.print_exception(e)
         self.running = False
@@ -512,19 +547,12 @@ def run():
                 time.sleep_ms(1000)
                 continue
 
-            # set clock (may fail)
-            for x in range(10):
-                try:
-                    assert wlan.set_rtc()
-                    break
-                except:
-                    pass
-
-            # eziot dns
+            # eziot dns+rtc update thread
             if not dns.running:
                 dns.start()
 
             # start server
+            # loop stops here until failure
             server.serve()
 
             # cascade KeyboardInterrupt
