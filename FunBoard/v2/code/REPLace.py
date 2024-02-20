@@ -60,7 +60,8 @@ excludes = [
     'video',
     'examples',
     'example',
-
+    'venv'
+    
     ]
 
 # -----------------------
